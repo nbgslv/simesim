@@ -2,8 +2,16 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import {useEffect} from "react";
 
 const Home: NextPage = () => {
+  useEffect(() => {
+    fetch('/api/order')
+      .then(res => res.json())
+      .then(data => console.log(data))
+      .catch(err => console.log(err))
+  }, [])
+
   return (
     <div className={styles.container}>
       <Head>
