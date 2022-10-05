@@ -1,0 +1,12 @@
+$body-bg: #ffffff;
+$white: #ffffff;
+
+.navbar-light .navbar-brand {
+  width: 6.25rem;
+}
+
+.navbar-light .navbar-nav .nav-link {
+  color: #ffffff !important;
+}
+
+@import "~bootstrap/scss/bootstrap";

@@ -7,7 +7,7 @@ export default class KeepGoApi {
     private readonly authHeaders: Record<string, string>
 
     constructor(baseUrl: string, apiKey: string, accessToken: string) {
-        this.baseUrl = 'https://myaccount.keepgo.com/api/v2'
+        this.baseUrl = baseUrl
         this.apiKey = apiKey
         this.accessToken = accessToken
         this.authHeaders = {
