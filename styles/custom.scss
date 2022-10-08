@@ -1,6 +1,10 @@
 $body-bg: #ffffff;
 $white: #ffffff;
 
+.btn-outline-primary {
+  $bs-btn-color: #ffffff !important;
+}
+
 .navbar-light .navbar-brand {
   width: 6.25rem;
 }

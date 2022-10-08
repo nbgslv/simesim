@@ -30,3 +30,14 @@
 .actionButton {
     width: 45%;
 }
+
+.actionButtonSecondary {
+    width: 45%;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+    transition: border-color .2s;
+
+    &:hover {
+        border-color: map-get($theme-colors, 'secondary') !important;
+    }
+}

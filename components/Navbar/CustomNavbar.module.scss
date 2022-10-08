@@ -1,3 +1,9 @@
 .navbar {
   height: 4rem;
+  transition: all .6s;
+  opacity: .8;
+}
+
+.navLinkTextDark {
+  color: rgba(0, 0, 0, 0.5) !important;
 }

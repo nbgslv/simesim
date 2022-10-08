@@ -1,0 +1,90 @@
+@import "../../styles/variables.scss";
+
+.timelineItemOuter {
+  position: relative;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.timelineItemOuter::before {
+  content: '';
+  width: 12.5rem;
+  height: 12.5rem;
+  background-color: var(--timeline-bg-color);
+  display: block;
+  border-radius: 100%;
+  transition: background-color .3s;
+}
+
+.timelineItemInner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.timelineItemInner::before {
+  content: '';
+  width: 10rem;
+  height: 10rem;
+  display: block;
+  border-radius: 100%;
+  background-color: #ffffff;
+}
+
+.timelineItemText {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  padding: 15px 10px 10px 10px;
+  color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.timelineItemText h2, .timelineItemText p {
+  color: map-get($theme-colors, 'dark');
+}
+
+.timelineContent {
+  position: absolute;
+  top: 210px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--timeline-bg-color);
+  color: rgba(0, 0, 0, 0.5) !important;
+  padding: 5px 10px;
+  border-radius: 5px;
+  text-align: center;
+  transition: display .3s;
+  width: 100%;
+}
+
+.timelineContent::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background-color: var(--timeline-bg-color);
+  display: block;
+  position: absolute;
+  top: -8px;
+  margin-left: -2px;
+  left: 50%;
+  transform: rotate(-45deg) translateX(-50%);
+}
+
+.timelineItemOuter.active::before {
+  background-color: map-get($theme-colors, 'primary');
+}
+
+.timelineItemOuter.active .timelineContent {
+  color: #fff;
+  background-color: map-get($theme-colors, 'primary');
+}
+
+.timelineItemOuter.active .timelineContent::before {
+  background-color: map-get($theme-colors, 'primary');
+}

@@ -1,6 +1,16 @@
+@use "hover/hover";
+@use "~bootstrap/scss/bootstrap";
 @import "custom";
 
 * {
   font-family: 'Arimo', sans-serif;
   color: white;
+}
+
+#__next {
+    height: 400vh;
+}
+
+:root {
+  --timeline-bg-color: map-get($theme-colors, 'secondary');
 }

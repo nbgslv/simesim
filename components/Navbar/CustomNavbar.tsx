@@ -1,12 +1,37 @@
-import React from 'react';
+import React, {RefObject, useEffect, useRef} from 'react';
 import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import Image from "next/image";
-import logoImage from '../../public/logoWhite.png'
+import logoImageWhiteText from '../../public/logoWhite.png'
+import logoImageBlackText from '../../public/logo.png'
 import styles from './CustomNavbar.module.scss'
 
-const CustomNavbar = () => {
+const CustomNavbar = ({ background, height }: { background: string | null, height: string }) => {
+    const navbarRef: RefObject<HTMLElement> = useRef(null)
+
+    useEffect(() => {
+        if (navbarRef.current) {
+            const navLinks: HTMLCollectionOf<HTMLElement> = Array.from(navbarRef.current.querySelectorAll('a.nav-link')) as unknown as HTMLCollectionOf<HTMLElement>
+            if (background) {
+                navbarRef.current.classList.add(`bg-light`)
+                if (Array.isArray(navLinks) && navLinks.length) {
+                    navLinks.forEach((link: HTMLElement) => {
+                        link.setAttribute('style', 'color: rgba(0, 0, 0, .5) !important')
+                    })
+                }
+            } else {
+                navbarRef.current.classList.remove(`bg-light`)
+                if (Array.isArray(navLinks) && navLinks.length) {
+                    navLinks.forEach((link: HTMLElement) => {
+                        link.setAttribute('style', 'color: rgb(255, 255, 255) !important')
+                    })
+                }
+            }
+            navbarRef.current.style.height = height
+        }
+    }, [background, height])
+
     return (
-        <Navbar expand="lg" className={styles.navbar} sticky="top">
+        <Navbar expand="lg" className={styles.navbar} fixed="top" ref={navbarRef}>
             <Container>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
@@ -26,7 +51,7 @@ const CustomNavbar = () => {
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>
-                <Navbar.Brand href="#home"><Image src={logoImage} alt="Logo image" layout="fixed" width={70} height={35} /></Navbar.Brand>
+                <Navbar.Brand href="#home" className="d-flex justify-content-end" style={{ marginLeft: '0' }}><Image src={background ? logoImageBlackText : logoImageWhiteText} alt="Logo image" layout="fixed" width={70} height={35} /></Navbar.Brand>
             </Container>
         </Navbar>
     );
