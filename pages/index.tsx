@@ -1,28 +1,28 @@
 import type { NextPage } from 'next'
 import Header from "../components/Header/Header";
-import Timeline from "../components/Timeline/Timeline";
-import TimelineItem from "../components/Timeline/TimelineItem";
-import styles from "../styles/Home.module.scss";
 import React, {LegacyRef, useEffect, useRef, useState} from "react";
-import {useScroll, useTransform, motion} from "framer-motion";
-import checkoutIcon from "../public/mail-box.png";
-import qrCode from "../public/qrCode.png";
-import globalConnection from "../public/global-connection.png";
-import Image from "next/image";
+import {useScroll} from "framer-motion";
 import Section from "../components/Section/Section";
 import text from '../lib/content/text.json'
-import {homedir} from "os";
 import TimelineSection from "../components/Timeline/TimelineSection";
+import KeepGoApi from "../utils/api/sevices/keepGo/api";
+import {KeepGoResponse} from "../utils/api/sevices/keepGo/types";
+import { ErrorWithMessage } from "../utils/api/types";
+import CountrySearch from "../components/CountrySearch/CountrySearch";
 
-const Home: NextPage = () => {
+export default function Home({ countriesList }: { countriesList: string[] }): JSX.Element {
     const [timeLineInView, setTimeLineInView] = useState<boolean>(false);
+    const [orderWindowInView, setOrderWindowInView] = useState<boolean>(false);
     const timelineRef: LegacyRef<HTMLDivElement> = useRef(null)
     const { scrollYProgress: scrollYProgressTimeLine } = useScroll({
         target: timelineRef,
         offset: ['start center', 'end end']
     })
-    const { scrollYProgress } = useScroll()
-    const timelineProgressAnimation = useTransform(scrollYProgress, [0.5, 1], [0, 100])
+    const orderWindowRef: LegacyRef<HTMLDivElement> = useRef(null)
+    const { scrollYProgress: scrollYProgressOrderWindow } = useScroll({
+        target: orderWindowRef,
+        offset: ['start center', 'end end']
+    })
 
     useEffect(() => {
         scrollYProgressTimeLine.onChange((value) => {
@@ -32,16 +32,46 @@ const Home: NextPage = () => {
                 setTimeLineInView(false)
             }
         })
-    }, [scrollYProgressTimeLine, timelineProgressAnimation])
+    }, [scrollYProgressTimeLine])
+
+    useEffect(() => {
+        scrollYProgressOrderWindow.onChange((value) => {
+            if (value > 0.99) {
+                setTimeLineInView(false)
+                setOrderWindowInView(true)
+            } else {
+                setOrderWindowInView(false)
+            }
+        })
+    }, [scrollYProgressTimeLine])
 
   return (
     <>
         <Header />
         <Section title={text.home.timelineSectionTitle} sticky={timeLineInView} forwardRef={timelineRef} >
-            <TimelineSection inView={timeLineInView} />
+            <TimelineSection />
+        </Section>
+        <Section title={''} sticky={orderWindowInView} forwardRef={orderWindowRef}>
+            <CountrySearch countriesList={countriesList}  />
         </Section>
     </>
   )
 }
 
-export default Home
+export async function getStaticProps() {
+    const keepGoApi = new KeepGoApi(process.env.KEEPGO_BASE_URL, process.env.KEEPGO_API_KEY, process.env.KEEPGO_ACCESS_TOKEN);
+    const countriesList: KeepGoResponse | Error = await keepGoApi.getCountries();
+    if (countriesList instanceof Error) {
+        return {
+            props: {
+                countriesList: []
+            }
+        }
+    }
+
+    return {
+        props: {
+            countriesList: countriesList.countries
+        }
+    }
+}

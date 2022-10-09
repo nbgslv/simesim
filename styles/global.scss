@@ -14,3 +14,7 @@
 :root {
   --timeline-bg-color: map-get($theme-colors, 'secondary');
 }
+
+.auto-complete-input {
+  color: black;
+}
