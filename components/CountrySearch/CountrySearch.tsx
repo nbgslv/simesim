@@ -10,7 +10,7 @@ type Country = {
     iso2?: string
 }
 
-const CountrySearch = ({ countriesList }: { countriesList: string[] }) => {
+const CountrySearch = ({ countriesList, onSelect }: { countriesList: { [key: string]: string }, onSelect: (country: string) => void }) => {
     const [query, setQuery] = useState<string>('');
     const [items, setItems] = useState<Country[]>([]);
     const [filteredItems, setFilteredItems] = useState<Country[]>([]);
@@ -50,12 +50,14 @@ const CountrySearch = ({ countriesList }: { countriesList: string[] }) => {
         setItemSelected(item)
         setFilteredItems([])
         mainInputRef.current?.blur()
+        onSelect(item.name)
     }
 
     const handleCancel = () => {
         setItemSelected(null)
         setFilteredItems([])
         setQuery('')
+        onSelect('')
     }
 
     return (

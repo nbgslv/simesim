@@ -28,7 +28,7 @@ enum BundleStatus {
     EXPIRED = 3,
 }
 
-type Bundle = {
+export type Bundle = {
     id: number,
     typeId: number,
     name: string,
@@ -72,10 +72,10 @@ type LineDetails = Omit<Line, 'expiredAt'> & {
 
 type Refill = {
     title: string,
-    amountMb: number,
-    amountDays: number,
-    priceUsd: number,
-    priceEur: number
+    amount_mb: number,
+    amount_days: number,
+    price_usd: number,
+    price_eur: number
 }
 
 type Transaction = {
@@ -104,10 +104,10 @@ export type KeepGoResponse = Partial<Pagination> & {
     available_refills?: [Refill]
     transactions?: Transactions
     products_types?: [string]
-    bundles?: [Bundle]
-    bundle: [Bundle]
+    bundles?: Bundle[]
+    bundle: Bundle[]
     network_providers?: [string]
-    countries?: [string]
+    countries?: { [key: string]: string }[]
     regions?: [string]
     data: [string]
 }
