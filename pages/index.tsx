@@ -1,6 +1,5 @@
 import Header from "../components/Header/Header";
-import React, {LegacyRef, useEffect, useRef, useState} from "react";
-import {useScroll} from "framer-motion";
+import React, {useState} from "react";
 import Section from "../components/Section/Section";
 import text from '../lib/content/text.json'
 import TimelineSection from "../components/Timeline/TimelineSection";
@@ -8,67 +7,44 @@ import KeepGoApi from "../utils/api/sevices/keepGo/api";
 import {Bundle, KeepGoResponse} from "../utils/api/sevices/keepGo/types";
 import CountrySearch from "../components/CountrySearch/CountrySearch";
 import BundleCard from "../components/Bundles/BundleCard";
+import Controller from "../components/ScrollMagic/Controller";
+import Scene from "../components/ScrollMagic/Scene";
 
-export default function Home({ countriesList, bundlesList }: { countriesList: { [key: string]: string }, bundlesList: Bundle[] }): JSX.Element {
-    const [timeLineInView, setTimeLineInView] = useState<boolean>(false);
-    const [orderWindowInView, setOrderWindowInView] = useState<boolean>(false);
+type HomeProps = {
+    countriesList: { [key: string]: string },
+    bundlesList: Bundle[]
+}
+
+export default function Home({ countriesList, bundlesList }: HomeProps): JSX.Element {
     const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-    const timelineRef: LegacyRef<HTMLDivElement> = useRef(null)
-    const { scrollYProgress: scrollYProgressTimeLine } = useScroll({
-        target: timelineRef,
-        offset: ['start center', 'end end']
-    })
-    const orderWindowRef: LegacyRef<HTMLDivElement> = useRef(null)
-    const { scrollYProgress: scrollYProgressOrderWindow } = useScroll({
-        target: orderWindowRef,
-        offset: ['start center', 'end end']
-    })
-
-    useEffect(() => {
-        scrollYProgressTimeLine.onChange((value) => {
-            if (value > 0.99) {
-                setTimeLineInView(true)
-            } else {
-                setTimeLineInView(false)
-            }
-        })
-    }, [scrollYProgressTimeLine])
-
-    useEffect(() => {
-        scrollYProgressOrderWindow.onChange((value) => {
-            if (value > 0.99) {
-                setTimeLineInView(false)
-                setOrderWindowInView(true)
-            } else {
-                setOrderWindowInView(false)
-            }
-        })
-    }, [scrollYProgressTimeLine])
 
     const handleCountrySelect = (country: string) => {
         setSelectedCountry(country)
     }
 
-
     return (
-    <>
+    <Controller>
         <Header />
-        <Section title={text.home.timelineSectionTitle} sticky={timeLineInView} forwardRef={timelineRef} >
-            <TimelineSection />
-        </Section>
-        <Section title={''} sticky={orderWindowInView} forwardRef={orderWindowRef}>
-            <CountrySearch countriesList={countriesList} onSelect={handleCountrySelect} />
-            <div className="d-flex flex-row justify-content-between">
-                {
-                    selectedCountry ? bundlesList.filter((bundle) => bundle.coverage.includes(selectedCountry)).map((bundle) => {
-                        return (
-                            <BundleCard key={bundle.id} title={''} description={''} bundle={bundle} />
-                        )
-                    }) : null
-                }
-            </div>
-        </Section>
-    </>
+        <Scene duration={6000}>
+            <Section title={text.home.timelineSectionTitle} id="timeline-section">
+                <TimelineSection />
+            </Section>
+        </Scene>
+        <Scene duration={4000}>
+            <Section title={''} id="bundles-section">
+                <CountrySearch countriesList={countriesList} onSelect={handleCountrySelect} />
+                <div className="d-flex flex-row justify-content-between">
+                    {
+                        selectedCountry ? bundlesList.filter((bundle) => bundle.coverage.includes(selectedCountry)).map((bundle) => {
+                            return (
+                                <BundleCard key={bundle.id} title={''} description={''} bundle={bundle} />
+                            )
+                        }) : null
+                    }
+                </div>
+            </Section>
+        </Scene>
+    </Controller>
   )
 }
 

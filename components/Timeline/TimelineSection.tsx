@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Timeline from "./Timeline";
 import {motion, useScroll, useTransform} from "framer-motion";
 import TimelineItem from "./TimelineItem";
@@ -15,18 +15,22 @@ const TimelineSection = () => {
     const [timelineTwoBackground, setTimelineTwoBackground] = useState<string>('#4502c6');
     const [timelineThreeBackground, setTimelineThreeBackground] = useState<string>('#4502c6');
     const { scrollYProgress } = useScroll()
-    const timelineOneAnimation = useTransform(scrollYProgress, [0, 0.5, 0.7], [1, 1, 1.3])
-    const timelineOneBgAnimation = useTransform(scrollYProgress, [0, 0.5, 0.7], ['#4502c6', '#4502c6', '#ff3904'])
-    const timelineOneTooltipAnimation = useTransform(scrollYProgress, [0, 0.5, 0.7], [0, 0, 1])
-    const timelineTwoAnimation = useTransform(scrollYProgress, [0.7, 0.9], [1, 1.3])
-    const timelineTwoBgAnimation = useTransform(scrollYProgress, [0.7, 0.9], ['#4502c6', '#ff3904'])
-    const timelineTwoTooltipAnimation = useTransform(scrollYProgress, [0.7, 0.9], [0, 1])
-    const timelineThreeAnimation = useTransform(scrollYProgress, [0.9, 1], [1, 1.3])
-    const timelineThreeBgAnimation = useTransform(scrollYProgress, [0.9, 1], ['#4502c6', '#ff3904'])
-    const timelineThreeTooltipAnimation = useTransform(scrollYProgress, [0.9, 1], [0, 1])
-    const timelineProgressAnimation = useTransform(scrollYProgress, [0.5, 1], [0, 100])
+    const containerRef = useRef<HTMLDivElement>(null)
+    const timelineOneAnimation = useTransform(scrollYProgress, [0, 0.06, 0.2], [1, 1, 1.3])
+    const timelineOneBgAnimation = useTransform(scrollYProgress, [0, 0.06, 0.2], ['#4502c6', '#4502c6', '#ff3904'])
+    const timelineOneTooltipAnimation = useTransform(scrollYProgress, [0, 0.06, 0.2], [0, 0, 1])
+    const timelineTwoAnimation = useTransform(scrollYProgress, [0.2, 0.4], [1, 1.3])
+    const timelineTwoBgAnimation = useTransform(scrollYProgress, [0.2, 0.4], ['#4502c6', '#ff3904'])
+    const timelineTwoTooltipAnimation = useTransform(scrollYProgress, [0.2, 0.4], [0, 1])
+    const timelineThreeAnimation = useTransform(scrollYProgress, [0.4, 0.6], [1, 1.3])
+    const timelineThreeBgAnimation = useTransform(scrollYProgress, [0.4, 0.6], ['#4502c6', '#ff3904'])
+    const timelineThreeTooltipAnimation = useTransform(scrollYProgress, [0.4, 0.6], [0, 1])
+    const timelineProgressAnimation = useTransform(scrollYProgress, [0.06, 0.6], [0, 100])
 
     useEffect(() => {
+        scrollYProgress.onChange((value) => {
+            console.log(value)
+        })
         timelineProgressAnimation.onChange((value) => {
             setTimelineProgress(value)
         })
@@ -42,7 +46,7 @@ const TimelineSection = () => {
     }, [timelineProgressAnimation])
 
     return (
-        <div className={`${styles.timelineWrapper} d-flex flex-column justify-content-center`}>
+        <div className={`${styles.timelineWrapper} d-flex flex-column justify-content-center`} ref={containerRef}>
             <Timeline progress={timelineProgress}>
                 <motion.div style={{ scale: timelineOneAnimation }}>
                     <TimelineItem tooltipScale={timelineOneTooltipAnimation} bgColor={timelineOneBackground} tooltipText={text.home.stepOneContentText}>

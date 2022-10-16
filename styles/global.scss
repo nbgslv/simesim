@@ -7,14 +7,18 @@
   color: white;
 }
 
-#__next {
-    height: 400vh;
-}
-
 :root {
   --timeline-bg-color: map-get($theme-colors, 'secondary');
 }
 
+#__next {
+    height: 100vh;
+}
+
 .auto-complete-input {
   color: black;
+}
+
+.pin-space {
+  padding-bottom: 300px;
 }
