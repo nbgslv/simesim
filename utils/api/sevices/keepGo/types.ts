@@ -70,7 +70,7 @@ type LineDetails = Omit<Line, 'expiredAt'> & {
     autoRefillList: [Refill],
 }
 
-type Refill = {
+export type Refill = {
     title: string,
     amount_mb: number,
     amount_days: number,

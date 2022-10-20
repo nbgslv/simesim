@@ -8,6 +8,7 @@ import styles from './TimelineSection.module.scss'
 import checkoutIcon from "../../public/mail-box.png";
 import qrCode from "../../public/qrCode.png";
 import globalConnection from "../../public/global-connection.png";
+import Section from "../Section/Section";
 
 const TimelineSection = () => {
     const [timelineProgress, setTimelineProgress] = useState<number>(0);
@@ -46,28 +47,30 @@ const TimelineSection = () => {
     }, [timelineProgressAnimation])
 
     return (
-        <div className={`${styles.timelineWrapper} d-flex flex-column justify-content-center`} ref={containerRef}>
-            <Timeline progress={timelineProgress}>
-                <motion.div style={{ scale: timelineOneAnimation }}>
-                    <TimelineItem tooltipScale={timelineOneTooltipAnimation} bgColor={timelineOneBackground} tooltipText={text.home.stepOneContentText}>
-                        <h2>{text.home.stepOneText}</h2>
-                        <Image src={checkoutIcon} width={92} height={92} className="mr-auto ml-auto" alt="shopping bag" />
-                    </TimelineItem>
-                </motion.div>
-                <motion.div style={{ scale: timelineTwoAnimation }}>
-                    <TimelineItem tooltipScale={timelineTwoTooltipAnimation} bgColor={timelineTwoBackground} tooltipText={text.home.stepTwoContentText}>
-                        <h2>{text.home.stepTwoText}</h2>
-                        <Image src={qrCode} width={92} height={92} alt="qr code" />
-                    </TimelineItem>
-                </motion.div>
-                <motion.div style={{ scale: timelineThreeAnimation }}>
-                    <TimelineItem tooltipScale={timelineThreeTooltipAnimation} bgColor={timelineThreeBackground} tooltipText={text.home.stepThreeContentText}>
-                        <h2>{text.home.stepThreeText}</h2>
-                        <Image src={globalConnection} width={92} height={92} alt="e-sim icon" />
-                    </TimelineItem>
-                </motion.div>
-            </Timeline>
-        </div>
+        <Section title={text.home.timelineSectionTitle} id="timeline-section" className={styles.timelineSection}>
+            <div className={`${styles.timelineWrapper} d-flex flex-column justify-content-center`} ref={containerRef}>
+                <Timeline progress={timelineProgress}>
+                    <motion.div style={{ scale: timelineOneAnimation }}>
+                        <TimelineItem tooltipScale={timelineOneTooltipAnimation} bgColor={timelineOneBackground} tooltipText={text.home.stepOneContentText}>
+                            <h2>{text.home.stepOneText}</h2>
+                            <Image src={checkoutIcon} width={92} height={92} className="mr-auto ml-auto" alt="shopping bag" />
+                        </TimelineItem>
+                    </motion.div>
+                    <motion.div style={{ scale: timelineTwoAnimation }}>
+                        <TimelineItem tooltipScale={timelineTwoTooltipAnimation} bgColor={timelineTwoBackground} tooltipText={text.home.stepTwoContentText}>
+                            <h2>{text.home.stepTwoText}</h2>
+                            <Image src={qrCode} width={92} height={92} alt="qr code" />
+                        </TimelineItem>
+                    </motion.div>
+                    <motion.div style={{ scale: timelineThreeAnimation }}>
+                        <TimelineItem tooltipScale={timelineThreeTooltipAnimation} bgColor={timelineThreeBackground} tooltipText={text.home.stepThreeContentText}>
+                            <h2>{text.home.stepThreeText}</h2>
+                            <Image src={globalConnection} width={92} height={92} alt="e-sim icon" />
+                        </TimelineItem>
+                    </motion.div>
+                </Timeline>
+            </div>
+        </Section>
     );
 };
 

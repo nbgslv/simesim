@@ -1,0 +1,26 @@
+@import "styles/variables";
+
+.bundlesSection {
+  background-color: map-get($theme-colors, "warning");
+  height: 100vh;
+}
+
+.row {
+  height: 100%;
+}
+
+.bundlesSearch {
+  height: 100%;
+}
+
+.firstStepContainer {
+  height: 55%;
+}
+
+.infoPlate {
+  background-color: map-get($theme-colors, 'blue');
+  color: $text-dark;
+  border-radius: 0.5rem;
+  text-align: center;
+  vertical-align: center;
+}

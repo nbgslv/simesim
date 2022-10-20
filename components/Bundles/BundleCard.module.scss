@@ -1,0 +1,31 @@
+@import "../../styles/variables";
+
+.bundleCardMain {
+  background-color: map-get($theme-colors, "pink");
+  width: 100%;
+}
+
+.bundleCardTitle {
+  color: $text-dark;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.bundleCardText {
+  color: $text-dark;
+  font-size: 0.9rem;
+}
+
+.bundleCardListItem {
+  background-color: map-get($theme-colors, "pink");
+  font-size: 0.875rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: map-get($theme-colors, "blue");
+  }
+}
+
+.bundleCardListItemActive {
+    background-color: map-get($theme-colors, "blue");
+}

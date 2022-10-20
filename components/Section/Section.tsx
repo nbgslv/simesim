@@ -6,18 +6,22 @@ type SectionProps = {
     children: JSX.Element[] | JSX.Element | null,
     title?: string,
     id: string
+    className?: string
 }
 
-const Section = ({ children, title, id }: SectionProps) => {
+const Section = ({ children, title, id, className }: SectionProps) => {
   return (
-      <Container
-          as="section"
-          className={styles.section}
-          id={id}
-      >
-          {title && <h1 className={`${styles.sectionTitle} text-center mb-4`}>{title}</h1>}
-          {children}
-      </Container>
+      <div className={className}>
+          <Container
+              as="section"
+              className={styles.section}
+              id={id}
+          >
+              {title && <h1 className={`${styles.sectionTitle} text-center mb-4`}>{title}</h1>}
+              {children}
+          </Container>
+      </div>
+
   )
 };
 

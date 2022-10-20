@@ -9,6 +9,7 @@ type SceneProps = {
     pushFollowers?: boolean,
     spacerClass?: string,
     triggerHook?: TriggerHook,
+    triggerElement?: string
 }
 
 const Scene = (
@@ -19,7 +20,8 @@ const Scene = (
         offset = 0,
         pushFollowers = true,
         spacerClass,
-        triggerHook = 0
+        triggerHook = 0,
+        triggerElement
     }: SceneProps
 ) => {
     const [scene, setScene] = React.useState<ScrollMagic.Scene | null>(null);
@@ -30,11 +32,10 @@ const Scene = (
             const ScrollMagic = (await import('scrollmagic')).default;
             if (controller && containerRef?.current && !scene) {
                 const newScene = new ScrollMagic.Scene({
-                    triggerElement: containerRef.current,
+                    triggerElement: triggerElement || containerRef.current,
                     duration,
                     offset,
-                    triggerHook,
-                    loglevel: 3
+                    triggerHook
                 })
                     .setPin(containerRef.current, { pushFollowers, spacerClass } as PinSettings)
                     .addTo(controller);
