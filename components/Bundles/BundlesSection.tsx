@@ -1,16 +1,12 @@
 import React, {useState} from 'react';
 import Section from "../Section/Section";
 import CountrySearch, {Country} from "../CountrySearch/CountrySearch";
-import BundleCard from "./BundleCard";
 import {Bundle, Refill} from "../../utils/api/sevices/keepGo/types";
 import styles from './BundlesSection.module.scss';
 import {Row, Col, Button} from "react-bootstrap";
 import * as travelImageData from '../../public/travel.json';
 import Lottie from "react-lottie";
 import {AnimatePresence, motion} from "framer-motion";
-import CloseIcon from "../../public/close.svg";
-import text from "../../lib/content/text.json";
-import Image from "next/image";
 import BundlesScroll from "./BundlesScroll";
 
 const BundlesSection = ({ countriesList, bundlesList }: { countriesList: { [key: string]: string }, bundlesList: Bundle[] }) => {

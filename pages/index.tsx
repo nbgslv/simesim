@@ -16,10 +16,10 @@ export default function Home({ countriesList, bundlesList }: HomeProps): JSX.Ele
     return (
     <Controller>
         <Header />
-        <Scene duration={6000}>
+        <Scene duration={4000}>
             <TimelineSection />
         </Scene>
-        <Scene duration={4000}>
+        <Scene duration={0}>
             <BundlesSection countriesList={countriesList} bundlesList={bundlesList} />
         </Scene>
     </Controller>

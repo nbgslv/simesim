@@ -1,10 +1,9 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import lookup from 'country-code-lookup';
 import styles from './CountrySearch.module.scss';
 import CloseIcon from '../../public/close.svg';
 import Image from "next/image";
 import { motion } from 'framer-motion';
-import {Button} from "react-bootstrap";
 import text from '../../lib/content/text.json'
 
 export type Country = {
@@ -106,9 +105,11 @@ const CountrySearch = ({ countriesList, onSelect }: { countriesList: { [key: str
                     {
                         filteredItems.map((item) => {
                             return (
-                                <div onClick={() => handleSelect(item)} role="option" key={item.id} className={`${styles.item}`}>
-                                    {item.iso2 ? <img src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${item.iso2.toUpperCase()}.svg`} width="40px" alt={item.name} /> : <span style={{ width: '100px' }}></span>}
-                                    <span className={`${styles.itemName}`}>{item.name}</span>
+                                <div onClick={() => handleSelect(item)} role="option" key={item.id} className={`${styles.item} d-flex`}>
+                                    <div style={{ width: '30px', height: '30px', position: 'relative' }}>
+                                        {item.iso2 ? <Image src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${item.iso2.toUpperCase()}.svg`} layout="intrinsic" width="30px" height="30px" alt={item.name} /> : null}
+                                    </div>
+                                    <div className={`${styles.itemName}`}>{item.name}</div>
                                 </div>
                             )
                         })
