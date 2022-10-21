@@ -29,9 +29,6 @@ const TimelineSection = () => {
     const timelineProgressAnimation = useTransform(scrollYProgress, [0.06, 0.6], [0, 100])
 
     useEffect(() => {
-        scrollYProgress.onChange((value) => {
-            console.log(value)
-        })
         timelineProgressAnimation.onChange((value) => {
             setTimelineProgress(value)
         })

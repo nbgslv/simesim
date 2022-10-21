@@ -6,6 +6,8 @@ import {Bundle, KeepGoResponse} from "../utils/api/sevices/keepGo/types";
 import Controller from "../components/ScrollMagic/Controller";
 import Scene from "../components/ScrollMagic/Scene";
 import BundlesSection from "../components/Bundles/BundlesSection";
+import QnaSection from "../components/QnA/QnaSection";
+import ScrollController from "../components/ScrollController/ScrollController";
 
 type HomeProps = {
     countriesList: { [key: string]: string },
@@ -14,15 +16,28 @@ type HomeProps = {
 
 export default function Home({ countriesList, bundlesList }: HomeProps): JSX.Element {
     return (
-    <Controller>
-        <Header />
-        <Scene duration={4000}>
-            <TimelineSection />
-        </Scene>
-        <Scene duration={0}>
-            <BundlesSection countriesList={countriesList} bundlesList={bundlesList} />
-        </Scene>
-    </Controller>
+
+            <Controller>
+                <Header />
+                <ScrollController>
+                    <Scene
+                        id="timeline-section"
+                        duration={4000}
+                        scrollSettings={{
+                            enable: false
+                        }}
+                    >
+                        <TimelineSection />
+                    </Scene>
+                    <Scene id="bundles-section" duration={0} pin={false}>
+                        <BundlesSection countriesList={countriesList} bundlesList={bundlesList} />
+                    </Scene>
+                    <Scene id="qna-section" duration={0} pin={false}>
+                        <QnaSection />
+                    </Scene>
+                </ScrollController>
+            </Controller>
+
   )
 }
 

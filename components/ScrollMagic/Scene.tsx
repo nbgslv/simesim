@@ -1,7 +1,9 @@
-import React, {useEffect} from 'react';
+import React, {MutableRefObject, useEffect} from 'react';
 import {PinSettings, TriggerHook} from "scrollmagic";
+import Scroll from 'react-scroll';
 
 type SceneProps = {
+    id: string,
     children: JSX.Element[] | JSX.Element | null,
     controller?: ScrollMagic.Controller | null,
     duration: number,
@@ -9,11 +11,27 @@ type SceneProps = {
     pushFollowers?: boolean,
     spacerClass?: string,
     triggerHook?: TriggerHook,
-    triggerElement?: string
+    triggerElement?: string,
+    pin?: boolean,
+    sectionRef?: MutableRefObject<any>,
+    scrollSettings?: ScrollSettings
 }
+
+export type ScrollSettings = {
+    enable?: boolean;
+    offset?: number;
+}
+
+const defaultScrollSettings: ScrollSettings = {
+    enable: true,
+    offset: 0
+}
+
+const ScrollElement = Scroll.Element;
 
 const Scene = (
     {
+        id,
         children,
         controller,
         duration,
@@ -21,23 +39,25 @@ const Scene = (
         pushFollowers = true,
         spacerClass,
         triggerHook = 0,
-        triggerElement
+        triggerElement,
+        pin = true,
+        sectionRef,
+        scrollSettings = defaultScrollSettings
     }: SceneProps
 ) => {
     const [scene, setScene] = React.useState<ScrollMagic.Scene | null>(null);
-    const containerRef = React.useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         (async () => {
             const ScrollMagic = (await import('scrollmagic')).default;
-            if (controller && containerRef?.current && !scene) {
+            if (controller && sectionRef?.current && !scene && pin) {
                 const newScene = new ScrollMagic.Scene({
-                    triggerElement: triggerElement || containerRef.current,
+                    triggerElement: triggerElement || sectionRef.current,
                     duration,
                     offset,
                     triggerHook
                 })
-                    .setPin(containerRef.current, { pushFollowers, spacerClass } as PinSettings)
+                    .setPin(sectionRef.current, { pushFollowers, spacerClass } as PinSettings)
                     .addTo(controller);
                 setScene(newScene);
             }
@@ -46,12 +66,18 @@ const Scene = (
         return () => {
             scene?.destroy();
         }
-    }, [controller, containerRef, duration, offset]);
+    }, [controller, sectionRef, duration, offset]);
+
+    useEffect(() => {
+        if (scene) {
+            scene.enabled(pin);
+        }
+    }, [pin]);
 
     return (
-        <div ref={containerRef}>
+        <ScrollElement ref={sectionRef} name={id} id={id}>
             {children}
-        </div>
+        </ScrollElement>
     );
 };
 

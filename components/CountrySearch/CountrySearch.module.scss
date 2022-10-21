@@ -10,9 +10,9 @@
 }
 
 .mainInput {
+  background-color: map-get($theme-colors, "light");
   color: $text-dark;
   position: relative;
-  background: transparent;
   outline: 2px solid transparent;
   outline-offset: 2px;
   padding: 0.5rem;
@@ -27,8 +27,10 @@
 }
 
 .listBox {
+  background-color: map-get($theme-colors, "light");
+  margin-top: 0.5rem;
   width: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.7);
+  border: 3px solid map-get($theme-colors, 'blue');
   border-radius: 0.5rem;
 }
 

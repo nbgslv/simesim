@@ -1,10 +1,15 @@
 @use "hover/hover";
 @use "~bootstrap/scss/bootstrap";
 @import "custom";
+@import "sections";
 
 * {
   font-family: 'Arimo', sans-serif;
   color: white;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 :root {
