@@ -3,7 +3,6 @@ import React, {useEffect} from 'react';
 const Controller = ({ children }: { children: JSX.Element[] | JSX.Element }) => {
     const [controller, setController] = React.useState<ScrollMagic.Controller | null>(null);
 
-
     useEffect(() => {
         (async () => {
             const ScrollMagic = (await import('scrollmagic')).default;
