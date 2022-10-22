@@ -1,6 +1,10 @@
 @import "./variables.scss";
 
 #qna-section {
+  & .accordion-item {
+    border: none;
+  }
+
   & .accordion-header {
     & .accordion-button {
       background-color: map-get($theme-colors, "blue");
@@ -17,14 +21,18 @@
         color: #ffffff;
 
         &::after {
+          position: absolute;
+          left: 0.375rem;
           margin-right: 0.375rem;
-          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+          background-image: url("data:image/svg+xml,%3Csvg width='24px' height='24px' viewBox='0 0 24 24' role='img' xmlns='http://www.w3.org/2000/svg' aria-labelledby='plusIconTitle' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='%23ffffff' color='%23ffffff'%3E%3Ctitle id='plusIconTitle'%3EPlus%3C/title%3E%3Cpath d='M20 12L4 12M12 4L12 20'/%3E%3C/svg%3E");
         }
       }
 
       &::after {
+        position: absolute;
+        left: 0.375rem;
         margin-right: 0.375rem;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        background-image: url("data:image/svg+xml,%3Csvg width='24px' height='24px' viewBox='0 0 24 24' role='img' xmlns='http://www.w3.org/2000/svg' aria-labelledby='plusIconTitle' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' fill='%23ffffff' color='%23ffffff'%3E%3Ctitle id='plusIconTitle'%3EPlus%3C/title%3E%3Cpath d='M20 12L4 12M12 4L12 20'/%3E%3C/svg%3E");
       }
     }
   }

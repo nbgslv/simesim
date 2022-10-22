@@ -5,7 +5,7 @@ import styles from './QnaSection.module.scss';
 
 const QnaSection = () => {
     return (
-        <Section id={'qna-section'} title={'שאלות ותשובות'}>
+        <Section id={'qna-section'} title={'שאלות ותשובות'} className={styles.qnaSection}>
             <Accordion defaultActiveKey="0" className={styles.accordionContainer} flush>
                 <Accordion.Item eventKey="0">
                     <Accordion.Header>Accordion Item #1</Accordion.Header>

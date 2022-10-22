@@ -7,6 +7,7 @@ import Controller from "../components/ScrollMagic/Controller";
 import Scene from "../components/ScrollMagic/Scene";
 import BundlesSection from "../components/Bundles/BundlesSection";
 import QnaSection from "../components/QnA/QnaSection";
+import Footer from "../components/Footer/Footer";
 
 type HomeProps = {
     countriesList: { [key: string]: string },
@@ -25,6 +26,9 @@ export default function Home({ countriesList, bundlesList }: HomeProps): JSX.Ele
         </Scene>
         <Scene duration={0} pin={false}>
             <QnaSection />
+        </Scene>
+        <Scene duration={0} pin={false}>
+            <Footer />
         </Scene>
     </Controller>
   )

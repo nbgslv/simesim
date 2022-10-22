@@ -18,7 +18,7 @@ const BundleCard = ({ bundle, setRefill }: { bundle: Bundle, setRefill: (refill:
 
     return (
         <Card className={styles.bundleCardMain}>
-            <Card.Body >
+            <Card.Body>
                 <Card.Title className={styles.bundleCardTitle}>{bundle.name}</Card.Title>
                 <Card.Text className={styles.bundleCardText}>
                     {bundle.description}

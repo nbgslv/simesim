@@ -5,8 +5,9 @@ import TimelineItem from "./TimelineItem";
 import text from "../../lib/content/text.json";
 import Image from "next/image";
 import styles from './TimelineSection.module.scss'
-import checkoutIcon from "../../public/mail-box.png";
-import qrCode from "../../public/qrCode.png";
+import checkoutIcon from "../../public/checkout.svg";
+import emailIcon from '../../public/mail-box.svg'
+import qrCode from "../../public/qrCode.svg";
 import globalConnection from "../../public/global-connection.png";
 import Section from "../Section/Section";
 
@@ -50,19 +51,19 @@ const TimelineSection = () => {
                     <motion.div style={{ scale: timelineOneAnimation }}>
                         <TimelineItem tooltipScale={timelineOneTooltipAnimation} bgColor={timelineOneBackground} tooltipText={text.home.stepOneContentText}>
                             <h2>{text.home.stepOneText}</h2>
-                            <Image src={checkoutIcon} width={92} height={92} className="mr-auto ml-auto" alt="shopping bag" />
+                            <div className={styles.iconContainer}><Image src="/checkout.svg" layout="fill" alt="shopping bag" /></div>
                         </TimelineItem>
                     </motion.div>
                     <motion.div style={{ scale: timelineTwoAnimation }}>
                         <TimelineItem tooltipScale={timelineTwoTooltipAnimation} bgColor={timelineTwoBackground} tooltipText={text.home.stepTwoContentText}>
                             <h2>{text.home.stepTwoText}</h2>
-                            <Image src={qrCode} width={92} height={92} alt="qr code" />
+                            <div className={styles.iconContainer}><Image src="/mail-box.svg" layout="fill" alt="qr code" /></div>
                         </TimelineItem>
                     </motion.div>
                     <motion.div style={{ scale: timelineThreeAnimation }}>
                         <TimelineItem tooltipScale={timelineThreeTooltipAnimation} bgColor={timelineThreeBackground} tooltipText={text.home.stepThreeContentText}>
                             <h2>{text.home.stepThreeText}</h2>
-                            <Image src={globalConnection} width={92} height={92} alt="e-sim icon" />
+                            <div className={styles.iconContainer}><Image src="/qrCode.svg" layout="fill" alt="e-sim icon" /></div>
                         </TimelineItem>
                     </motion.div>
                 </Timeline>

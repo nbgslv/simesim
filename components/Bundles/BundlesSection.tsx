@@ -62,7 +62,7 @@ const BundlesSection = ({ countriesList, bundlesList }: { countriesList: { [key:
                             </div>
                         ): null}
                         {currentStep >= 1 ? (
-                            <div className="h-100">
+                            <div className="h-100 mt-2">
                                 <div className={`${styles.infoPlate} p-1 mb-2`}>
                                     <h3>2. בוחרים חבילת דאטה</h3>
                                 </div>
