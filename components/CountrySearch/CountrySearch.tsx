@@ -5,6 +5,8 @@ import CloseIcon from '../../public/close.svg';
 import Image from "next/image";
 import { motion } from 'framer-motion';
 import text from '../../lib/content/text.json'
+import {blurDataPlaceholder} from "../../lib/content/blurDataUri";
+import LoadingRings from '../../public/rings.svg'
 
 export type Country = {
     name: string,
@@ -12,14 +14,21 @@ export type Country = {
     iso2?: string
 }
 
-const CountrySearch = ({ countriesList, onSelect }: { countriesList: { [key: string]: string }, onSelect: (country: Country | null) => void }) => {
+type CountrySearchProps = {
+    countriesList: { [key: string]: string },
+    onSelect: (country: Country | null) => void
+}
+
+const CountrySearch = ({ countriesList, onSelect }: CountrySearchProps) => {
     const [query, setQuery] = useState<string>('');
     const [items, setItems] = useState<Country[]>([]);
     const [filteredItems, setFilteredItems] = useState<Country[]>([]);
     const [itemSelected, setItemSelected] = useState<Country | null>(null)
     const [countryMapError, setCountryMapError] = useState<boolean>(false)
     const [countryFlagError, setCountryFlagError] = useState<boolean>(false)
+    const [countryMapLoading, setCountryMapLoading] = useState<boolean>(false)
     const mainInputRef = useRef<HTMLInputElement>(null)
+    const MAX_RESULTS = 5;
 
     useEffect(() => {
         const itemsArr = Object
@@ -55,6 +64,7 @@ const CountrySearch = ({ countriesList, onSelect }: { countriesList: { [key: str
         setFilteredItems([])
         mainInputRef.current?.blur()
         onSelect(item)
+        setCountryMapLoading(true)
     }
 
     const handleCancel = () => {
@@ -103,15 +113,26 @@ const CountrySearch = ({ countriesList, onSelect }: { countriesList: { [key: str
             {filteredItems.length ? (
                 <div role="listbox" className={`${styles.listBox}`}>
                     {
-                        filteredItems.map((item) => {
-                            return (
-                                <div onClick={() => handleSelect(item)} role="option" key={item.id} className={`${styles.item} d-flex`}>
-                                    <div style={{ width: '30px', height: '30px', position: 'relative' }}>
-                                        {item.iso2 ? <Image src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${item.iso2.toUpperCase()}.svg`} layout="intrinsic" width="30px" height="30px" alt={item.name} /> : null}
+                        filteredItems.map((item, index) => {
+                            if (index < MAX_RESULTS) {
+                                return (
+                                    <div onClick={() => handleSelect(item)} role="option"
+                                         key={item.id} className={`${styles.item} d-flex`}>
+                                        <div style={{
+                                            width: '30px',
+                                            height: '30px',
+                                            position: 'relative'
+                                        }}>
+                                            {item.iso2 ? <Image
+                                                src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${item.iso2.toUpperCase()}.svg`}
+                                                placeholder="blur" blurDataURL={blurDataPlaceholder}
+                                                layout="intrinsic" width="30px" height="30px"
+                                                alt={item.name}/> : null}
+                                        </div>
+                                        <div className={`${styles.itemName}`}>{item.name}</div>
                                     </div>
-                                    <div className={`${styles.itemName}`}>{item.name}</div>
-                                </div>
-                            )
+                                )
+                            }
                         })
                     }
                 </div>
@@ -123,11 +144,12 @@ const CountrySearch = ({ countriesList, onSelect }: { countriesList: { [key: str
                     </div>
                     <div className={`${styles.selectionMedia} d-flex justify-content-between w-100`}>
                         <div className={`position-relative ${countryFlagError ? 'w-100' : 'w-50'} ${countryMapError ? 'd-none' : ''} h-100`}>
-                            <Image src={`https://mapsvg.com/static/maps/geo-calibrated/${itemSelected.name.toLowerCase().replace(' ', '-')}.svg`} layout="fill" className={styles.countryMapImage} objectFit="contain" onError={() => setCountryMapError(true)} />
+                            {countryMapLoading && <LoadingRings />}
+                            <Image src={`https://mapsvg.com/static/maps/geo-calibrated/${itemSelected.name.toLowerCase().replace(' ', '-')}.svg`} placeholder="blur" blurDataURL={blurDataPlaceholder} layout="fill" className={styles.countryMapImage} objectFit="contain" onLoadingComplete={() => setCountryMapLoading(false)} onError={() => setCountryMapError(true)} />
                         </div>
-                        <div className={`position-relative ${countryMapError ? 'w-100' : 'w-50'} ${countryFlagError ? 'd-none' : ''} h-100`}>
-                            <Image src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${itemSelected.iso2?.toUpperCase()}.svg`} layout="fill" alt={itemSelected.name} onError={() => setCountryFlagError(true)} />
-                        </div>
+                        <motion.div className={`position-relative ${countryMapError ? 'w-100' : 'w-50'} ${countryFlagError ? 'd-none' : ''} h-100`} layout>
+                            <Image src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${itemSelected.iso2?.toUpperCase()}.svg`} placeholder="blur" blurDataURL={blurDataPlaceholder} layout="fill" alt={itemSelected.name} onError={() => setCountryFlagError(true)} />
+                        </motion.div>
                     </div>
                 </div>
             ) : null}

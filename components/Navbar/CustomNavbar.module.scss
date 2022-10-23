@@ -1,3 +1,5 @@
+@import "styles/variables";
+
 .navbar {
   height: 4rem;
   transition: all .6s;
@@ -5,5 +7,17 @@
 }
 
 .navLinkTextDark {
-  color: rgba(0, 0, 0, 0.5) !important;
+  color: rgba(0, 0, 0, 0.8) !important;
+
+  &:hover {
+    color: map-get($theme-colors, 'blue') !important;
+  }
+}
+
+.navLinkTextLight {
+  color: map-get($theme-colors, 'light') !important;
+
+  &:hover {
+    color: map-get($theme-colors, 'blue') !important;
+  }
 }

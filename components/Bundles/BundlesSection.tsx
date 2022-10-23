@@ -9,9 +9,16 @@ import Lottie from "react-lottie";
 import {AnimatePresence, motion} from "framer-motion";
 import BundlesScroll from "./BundlesScroll";
 
-const BundlesSection = ({ countriesList, bundlesList }: { countriesList: { [key: string]: string }, bundlesList: Bundle[] }) => {
+type BundlesSectionProps = {
+    countriesList: { [key: string]: string },
+    bundlesList: Bundle[]
+}
+
+const BundlesSection = ({ countriesList, bundlesList }: BundlesSectionProps) => {
     const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+    // @ts-ignore
     const [selectedBundle, setSelectedBundle] = useState<number | null>(null);
+    // @ts-ignore
     const [selectedRefill, setSelectedRefill] = useState<Refill | null>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
 
@@ -52,17 +59,20 @@ const BundlesSection = ({ countriesList, bundlesList }: { countriesList: { [key:
                 <Row className={`d-flex justify-content-between align-items-center p-3 ${styles.row}`}>
                     <Col className={`d-flex justify-content-between flex-column ${styles.bundlesSearch}`}>
                         {currentStep >= 0 ? (
-                            <div className={styles.firstStepContainer}>
+                            <motion.div className={styles.firstStepContainer} layout onAnimationComplete={(def) => console.log(def)}>
                                 <div className={`${styles.infoPlate} p-1 mb-2`}>
                                     <h3>1. מספרים לנו לאן אתם טסים</h3>
                                 </div>
                                 <div className="h-100">
-                                    <CountrySearch countriesList={countriesList} onSelect={handleCountrySelect} />
+                                    <CountrySearch
+                                        countriesList={countriesList}
+                                        onSelect={handleCountrySelect}
+                                    />
                                 </div>
-                            </div>
+                            </motion.div>
                         ): null}
                         {currentStep >= 1 ? (
-                            <div className="h-100 mt-2">
+                            <div className="h-100 mt-4">
                                 <div className={`${styles.infoPlate} p-1 mb-2`}>
                                     <h3>2. בוחרים חבילת דאטה</h3>
                                 </div>
@@ -71,9 +81,11 @@ const BundlesSection = ({ countriesList, bundlesList }: { countriesList: { [key:
                                 </div>
                             </div>
                         ): null}
-                        <div>
-                            <Button variant="primary" size="lg" className={`w-100 ${currentStep < 2 ? 'invisible' : ''}`}>3. מזמינים</Button>
-                        </div>
+                        {currentStep >= 2 ? (
+                            <div>
+                                <Button variant="primary" size="lg" className={`w-100`}>3. מזמינים</Button>
+                            </div>
+                        ): null}
                     </Col>
                     <Col>
                         <Lottie

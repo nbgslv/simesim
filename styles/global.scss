@@ -14,6 +14,7 @@ html {
 
 :root {
   --timeline-bg-color: map-get($theme-colors, 'secondary');
+  --bs-nav-link-font-size: 0.875rem;
 }
 
 #__next {
@@ -34,4 +35,13 @@ html {
 
 h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0;
+}
+
+.nav-link {
+  color: map-get($theme-colors, 'light');
+  padding: 0.2rem;
+
+  &:hover {
+    color: map-get($theme-colors, 'blue');
+  }
 }

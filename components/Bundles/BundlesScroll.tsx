@@ -5,7 +5,6 @@ import LeftArrow from '../../public/left-arrow.svg';
 import RightArrow from '../../public/right-arrow.svg';
 import styles from './BundlesScroll.module.scss';
 import {AnimatePresence, motion} from "framer-motion";
-import {set} from "immutable";
 
 const BundlesScroll = ({ bundlesList, setRefill, resetRefill }: { bundlesList: Bundle[], setRefill: (refill: Refill | null, bundleId: number | null) => void, resetRefill: () => void }) => {
     const [currentBundle, setCurrentBundle] = React.useState<number>(0);
@@ -65,7 +64,7 @@ const BundlesScroll = ({ bundlesList, setRefill, resetRefill }: { bundlesList: B
                     drag="x"
                     dragConstraints={{ left: 0, right: 0 }}
                     dragElastic={1}
-                    onDragEnd={(e, { offset, velocity }) => {
+                    onDragEnd={(e, { offset }) => {
                         if (offset.x < 0) {
                             paginate(1);
                         } else if (offset.x > 0) {
@@ -75,7 +74,7 @@ const BundlesScroll = ({ bundlesList, setRefill, resetRefill }: { bundlesList: B
                 >
                     <motion.div className={styles.bundleCardWrapper} whileHover={{
                         scale: 1.1,
-                        boxShadow: '6px 9px 8px 2px rgba(0,0,0,0.81)'
+                        boxShadow: '0 0.5rem 1rem rgb(0 0 0 / 15%)'
                     }}>
                         <BundleCard bundle={bundlesList[currentBundle]} setRefill={setRefill} />
                     </motion.div>

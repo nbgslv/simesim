@@ -2,7 +2,7 @@ $body-bg: #ffffff;
 $white: #ffffff;
 
 .btn-outline-primary {
-  $bs-btn-color: #ffffff !important;
+  $bs-btn-color: #ffffff;
 }
 
 .navbar-light .navbar-brand {
@@ -10,7 +10,7 @@ $white: #ffffff;
 }
 
 .navbar-light .navbar-nav .nav-link {
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 @import "~bootstrap/scss/bootstrap";

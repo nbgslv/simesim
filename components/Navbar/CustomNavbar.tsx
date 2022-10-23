@@ -15,14 +15,16 @@ const CustomNavbar = ({ background, height }: { background: string | null, heigh
                 navbarRef.current.classList.add(`bg-light`)
                 if (Array.isArray(navLinks) && navLinks.length) {
                     navLinks.forEach((link: HTMLElement) => {
-                        link.setAttribute('style', 'color: rgba(0, 0, 0, .5) !important')
+                        link.classList.add(styles.navLinkTextDark)
+                        link.classList.remove(styles.navLinkTextLight)
                     })
                 }
             } else {
                 navbarRef.current.classList.remove(`bg-light`)
                 if (Array.isArray(navLinks) && navLinks.length) {
                     navLinks.forEach((link: HTMLElement) => {
-                        link.setAttribute('style', 'color: rgb(255, 255, 255) !important')
+                        link.classList.add(styles.navLinkTextLight)
+                        link.classList.remove(styles.navLinkTextDark)
                     })
                 }
             }
@@ -51,7 +53,7 @@ const CustomNavbar = ({ background, height }: { background: string | null, heigh
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>
-                <Navbar.Brand href="#home" className="d-flex justify-content-end" style={{ marginLeft: '0' }}><Image src={background ? logoImageBlackText : logoImageWhiteText} alt="Logo image" layout="fixed" width={70} height={35} /></Navbar.Brand>
+                <Navbar.Brand href="#home" className="d-flex justify-content-end" style={{ marginLeft: '0' }}><Image src={background ? logoImageBlackText : logoImageWhiteText} alt="Logo image" layout="fixed" width={65} height={35} /></Navbar.Brand>
             </Container>
         </Navbar>
     );
