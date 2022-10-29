@@ -1,5 +1,3 @@
-@use "hover/hover";
-@use "~bootstrap/scss/bootstrap";
 @import "custom";
 @import "sections";
 
@@ -13,7 +11,7 @@ html {
 }
 
 :root {
-  --timeline-bg-color: map-get($theme-colors, 'secondary');
+  --nav-bg-color: $secondary-color;
   --bs-nav-link-font-size: 0.875rem;
 }
 

@@ -1,4 +1,4 @@
-@import "../../styles/variables";
+@import "styles/variables";
 
 .bundleCardMain {
   background-color: map-get($theme-colors, "light");
@@ -6,26 +6,26 @@
 }
 
 .bundleCardTitle {
-  color: $text-dark;
+  color: $text-color;
   font-size: 1.3rem;
   font-weight: 700;
 }
 
 .bundleCardText {
-  color: $text-dark;
+  color: $text-color;
   font-size: 0.9rem;
 }
 
 .bundleCardListItem {
-  background-color: map-get($theme-colors, "light");
+  background-color: $background-color;
   font-size: 0.875rem;
   cursor: pointer;
 
   &:hover {
-    background-color: map-get($theme-colors, "blue");
+    background-color: $secondary-color;
   }
 }
 
 .bundleCardListItemActive {
-    background-color: map-get($theme-colors, "blue");
+    background-color: $secondary-color;
 }

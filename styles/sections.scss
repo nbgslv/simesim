@@ -7,8 +7,8 @@
 
   & .accordion-header {
     & .accordion-button {
-      background-color: map-get($theme-colors, "blue");
-      border-bottom-color: map-get($theme-colors, "blue");;
+      background-color: $primary-color;
+      border-bottom-color: $primary-color;
       color: #ffffff;
 
       &:focus {
@@ -17,7 +17,7 @@
       }
 
       &:not(.collapsed) {
-        background-color: map-get($theme-colors, "blue");
+        background-color: $primary-color;
         color: #ffffff;
 
         &::after {
@@ -38,8 +38,8 @@
   }
 
   & .accordion-body {
-    background-color: map-get($theme-colors, "light");
-    color: $text-dark;
+    background-color: $background-color;
+    color: $text-color;
   }
 }
 

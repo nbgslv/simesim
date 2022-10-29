@@ -1,12 +1,16 @@
-import React from 'react';
+import React, {useRef, useTransition} from 'react';
 import Section from "../Section/Section";
 import {Accordion} from "react-bootstrap";
 import styles from './QnaSection.module.scss';
+import Image from "next/image";
+import {motion} from 'framer-motion';
 
 const QnaSection = () => {
+    const imageRef = useRef<HTMLDivElement>(null)
+
     return (
         <Section id={'qna-section'} title={'שאלות ותשובות'} className={styles.qnaSection}>
-            <Accordion defaultActiveKey="0" className="shadow" flush>
+            <Accordion defaultActiveKey="0" className="shadow">
                 <Accordion.Item eventKey="0">
                     <Accordion.Header>Accordion Item #1</Accordion.Header>
                     <Accordion.Body>
@@ -44,6 +48,9 @@ const QnaSection = () => {
                     </Accordion.Body>
                 </Accordion.Item>
             </Accordion>
+            <motion.div ref={imageRef} className={styles.qnaImage} animate={{ rotate: [0, 45, -45, 0] }} transition={{ repeat: Infinity, duration: 5, repeatType: 'mirror', type: 'spring' }}>
+                <Image src={'/plane.svg'} alt={'faq'} layout="responsive" width={500} height={300} />
+            </motion.div>
         </Section>
     );
 };

@@ -8,13 +8,15 @@ import Scene from "../components/ScrollMagic/Scene";
 import BundlesSection from "../components/Bundles/BundlesSection";
 import QnaSection from "../components/QnA/QnaSection";
 import Footer from "../components/Footer/Footer";
+import CheckPhoneSection, {PhonesList} from "../components/CheckPhone/CheckPhoneSection";
 
 type HomeProps = {
     countriesList: { [key: string]: string },
-    bundlesList: Bundle[]
+    bundlesList: Bundle[],
+    phonesList: PhonesList[]
 }
 
-export default function Home({ countriesList, bundlesList }: HomeProps): JSX.Element {
+export default function Home({ countriesList, bundlesList, phonesList }: HomeProps): JSX.Element {
     return (
     <Controller>
         <Header />
@@ -28,6 +30,9 @@ export default function Home({ countriesList, bundlesList }: HomeProps): JSX.Ele
             <QnaSection />
         </Scene>
         <Scene duration={0} pin={false}>
+            <CheckPhoneSection phonesList={phonesList} />
+        </Scene>
+        <Scene duration={0} pin={false}>
             <Footer />
         </Scene>
     </Controller>
@@ -38,12 +43,14 @@ export async function getStaticProps() {
     const keepGoApi = new KeepGoApi(process.env.KEEPGO_BASE_URL, process.env.KEEPGO_API_KEY, process.env.KEEPGO_ACCESS_TOKEN);
     const countriesList: KeepGoResponse | Error = await keepGoApi.getCountries();
     const bundlesList: KeepGoResponse | Error = await keepGoApi.getBundles();
+    const phonesList: KeepGoResponse | Error = await keepGoApi.getEsimDevices();
 
-    if (countriesList instanceof Error || bundlesList instanceof Error) {
+    if (countriesList instanceof Error || bundlesList instanceof Error || phonesList instanceof Error) {
         return {
             props: {
                 countriesList: [],
-                bundlesList: []
+                bundlesList: [],
+                phonesList: []
             }
         }
     }
@@ -51,7 +58,8 @@ export async function getStaticProps() {
     return {
         props: {
             countriesList: countriesList.countries,
-            bundlesList: bundlesList.bundles
+            bundlesList: bundlesList.bundles,
+            phonesList: phonesList.data
         }
     }
 }

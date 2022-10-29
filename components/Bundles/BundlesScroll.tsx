@@ -74,7 +74,7 @@ const BundlesScroll = ({ bundlesList, setRefill, resetRefill }: { bundlesList: B
                 >
                     <motion.div className={styles.bundleCardWrapper} whileHover={{
                         scale: 1.1,
-                        boxShadow: '0 0.5rem 1rem rgb(0 0 0 / 15%)'
+                        boxShadow: '0px 3px 15px 5px rgba(0,0,0,0.25)'
                     }}>
                         <BundleCard bundle={bundlesList[currentBundle]} setRefill={setRefill} />
                     </motion.div>

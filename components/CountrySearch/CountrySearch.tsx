@@ -80,7 +80,13 @@ const CountrySearch = ({ countriesList, onSelect }: CountrySearchProps) => {
 
     return (
         <>
-            <SearchAutocomplete onSelect={handleSelect} onCancel={handleCancel} items={items} itemComponent={CountrySearchItem} placeholder="לאן טסים?" />
+            <SearchAutocomplete
+                onSelect={handleSelect}
+                onCancel={handleCancel}
+                items={items}
+                ItemComponent={CountrySearchItem}
+                placeholder="לאן טסים?"
+            />
             {itemSelected ? (
                 <div className={`${styles.selectionContainer} d-flex flex-column w-100 align-items-center text-center p-2`}>
                     <div className="mt-1 mb-3">

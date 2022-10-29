@@ -1,7 +1,7 @@
 @import "styles/variables";
 
 .bundlesSection {
-  background-color: map-get($theme-colors, "warning");
+  background-color: $primary-color;
   height: 100vh;
 }
 
@@ -19,8 +19,7 @@
 }
 
 .infoPlate {
-  background-color: map-get($theme-colors, 'blue');
-  color: $text-dark;
+  color: $text-color;
   border-radius: 0.5rem;
   text-align: center;
   vertical-align: center;

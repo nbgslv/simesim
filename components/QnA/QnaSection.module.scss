@@ -1,6 +1,12 @@
 @import "../../styles/variables.scss";
 
 .qnaSection {
-  background-color: map-get($theme-colors, "yellow");
+  background-color: $background-color;
   height: 100vh;
+}
+
+.qnaImage {
+  width: 57%;
+  margin-right: auto;
+  margin-left: auto;
 }

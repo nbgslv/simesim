@@ -1,15 +1,21 @@
 $theme-colors: (
-        "light":      #d8e0e7,
-        "dark":       #0b0b0c,
-        "primary":    #ff3904,
-        "secondary":  #4502c6,
+        "light":      #F5F5F5,
+        "dark":       #230007,
+        "primary":    #4502C6,
+        "secondary":  #8D99AE,
         "info":       #946be4,
         "success":    #589e00,
         "warning":    #ffbd5e,
         "danger":     #ef0064,
-        "yellow":     #F2FF49,
-        "pink":       #FB62F6,
-        "blue":       #5AA9E6,
+        "orange":     #FF3904,
 );
 
-$text-dark: #0C2231;
+$text-color: map-get($theme-colors, 'dark');
+$background-color: map-get($theme-colors, 'light');
+$primary-color: map-get($theme-colors, 'primary');
+$secondary-color: map-get($theme-colors, 'secondary');
+
+@mixin shadow {
+  -webkit-box-shadow: 0px 3px 15px 5px rgba(0,0,0,0.25);
+  box-shadow: 0px 3px 15px 5px rgba(0,0,0,0.25);
+}

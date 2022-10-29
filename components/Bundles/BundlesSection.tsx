@@ -16,9 +16,7 @@ type BundlesSectionProps = {
 
 const BundlesSection = ({ countriesList, bundlesList }: BundlesSectionProps) => {
     const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
-    // @ts-ignore
     const [selectedBundle, setSelectedBundle] = useState<number | null>(null);
-    // @ts-ignore
     const [selectedRefill, setSelectedRefill] = useState<Refill | null>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
 
@@ -83,7 +81,7 @@ const BundlesSection = ({ countriesList, bundlesList }: BundlesSectionProps) => 
                         ): null}
                         {currentStep >= 2 ? (
                             <div>
-                                <Button variant="primary" size="lg" className={`w-100`}>3. מזמינים</Button>
+                                <Button variant="primary" size="lg" className={`${styles.orderButton} w-100`}>3. מזמינים</Button>
                             </div>
                         ): null}
                     </Col>

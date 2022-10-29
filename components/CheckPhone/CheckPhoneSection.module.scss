@@ -1,0 +1,65 @@
+@import "styles/variables";
+
+.main {
+  height: 100vh;
+  background-color: map-get($theme-colors, 'light');
+}
+
+.resultsContainer {
+  color: map-get($theme-colors, 'success');
+}
+
+.titleWrapper {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  color: $text-color;
+}
+
+.brandSearch {
+  margin-bottom: 1rem;
+}
+
+.modelSearch {
+  margin-bottom: 1rem;
+}
+
+.listBox {
+  margin-top: 0.5rem;
+  width: 100%;
+  border: 3px solid map-get($theme-colors, 'primary');
+  border-radius: 0.5rem;
+}
+
+.listBoxItem {
+  color: $text-color;
+  position: relative;
+  padding: 0.7rem 0.5rem;
+  cursor: pointer;
+  width: 100%;
+
+  &:hover {
+    background-color: rgba(map-get($theme-colors, 'secondary'), 0.1);
+  }
+}
+
+.iconSuccess svg {
+  width: 100%;
+  height: 30%;
+}
+
+.iconSuccess path {
+  color: map-get($theme-colors, 'success') !important;
+}
+
+.disclaimer {
+  position: absolute;
+  bottom: 5rem;
+  right: 0;
+}
+
+.disclaimer small {
+  color: $text-color;
+}

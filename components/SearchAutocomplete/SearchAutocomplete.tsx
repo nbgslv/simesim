@@ -1,5 +1,14 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {motion} from "framer-motion";
+import React, {
+    ElementType,
+    FC,
+    forwardRef,
+    MutableRefObject, ReactNode,
+    useEffect,
+    useImperativeHandle,
+    useRef,
+    useState
+} from 'react';
+import {AnimatePresence, motion} from "framer-motion";
 import CloseIcon from "../../public/close.svg";
 import styles from "./SearchAutocomplete.module.scss";
 
@@ -14,37 +23,89 @@ type SearchAutocompleteProps<T> = {
     onCancel: () => void,
     placeholder?: string,
     items: Item<T>[],
-    itemComponent?: (item: any, selectItem: (item: any) => void) => JSX.Element,
+    ItemComponent?: ElementType,
     onQueryChange?: (query: string) => void,
+    clearSelectedItem?: boolean,
+    focusedBorderColor?: string,
+    ListBoxComponent?: ElementType,
 }
 
-const DefaultCountrySearchItem = <T extends object>(item: Item<T>, selectItem: (item: Item<T>) => void) => {
-    return (
-        <div
-            role="option"
-            onClick={() => selectItem(item)}
-            key={item.id}
-        >
-            <div>
-                {item.displayValue}
-            </div>
-        </div>
-    )
+type DefaultListBoxComponentProps = {
+    children: ReactNode | ReactNode[],
 }
 
-const SearchAutocomplete = <T extends object>({
+type DefaultCountrySearchItemProps<T> = {
+    item: Item<T>,
+    selectItem: (item: Item<T>) => void
+}
+
+const SearchAutocompleteInner = <T extends object>({
     maxResults = 5,
     onSelect,
     onCancel,
     placeholder = undefined,
     items,
-    itemComponent = DefaultCountrySearchItem,
-    onQueryChange
-}: SearchAutocompleteProps<T>) => {
+    ItemComponent,
+    onQueryChange,
+    focusedBorderColor = '#fff',
+    ListBoxComponent,
+}: SearchAutocompleteProps<T>, ref: any) => {
     const [itemSelected, setItemSelected] = useState<Item<T> | null>(null)
     const [query, setQuery] = useState<string>('');
     const [filteredItems, setFilteredItems] = useState<Item<T>[]>([]);
     const mainInputRef = useRef<HTMLInputElement>(null)
+
+    const DefaultListBoxComponent: FC<DefaultListBoxComponentProps> = ({ children }) => {
+        const variants = {
+            initial: {
+                height: 0,
+                transition: {
+                    when: 'afterChildren',
+                }
+            },
+            show: {
+                height: 'fit-content',
+                transition: {
+                    when: 'beforeChildren',
+                    staggerChildren: 0.5,
+                }
+            }
+        }
+
+        return (
+            <AnimatePresence>
+                <motion.div
+                    layout
+                    initial="initial"
+                    animate="show"
+                    exit="initial"
+                    variants={variants}
+                    role="listbox"
+                    className={`${styles.listBox}`}
+                >
+                    {children}
+                </motion.div>
+            </AnimatePresence>
+        )
+    }
+
+    const DefaultItemComponent: FC<DefaultCountrySearchItemProps<T>> = ({ item, selectItem }) => {
+        if (!item) return null;
+
+        return (
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                role="option"
+                onClick={() => selectItem(item)}
+                key={item.id}
+            >
+                <div>
+                    {item.displayValue}
+                </div>
+            </motion.div>
+        )
+    }
 
     useEffect(() => {
         if (query) {
@@ -80,10 +141,21 @@ const SearchAutocomplete = <T extends object>({
         onCancel()
     }
 
+    useImperativeHandle(ref, () => ({
+        handleCancel() {
+            setItemSelected(null)
+            setFilteredItems([])
+            setQuery('')
+            onSelect(null)
+            onCancel()
+        }
+    }))
+
     return (
         <>
             <div className="position-relative">
-                <input
+                <motion.input
+                    whileFocus={{ borderColor: focusedBorderColor }}
                     ref={mainInputRef}
                     placeholder={placeholder}
                     className={styles.mainInput}
@@ -109,20 +181,27 @@ const SearchAutocomplete = <T extends object>({
                 </button>
             </div>
             {filteredItems.length ? (
-                <div role="listbox" className={`${styles.listBox}`}>
-                    {
-                        filteredItems.map((item, index) => {
-                            if (index < maxResults) {
-                                if (itemComponent) {
-                                    return itemComponent(item, handleSelect)
-                                }
-                            }
-                        })
-                    }
-                </div>
+                ListBoxComponent ?
+                    <ListBoxComponent children={filteredItems.slice(0, maxResults).map((item, i) => {
+                        const ItemComponentToUse = ItemComponent || DefaultItemComponent
+                        return (
+                            <ItemComponentToUse key={i} item={item} selectItem={handleSelect} />
+                        )
+                    })} />
+                    : <DefaultListBoxComponent>
+                        {filteredItems.map((item, i) => {
+                            const ItemComponentToUse = ItemComponent || DefaultItemComponent
+                            if (i < maxResults)
+                            return (
+                                <ItemComponentToUse key={i} item={item} selectItem={handleSelect} />
+                            )
+                        })}
+                    </DefaultListBoxComponent>
             ) : null}
         </>
     );
 };
+
+const SearchAutocomplete = forwardRef(SearchAutocompleteInner) as <T extends object>(props: SearchAutocompleteProps<T> & { ref?: MutableRefObject<any> }) => JSX.Element;
 
 export default SearchAutocomplete;

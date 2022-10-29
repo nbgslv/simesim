@@ -1,7 +1,9 @@
+@import "styles/variables";
+
 .arrowButtonRight {
   position: absolute;
   top: 50%;
-  right: 0;
+  right: -10px;
   transform: translateY(-50%);
   background: transparent;
   border: none;
@@ -11,10 +13,14 @@
   align-items: center;
 }
 
+.arrowButtonRight svg {
+    fill: $background-color;
+}
+
 .arrowButtonLeft {
   position: absolute;
   top: 50%;
-  left: 0;
+  left: -10px;
   transform: translateY(-50%);
   background: transparent;
   border: none;
@@ -23,6 +29,11 @@
   display: flex;
   align-items: center;
 }
+
+.arrowButtonLeft svg {
+  fill: $background-color;
+}
+
 
 .bundleCardWrapper {
   position: absolute;

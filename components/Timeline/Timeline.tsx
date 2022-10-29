@@ -1,17 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import styles from './Timeline.module.scss';
+import React from 'react';
 
-const Timeline = ({ children, progress } : { children: JSX.Element | JSX.Element[], progress: number }) => {
+const Timeline = ({ children } : { children: JSX.Element | JSX.Element[] }) => {
     return (
-        <div>
-            <div className={styles.timeline}>
-                <div className={styles.timelineProgress} style={{ width: `${progress}%` }}></div>
-                <div className={styles.timelineItems}>
-                    {children}
-                </div>
-            </div>
+        <div className="w-100 h-100 d-flex justify-content-between align-items-center">
+            {children}
         </div>
-
     );
 };
 
