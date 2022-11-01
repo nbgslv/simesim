@@ -4,8 +4,17 @@ import Image from "next/image";
 import logoImageWhiteText from '../../public/logoWhite.png'
 import logoImageBlackText from '../../public/logo.png'
 import styles from './CustomNavbar.module.scss'
+import text from '../../lib/content/text.json';
+
+enum Sections {
+    home = 'home',
+    info = 'info',
+    order = 'order',
+    checkPhone = 'checkPhone',
+}
 
 const CustomNavbar = ({ background, height }: { background: string | null, height: string }) => {
+    const [activeSection, setActiveSection] = React.useState<string | null>(null)
     const navbarRef: RefObject<HTMLElement> = useRef(null)
 
     useEffect(() => {
@@ -38,19 +47,14 @@ const CustomNavbar = ({ background, height }: { background: string | null, heigh
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav>
-                        <Nav.Link href="#home">Home</Nav.Link>
-                        <Nav.Link href="#link">Link</Nav.Link>
-                        <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                            <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.2">
-                                Another action
-                            </NavDropdown.Item>
-                            <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-                            <NavDropdown.Divider />
-                            <NavDropdown.Item href="#action/3.4">
-                                Separated link
-                            </NavDropdown.Item>
-                        </NavDropdown>
+                        <Nav.Link href="#bundles-section">{text.header.navbar.order}</Nav.Link>
+                        <Nav.Link href="#">{text.header.navbar.info}</Nav.Link>
+                        <Nav.Link href="#">{text.header.navbar.guide}</Nav.Link>
+                        <Nav.Link href="#">{text.header.navbar.about}</Nav.Link>
+                        <Nav.Link href="#">{text.header.navbar.contact}</Nav.Link>
+                    </Nav>
+                    <Nav className={`me-auto ${styles.login}`}>
+                        <Nav.Link href="#">{text.header.navbar.login}</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
                 <Navbar.Brand href="#home" className="d-flex justify-content-end" style={{ marginLeft: '0' }}><Image src={background ? logoImageBlackText : logoImageWhiteText} alt="Logo image" layout="fixed" width={65} height={35} /></Navbar.Brand>

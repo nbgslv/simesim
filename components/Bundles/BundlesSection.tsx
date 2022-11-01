@@ -8,6 +8,7 @@ import * as travelImageData from '../../public/travel.json';
 import Lottie from "react-lottie";
 import {AnimatePresence, motion} from "framer-motion";
 import BundlesScroll from "./BundlesScroll";
+import OrderModal from "../Order/OrderModal";
 
 type BundlesSectionProps = {
     countriesList: { [key: string]: string },
@@ -19,6 +20,7 @@ const BundlesSection = ({ countriesList, bundlesList }: BundlesSectionProps) => 
     const [selectedBundle, setSelectedBundle] = useState<number | null>(null);
     const [selectedRefill, setSelectedRefill] = useState<Refill | null>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
+    const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
 
     const handleCountrySelect = (country: Country | null) => {
         setSelectedCountry(country)
@@ -81,7 +83,14 @@ const BundlesSection = ({ countriesList, bundlesList }: BundlesSectionProps) => 
                         ): null}
                         {currentStep >= 2 ? (
                             <div>
-                                <Button variant="primary" size="lg" className={`${styles.orderButton} w-100`}>3. מזמינים</Button>
+                                <Button variant="primary" size="lg" className={`${styles.orderButton} w-100`} onClick={() => setOrderModalOpen(true)}>3. מזמינים</Button>
+                                <OrderModal
+                                    show={orderModalOpen}
+                                    onHide={() => setOrderModalOpen(false)}
+                                    country={selectedCountry?.displayValue}
+                                    bundle={bundlesList.find((bundle) => bundle.id === selectedBundle)}
+                                    refill={selectedRefill}
+                                />
                             </div>
                         ): null}
                     </Col>

@@ -1,5 +1,5 @@
 import Header from "../components/Header/Header";
-import React, {useState} from "react";
+import React from "react";
 import TimelineSection from "../components/Timeline/TimelineSection";
 import KeepGoApi from "../utils/api/sevices/keepGo/api";
 import {Bundle, KeepGoResponse} from "../utils/api/sevices/keepGo/types";
@@ -20,16 +20,16 @@ export default function Home({ countriesList, bundlesList, phonesList }: HomePro
     return (
     <Controller>
         <Header />
-        <Scene duration={4000}>
+        <Scene duration={500}>
             <TimelineSection />
         </Scene>
-        <Scene duration={0} pin={false}>
+        <Scene duration={500}>
             <BundlesSection countriesList={countriesList} bundlesList={bundlesList} />
         </Scene>
-        <Scene duration={0} pin={false}>
+        <Scene duration={500}>
             <QnaSection />
         </Scene>
-        <Scene duration={0} pin={false}>
+        <Scene duration={500}>
             <CheckPhoneSection phonesList={phonesList} />
         </Scene>
         <Scene duration={0} pin={false}>

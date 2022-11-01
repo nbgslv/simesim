@@ -10,14 +10,18 @@
   color: rgba(0, 0, 0, 0.8) !important;
 
   &:hover {
-    color: map-get($theme-colors, 'blue') !important;
+    color: map-get($theme-colors, 'primary') !important;
   }
 }
 
 .navLinkTextLight {
-  color: map-get($theme-colors, 'light') !important;
+  color: #ffffff;
 
   &:hover {
-    color: map-get($theme-colors, 'blue') !important;
+    color: map-get($theme-colors, 'primary') !important;
   }
+}
+
+.login {
+  margin-left: 2rem;
 }

@@ -1,6 +1,6 @@
 import React, {
     ElementType,
-    FC,
+    FC, ForwardedRef,
     forwardRef,
     MutableRefObject, ReactNode,
     useEffect,
@@ -11,6 +11,7 @@ import React, {
 import {AnimatePresence, motion} from "framer-motion";
 import CloseIcon from "../../public/close.svg";
 import styles from "./SearchAutocomplete.module.scss";
+import Input from "../Input/Input";
 
 export type Item<T> = T & {
     id: string | number,
@@ -49,7 +50,7 @@ const SearchAutocompleteInner = <T extends object>({
     onQueryChange,
     focusedBorderColor = '#fff',
     ListBoxComponent,
-}: SearchAutocompleteProps<T>, ref: any) => {
+}: SearchAutocompleteProps<T>, ref: ForwardedRef<any>) => {
     const [itemSelected, setItemSelected] = useState<Item<T> | null>(null)
     const [query, setQuery] = useState<string>('');
     const [filteredItems, setFilteredItems] = useState<Item<T>[]>([]);
@@ -154,12 +155,9 @@ const SearchAutocompleteInner = <T extends object>({
     return (
         <>
             <div className="position-relative">
-                <motion.input
-                    whileFocus={{ borderColor: focusedBorderColor }}
+                <Input
                     ref={mainInputRef}
                     placeholder={placeholder}
-                    className={styles.mainInput}
-                    type="text"
                     value={itemSelected ? itemSelected.displayValue : query}
                     onChange={handleChange}
                 />
@@ -192,9 +190,9 @@ const SearchAutocompleteInner = <T extends object>({
                         {filteredItems.map((item, i) => {
                             const ItemComponentToUse = ItemComponent || DefaultItemComponent
                             if (i < maxResults)
-                            return (
-                                <ItemComponentToUse key={i} item={item} selectItem={handleSelect} />
-                            )
+                                return (
+                                    <ItemComponentToUse key={i} item={item} selectItem={handleSelect} />
+                                )
                         })}
                     </DefaultListBoxComponent>
             ) : null}

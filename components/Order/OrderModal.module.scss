@@ -1,0 +1,52 @@
+@import "styles/variables";
+
+.main {
+  :global div {
+    color: $text-color;
+  }
+}
+
+.orderModalRow {
+  margin-top: 1rem;
+}
+
+.orderModalRow {
+  font-weight: 700;
+}
+
+.omFieldTitle {
+  display: flex;
+  align-items: center;
+  composes: orderModalRow;
+  font-weight: 700;
+  margin-top: 0;
+}
+
+.bundleText {
+  margin-left: 1rem;
+  font-weight: 200;
+}
+
+.countryText {
+  font-weight: 200;
+}
+
+.dateInput {
+  width: 45%;
+  :global .react-datepicker__input-container input {
+    width: 100%;
+    background-color: $background-color;
+    color: $text-color;
+    position: relative;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    padding: 0.5rem;
+    border: 3px solid $secondary-color;
+    border-radius: 0.5rem;
+    height: 3rem;
+  }
+}
+
+.submitButton {
+  color: $background-color !important;
+}
