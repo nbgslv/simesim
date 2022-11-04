@@ -93,7 +93,6 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
         let index = 0;
         phonesList.forEach((list) => {
             list.brands.forEach((brand, id) => {
-                console.log(brand)
                 brandsArray.push({
                     id,
                     displayValue: brand.title,

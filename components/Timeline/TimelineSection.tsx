@@ -12,7 +12,6 @@ const TimelineSection = () => {
     const [animate, setAnimate] = React.useState<boolean>(true);
 
     useEffect(() => {
-        console.log(!animateArray.some((item) => !item))
         setAnimate(!animateArray.some((item) => !item))
     }, [animateArray])
 

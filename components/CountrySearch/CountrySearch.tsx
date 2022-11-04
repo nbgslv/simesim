@@ -20,7 +20,6 @@ type CountrySearchProps = {
 }
 
 const CountrySearchItem = ({ item, selectItem }: {item: Country, selectItem: (item: Country) => void}) => {
-    console.log(selectItem)
     return (
         <div onClick={() => selectItem(item)} role="option"
              key={item.id} className={`${styles.item} d-flex`}>

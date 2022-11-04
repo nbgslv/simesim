@@ -1,0 +1,16 @@
+@import "styles/variables";
+
+.main {
+  background-color: $background-color;
+  height: 100vh;
+
+  :global {
+    * {
+      color: $text-color;
+    }
+
+    button {
+      color: $background-color;
+    }
+  }
+}

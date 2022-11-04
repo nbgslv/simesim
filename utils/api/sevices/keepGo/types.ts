@@ -21,7 +21,7 @@ type Pagination = {
     currentPage: number,
 }
 
-enum BundleStatus {
+export enum BundleStatus {
     NON_ACTIVE = 0,
     ACTIVE = 1,
     FINISHED = 2,
@@ -107,7 +107,7 @@ export type KeepGoResponse = Partial<Pagination> & {
     bundles?: Bundle[]
     bundle: Bundle[]
     network_providers?: [string]
-    countries?: { [key: string]: string }[]
+    countries?: { [key: string]: string }
     regions?: [string]
     data: [string]
 }

@@ -1,0 +1,16 @@
+@import "styles/variables";
+
+.main {
+  :global {
+    * {
+       color: $text-color;
+    }
+    .navbar-nav a {
+      color: $text-color;
+
+        &:hover {
+            color: $primary-color;
+        }
+    }
+  }
+}

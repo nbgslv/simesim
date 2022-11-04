@@ -29,10 +29,6 @@ const OrderModal = ({ show, onHide, bundle, refill, country }: BundlesSectionPro
         }
     });
 
-    useEffect(() => {
-        console.log({ errors })
-    }, [errors])
-
     return (
         <Modal
             show={show}
