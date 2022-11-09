@@ -1,4 +1,4 @@
-import React, {RefObject, useCallback} from 'react';
+import React, {RefObject, useCallback, useEffect} from 'react';
 import AdminLayout from "../../components/Layouts/AdminLayout";
 import AdminTable from "../../components/AdminTable/AdminTable";
 import prisma from "../../lib/prisma";
@@ -6,15 +6,18 @@ import {format, parseISO} from "date-fns";
 import {Prisma} from "@prisma/client";
 import AdminTableSwitch from "../../components/AdminTable/AdminTableSwitch";
 import {GridApiCommunity} from "@mui/x-data-grid/internals";
-import {GridColumns, GridRowId, GridValidRowModel} from "@mui/x-data-grid";
+import {GridColumns, GridRowId, GridRowModel, GridValidRowModel} from "@mui/x-data-grid";
 
-type CountriesAsAdminTableData = (GridValidRowModel & Prisma.CountrySelect)[]
-
-
+type CountriesAsAdminTableData = (GridValidRowModel & Prisma.CountryMaxAggregateOutputType)[]
 
 const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
-    const [changeShowLoading, setChangeShowLoading] = React.useState<string>('');
-    const [changeLockTranslationLoading, setChangeLockTranslationLoading] = React.useState<string>('');
+    const [countriesRows, setCountriesRows] = React.useState<CountriesAsAdminTableData>(countries);
+    const [changeShowLoading, setChangeShowLoading] = React.useState<GridRowId>('');
+    const [changeLockTranslationLoading, setChangeLockTranslationLoading] = React.useState<GridRowId>('');
+
+    useEffect(() => {
+        setCountriesRows(countries);
+    }, [countries]);
 
     const columns: GridColumns = [
         {
@@ -33,10 +36,9 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
                 return (
                     <AdminTableSwitch
                         checked={params.value}
-                        onChange={handleAdminTableLockTranslationSwitchChange}
+                        onChange={handleLockTranslationToggle}
                         rowId={params.id}
                         row={params.row}
-                        api={params.api}
                         loading={changeLockTranslationLoading}
                     />
                 )
@@ -49,10 +51,9 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
                 return (
                     <AdminTableSwitch
                         checked={params.value}
-                        onChange={handleAdminTableShowSwitchChange}
+                        onChange={handleShowToggle}
                         rowId={params.id}
                         row={params.row}
-                        api={params.api}
                         loading={changeShowLoading}
                     />
                 )
@@ -75,11 +76,10 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
         });
     }, [changeShowLoading, changeLockTranslationLoading])
 
-    const handleAdminTableLockTranslationSwitchChange = async (
+    const handleLockTranslationToggle = async (
         checked: boolean,
-        rowId: string,
-        row: Prisma.CountrySelect,
-        api: GridApiCommunity
+        rowId: GridRowId,
+        row: GridRowModel<Prisma.CountryMaxAggregateOutputType>
     ) => {
         try {
             setChangeLockTranslationLoading(rowId)
@@ -92,7 +92,7 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
             const serializedUpdate = {...updateJson}
             serializedUpdate.createdAt = format(parseISO(serializedUpdate.createdAt), 'dd/MM/yy kk:mm')
             serializedUpdate.updatedAt = format(parseISO(serializedUpdate.updatedAt), 'dd/MM/yy kk:mm')
-            api.updateRows([{...row, lockTranslation: updateJson.lockTranslation}])
+            setCountriesRows(countries => countries.map(country => country.id === rowId ? serializedUpdate : country))
         } catch (e) {
             console.error(e)
         } finally {
@@ -101,11 +101,10 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     }
 
 
-    const handleAdminTableShowSwitchChange = async (
+    const handleShowToggle = async (
         checked: boolean,
-        rowId: string,
-        row: Prisma.CountrySelect,
-        api: GridApiCommunity
+        rowId: GridRowId,
+        row: GridRowModel<Prisma.CountryMaxAggregateOutputType>,
     ) => {
         try {
             setChangeShowLoading(rowId)
@@ -118,7 +117,7 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
             const serializedUpdate = {...updateJson}
             serializedUpdate.createdAt = format(parseISO(serializedUpdate.createdAt), 'dd/MM/yy kk:mm')
             serializedUpdate.updatedAt = format(parseISO(serializedUpdate.updatedAt), 'dd/MM/yy kk:mm')
-            api.updateRows([{...row, show: updateJson.show}])
+            setCountriesRows(countries => countries.map(country => country.id === rowId ? serializedUpdate : country))
         } catch (e) {
             console.error(e)
         } finally {
@@ -126,7 +125,7 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
         }
     }
 
-    const handleRowUpdate = async (newRow: Prisma.CountrySelect, oldRow: Prisma.CountrySelect) => {
+    const handleRowUpdate = async (newRow: GridRowModel<Prisma.CountryMaxAggregateOutputType>, oldRow: GridRowModel<Prisma.CountryMaxAggregateOutputType>) => {
         try {
             const update = await updateRow(JSON.stringify({
                     ...newRow,
@@ -168,9 +167,10 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
         <AdminLayout>
             <AdminTable
                 columns={columns}
-                data={countries}
+                data={countriesRows}
                 processRowUpdate={handleRowUpdate}
                 onDelete={handleRowsDelete}
+                rowActions={[]}
             />
         </AdminLayout>
     );

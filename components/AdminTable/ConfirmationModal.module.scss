@@ -1,0 +1,7 @@
+@import "styles/variables";
+
+.main {
+  :global * {
+    color: $text-color
+  }
+}

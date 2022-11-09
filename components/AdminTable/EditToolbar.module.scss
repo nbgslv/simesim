@@ -1,0 +1,19 @@
+@import "styles/variables";
+
+.button {
+  margin-left: 1rem;
+
+  :global svg {
+    margin-left: 1rem;
+  }
+
+  :global path {
+    color: $background-color
+  }
+}
+
+.spinner {
+  position: absolute;
+  right: 50%;
+  transform: translateX(-50%);
+}

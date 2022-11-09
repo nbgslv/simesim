@@ -1,0 +1,11 @@
+@import "styles/variables";
+
+.main {
+  :global * {
+    color: $text-color;
+
+    & > form > div {
+      margin-bottom: 1rem;
+    }
+  }
+}

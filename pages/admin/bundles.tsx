@@ -38,7 +38,12 @@ const Bundles = ({ bundlesList }: { bundlesList: Prisma.BundleSelect[] }) => {
     ]
     return (
         <AdminLayout>
-            <AdminTable columns={columns as never[]} data={bundlesList as never} />
+            <AdminTable
+                columns={columns}
+                data={bundlesList}
+                multiActions={[]}
+                rowActions={[]}
+            />
         </AdminLayout>
     );
 };

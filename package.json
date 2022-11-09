@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ebay/nice-modal-react": "^1.2.8",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@fortawesome/fontawesome-svg-core": "^6.2.0",
@@ -16,6 +17,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.2.0",
     "@fortawesome/free-solid-svg-icons": "^6.2.0",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@hookform/resolvers": "^2.9.10",
     "@mui/material": "^5.10.12",
     "@mui/x-data-grid": "^5.17.9",
     "@prisma/client": "^4.5.0",
@@ -24,6 +26,7 @@
     "bootstrap": "^5.2.2",
     "bottleneck": "^2.19.5",
     "country-code-lookup": "^0.0.20",
+    "cuid": "^2.1.8",
     "date-fns": "^2.29.3",
     "framer-motion": "^7.5.3",
     "next": "12.3.1",
@@ -36,7 +39,8 @@
     "react-lottie": "^1.2.3",
     "sass": "^1.55.0",
     "scrollmagic": "^2.0.8",
-    "styled-components": "^5.3.6"
+    "styled-components": "^5.3.6",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@svgr/webpack": "^6.5.0",
