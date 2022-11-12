@@ -1,7 +1,7 @@
 import React from 'react';
 import prisma from "../../lib/prisma";
 import AdminTable from "../../components/AdminTable/AdminTable";
-import styles from './main.module.scss'
+import styles from '../../styles/main.module.scss'
 import AdminLayout from "../../components/Layouts/AdminLayout";
 
 const Main = ({ lastLines }) => {

@@ -5,16 +5,11 @@ import logoImageWhiteText from '../../public/logoWhite.png'
 import logoImageBlackText from '../../public/logo.png'
 import styles from './CustomNavbar.module.scss'
 import text from '../../lib/content/text.json';
+import {useSession} from "next-auth/react";
 
-enum Sections {
-    home = 'home',
-    info = 'info',
-    order = 'order',
-    checkPhone = 'checkPhone',
-}
-
-const CustomNavbar = ({ background, height }: { background: string | null, height: string }) => {
+const CustomNavbar = ({ background, height, hideJumbotron = false }: { background: string | null, height: string, hideJumbotron: boolean }) => {
     const [activeSection, setActiveSection] = React.useState<string | null>(null)
+    const { status } = useSession()
     const navbarRef: RefObject<HTMLElement> = useRef(null)
 
     useEffect(() => {
@@ -42,7 +37,7 @@ const CustomNavbar = ({ background, height }: { background: string | null, heigh
     }, [background, height])
 
     return (
-        <Navbar expand="lg" className={styles.navbar} fixed="top" ref={navbarRef}>
+        <Navbar expand="lg" className={styles.navbar} fixed={hideJumbotron ? undefined : "top"} ref={navbarRef}>
             <Container>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
@@ -54,10 +49,19 @@ const CustomNavbar = ({ background, height }: { background: string | null, heigh
                         <Nav.Link href="#">{text.header.navbar.contact}</Nav.Link>
                     </Nav>
                     <Nav className={`me-auto ${styles.login}`}>
-                        <Nav.Link href="#">{text.header.navbar.login}</Nav.Link>
+                        {status === 'authenticated' ? (
+                            <NavDropdown title="אזור אישי">
+                                <NavDropdown.Item href="#action/3.1">הזמנות</NavDropdown.Item>
+                                <NavDropdown.Item href="#action/3.2">הגדרות</NavDropdown.Item>
+                                <NavDropdown.Divider />
+                                <NavDropdown.Item href="/api/auth/signout">התנתק</NavDropdown.Item>
+                            </NavDropdown>
+                        ) : (
+                            <Nav.Link href="/login">{text.header.navbar.login}</Nav.Link>
+                        )}
                     </Nav>
                 </Navbar.Collapse>
-                <Navbar.Brand href="#home" className="d-flex justify-content-end" style={{ marginLeft: '0' }}><Image src={background ? logoImageBlackText : logoImageWhiteText} alt="Logo image" layout="fixed" width={65} height={35} /></Navbar.Brand>
+                <Navbar.Brand href="/" className="d-flex justify-content-end" style={{ marginLeft: '0' }}><Image src={background ? logoImageBlackText : logoImageWhiteText} alt="Logo image" layout="fixed" width={65} height={35} /></Navbar.Brand>
             </Container>
         </Navbar>
     );

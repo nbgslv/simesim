@@ -1,0 +1,32 @@
+@import "variables";
+
+.signIn {
+  height: 64vh;
+  background-color: $background-color;
+
+  :global * {
+    color: $text-color;
+  }
+}
+
+.formGroup {
+  margin-bottom: 1rem;
+}
+
+.button {
+  color: #ffffff;
+}
+
+.otpInput {
+  margin-right: 1rem;
+  width: 2rem !important;
+  height: 3rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.alert {
+  margin-top: 2rem;
+}
