@@ -1,7 +1,5 @@
 import React from 'react';
-import {Switch} from "@mui/material";
-import {GridApiCommunity} from "@mui/x-data-grid/internals";
-import {Spinner} from "react-bootstrap";
+import {Spinner, Form} from "react-bootstrap";
 import {GridRowId, GridRowModel, GridValidRowModel} from "@mui/x-data-grid";
 
 type AdminTableSwitchProps<T extends GridValidRowModel> = {
@@ -23,7 +21,7 @@ const AdminTableSwitch = <T extends GridValidRowModel>({ checked, onChange, rowI
 
     if (loading === rowId) return <Spinner className="mx-auto" animation={'border'} />
     return (
-        <Switch checked={checked} onChange={handleChange} />
+        <Form.Check type="switch" checked={checked} onChange={handleChange} />
     );
 };
 
