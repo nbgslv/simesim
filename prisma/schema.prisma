@@ -1,0 +1,258 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["extendedWhereUnique"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRoles {
+  ADMIN
+  USER
+}
+
+model User {
+  id             String          @id @default(cuid())
+  email          String          @unique
+  firstName      String?
+  lastName       String?
+  plans          Plan[]
+  phone          String          @unique
+  paymentMethods PaymentMethod[]
+  createdAt      DateTime        @default(now()) @map(name: "created_at")
+  updatedAt      DateTime        @updatedAt @map(name: "updated_at")
+  lastLogin      DateTime?
+  Payment        Payment[]
+  emailVerified  DateTime?       @map("email_verified")
+  image          String?
+  role           UserRoles       @default(USER)
+
+  @@map(name: "users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+model PlanModel {
+  id          String   @id @default(cuid())
+  bundle      Bundle   @relation(fields: [bundleId], references: [id])
+  bundleId    String
+  refill      Refill   @relation(fields: [refillId], references: [id])
+  refillId    String
+  name        String
+  description String?
+  price       Int
+  vat         Boolean
+  coupons     Coupon[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  Plan        Plan[]
+}
+
+model Plan {
+  id          String    @id @default(cuid())
+  planModel   PlanModel @relation(fields: [planModelId], references: [id])
+  planModelId String
+  price       Int
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  payment     Payment?  @relation(fields: [paymentId], references: [id])
+  paymentId   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  line        Line?     @relation(fields: [lineId], references: [id])
+  lineId      String?
+  Bundle      Bundle    @relation(fields: [bundleId], references: [id])
+  bundleId    String
+  Refill      Refill    @relation(fields: [refillId], references: [id])
+  refillId    String
+}
+
+model Payment {
+  id              String         @id @default(cuid())
+  externalId      String?        @unique
+  amount          Int
+  paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+  paymentMethodId String?
+  status          String
+  user            User           @relation(fields: [userId], references: [id])
+  userId          String
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  Plan            Plan[]
+}
+
+model PaymentMethod {
+  id         String    @id @default(cuid())
+  cardNumber String
+  cardType   String
+  expMonth   String
+  expYear    String
+  last4      String
+  user       User      @relation(fields: [userId], references: [id])
+  userId     String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  Payment    Payment[]
+}
+
+model Line {
+  id                 String               @id @default(cuid())
+  externalId         String               @unique
+  iccid              String
+  productId          String
+  deactivationDate   DateTime
+  expiredAt          DateTime
+  allowedUsageKb     Int
+  remainingUsageKb   Int
+  remainingDays      Int
+  status             Int
+  bundle             Bundle               @relation(fields: [bundleId], references: [id])
+  bundleId           String
+  notes              String
+  dataBundles        LinesOnDataBundles[]
+  dataBundlesIds     String[]
+  qrCode             String
+  lpaCode            String
+  msisdn             String?
+  autoRefillTurnedOn Int?
+  autoRefillAmountMb String?
+  autoRefillPrice    Int?
+  autoRefillCurrency String?
+  autoRefillList     AutoRefillsLists[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  Plan               Plan[]
+}
+
+model AutoRefillsLists {
+  refill    Refill   @relation(fields: [refillId], references: [id])
+  refillId  String
+  line      Line     @relation(fields: [lineId], references: [id])
+  lineId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([refillId, lineId])
+}
+
+model LinesOnDataBundles {
+  line         Line       @relation(fields: [lineId], references: [id])
+  lineId       String
+  dataBundle   DataBundle @relation(fields: [dataBundleId], references: [id])
+  dataBundleId String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@id([lineId, dataBundleId])
+}
+
+model Bundle {
+  id          String      @id @default(cuid())
+  externalId  String      @unique
+  typeId      Int?
+  name        String
+  description String
+  coverage    String[]
+  refills     Refill[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  Plan        Plan[]
+  line        Line[]
+  PlanModel   PlanModel[]
+}
+
+model DataBundle {
+  id                 String               @id @default(cuid())
+  externalId         String               @unique
+  status             BundleStatus
+  allowedUsageKb     Int
+  activeKb           Int
+  remainingUsageKb   Int
+  validity           Int
+  assignedAt         String
+  activatedAt        String
+  terminatedAt       String
+  expireAt           String
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  linesOnDataBundles LinesOnDataBundles[]
+}
+
+enum BundleStatus {
+  NON_ACTIVE
+  ACTIVE
+  FINISHED
+  EXPIRED
+}
+
+model Refill {
+  id               String             @id @default(cuid())
+  title            String
+  amount_mb        Int
+  amount_days      Int?
+  price_usd        Float
+  price_eur        Float
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  Plan             Plan[]
+  AutoRefillsLists AutoRefillsLists[]
+  bundle           Bundle             @relation(fields: [bundleId], references: [id])
+  bundleId         String
+  PlanModel        PlanModel[]
+}
+
+model Transaction {
+  id                String @id @default(cuid())
+  createdAtExternal String
+  status            String
+  amount            String
+  currency          String
+  type              String
+  invoiceHash       String
+  refillAmountMb    Int
+  reason            String
+  productId         String
+}
+
+model Country {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  translation     String
+  lockTranslation Boolean  @default(false)
+  show            Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum DiscountType {
+  PERCENT
+  AMOUNT
+}
+
+model Coupon {
+  id             String       @id @default(cuid())
+  code           String       @unique
+  discount       Int
+  discountType   DiscountType
+  validFrom      DateTime
+  validTo        DateTime
+  maxUsesPerUser Int          @default(1)
+  maxUsesTotal   Int          @default(-1)
+  uses           Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  PlanModel      PlanModel?   @relation(fields: [planModelId], references: [id])
+  planModelId    String?
+}

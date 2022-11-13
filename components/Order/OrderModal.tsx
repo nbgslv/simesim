@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {Button, Col, Container, Modal, Row} from "react-bootstrap";
+import React from 'react';
+import {Button, Col, Modal, Row, Form} from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import { useForm, Controller } from "react-hook-form";
 import Input from "../Input/Input";
@@ -20,12 +20,13 @@ const OrderModal = ({ show, onHide, bundle, refill, country }: BundlesSectionPro
         mode: 'onBlur',
         reValidateMode: 'onChange',
         defaultValues: {
-            startDate: new Date(),
-            endDate: new Date(),
+            startDate: null,
+            endDate: null,
             firstName: '',
             lastName: '',
             email: '',
             phone: '',
+            terms: false,
         }
     });
 
@@ -167,6 +168,7 @@ const OrderModal = ({ show, onHide, bundle, refill, country }: BundlesSectionPro
                                         />
                                     }
                                 />
+                                <small>מספר זה ישמש בעת התחברות לחשבונך</small>
                             </Col>
                         </Row>
                         <Row className={styles.orderModalRow}>
@@ -193,8 +195,30 @@ const OrderModal = ({ show, onHide, bundle, refill, country }: BundlesSectionPro
                             </Col>
                         </Row>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button type="submit" variant="primary" className={styles.submitButton}>לתשלום</Button>
+                <Modal.Footer className="d-flex justify-content-between">
+                    <div>
+                        <Controller
+                            name="terms"
+                            control={control}
+                            rules={{ required: true }}
+                            render={({ field, fieldState }) => (
+                                <Form.Check type="checkbox" id="terms" reverse>
+                                    <Form.Check.Input
+                                        type="checkbox"
+                                        isInvalid={fieldState.error !== undefined}
+                                        checked={field.value}
+                                        onChange={field.onChange}
+                                    />
+                                    <Form.Check.Label>אני מאשר/ת את&nbsp;
+                                        <a href="/terms" target="_blank">תנאי השימוש</a>
+                                    </Form.Check.Label>
+                                </Form.Check>
+                            )}
+                        />
+                    </div>
+                    <div>
+                        <Button type="submit" variant="primary" className={styles.submitButton}>לתשלום</Button>
+                    </div>
                 </Modal.Footer>
             </form>
         </Modal>

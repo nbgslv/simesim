@@ -4,6 +4,16 @@
   :global div {
     color: $text-color;
   }
+
+  :global label {
+    color: $text-color;
+  }
+
+  :global small {
+    color: $text-color;
+    font-weight: 100;
+    font-size: 0.7rem;
+  }
 }
 
 .orderModalRow {

@@ -6,6 +6,7 @@ import logoImageBlackText from '../../public/logo.png'
 import styles from './CustomNavbar.module.scss'
 import text from '../../lib/content/text.json';
 import {useSession} from "next-auth/react";
+import Link from "next/link";
 
 const CustomNavbar = ({ background, height, hideJumbotron = false }: { background: string | null, height: string, hideJumbotron: boolean }) => {
     const [activeSection, setActiveSection] = React.useState<string | null>(null)
@@ -42,11 +43,21 @@ const CustomNavbar = ({ background, height, hideJumbotron = false }: { backgroun
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav>
-                        <Nav.Link href="#bundles-section">{text.header.navbar.order}</Nav.Link>
-                        <Nav.Link href="#">{text.header.navbar.info}</Nav.Link>
-                        <Nav.Link href="#">{text.header.navbar.guide}</Nav.Link>
-                        <Nav.Link href="#">{text.header.navbar.about}</Nav.Link>
-                        <Nav.Link href="#">{text.header.navbar.contact}</Nav.Link>
+                        <Link href="/#bundles-section" passHref>
+                            <Nav.Link>{text.header.navbar.order}</Nav.Link>
+                        </Link>
+                        <Link href="/info" passHref>
+                            <Nav.Link>{text.header.navbar.info}</Nav.Link>
+                        </Link>
+                        <Link href="/guide" passHref>
+                            <Nav.Link>{text.header.navbar.guide}</Nav.Link>
+                        </Link>
+                        <Link href="/about" passHref>
+                            <Nav.Link>{text.header.navbar.about}</Nav.Link>
+                        </Link>
+                        <Link href="/contact" passHref>
+                            <Nav.Link>{text.header.navbar.contact}</Nav.Link>
+                        </Link>
                     </Nav>
                     <Nav className={`me-auto ${styles.login}`}>
                         {status === 'authenticated' ? (
@@ -57,11 +68,27 @@ const CustomNavbar = ({ background, height, hideJumbotron = false }: { backgroun
                                 <NavDropdown.Item href="/api/auth/signout">התנתק</NavDropdown.Item>
                             </NavDropdown>
                         ) : (
-                            <Nav.Link href="/login">{text.header.navbar.login}</Nav.Link>
+                            <Link href="/login" passHref>
+                                <Nav.Link>{text.header.navbar.login}</Nav.Link>
+                            </Link>
                         )}
                     </Nav>
                 </Navbar.Collapse>
-                <Navbar.Brand href="/" className="d-flex justify-content-end" style={{ marginLeft: '0' }}><Image src={background ? logoImageBlackText : logoImageWhiteText} alt="Logo image" layout="fixed" width={65} height={35} /></Navbar.Brand>
+                <Link href="/" passHref>
+                    <Navbar.Brand
+                        href="/"
+                        className="d-flex justify-content-end"
+                        style={{ marginLeft: '0' }}
+                    >
+                        <Image
+                            src={background ? logoImageBlackText : logoImageWhiteText}
+                            alt="Logo image"
+                            layout="fixed"
+                            width={65}
+                            height={35}
+                        />
+                    </Navbar.Brand>
+                </Link>
             </Container>
         </Navbar>
     );
