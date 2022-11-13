@@ -3,7 +3,7 @@ import prisma from "../prisma";
 import {Bundle, Refill} from "../../utils/api/sevices/keepGo/types";
 
 const getBundles = async () => {
-    const keepGoApi = new KeepGoApi(process.env.KEEPGO_BASE_URL, process.env.KEEPGO_API_KEY, process.env.KEEPGO_ACCESS_TOKEN);
+    const keepGoApi = new KeepGoApi(process.env.KEEPGO_BASE_URL || '', process.env.KEEPGO_API_KEY || '', process.env.KEEPGO_ACCESS_TOKEN || '');
     return keepGoApi.getBundles();
 }
 

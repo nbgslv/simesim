@@ -40,7 +40,7 @@ export default function Home({ countriesList, bundlesList, phonesList }: HomePro
 }
 
 export async function getStaticProps() {
-    const keepGoApi = new KeepGoApi(process.env.KEEPGO_BASE_URL, process.env.KEEPGO_API_KEY, process.env.KEEPGO_ACCESS_TOKEN);
+    const keepGoApi = new KeepGoApi(process.env.KEEPGO_BASE_URL || '', process.env.KEEPGO_API_KEY || '', process.env.KEEPGO_ACCESS_TOKEN || '');
     const countriesList: KeepGoResponse | Error = await keepGoApi.getCountries();
     const bundlesList: KeepGoResponse | Error = await keepGoApi.getBundles();
     const phonesList: KeepGoResponse | Error = await keepGoApi.getEsimDevices();
