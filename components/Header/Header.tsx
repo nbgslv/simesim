@@ -38,11 +38,23 @@ const Header = ({ hideJumbotron = false }: { hideJumbotron?: boolean }) => {
                                 <Image src={coverImage} />
                             </Col>
                             <Col>
-                                <Image src={logoTextWhite} layout="fixed" width={300} height={55} />
+                                <div><Image src={logoTextWhite} layout="fixed" width={300} height={55} /></div>
                                 <p className="mt-4">{text.home.coverText}</p>
                                 <div className="d-flex justify-content-between mt-4">
-                                    <Button variant="primary" className={styles.actionButton}>{text.home.orderButtonText}</Button>
-                                    <Button variant="outline-primary" className={styles.actionButtonSecondary}>{text.home.moreDetailsButtonText}</Button>
+                                    <Button
+                                        variant="primary"
+                                        className={styles.actionButton}
+                                        href="/#bundles-section"
+                                    >
+                                        {text.home.orderButtonText}
+                                    </Button>
+                                    <Button
+                                        variant="outline-primary"
+                                        className={styles.actionButtonSecondary}
+                                        href="/#timeline-section"
+                                    >
+                                        {text.home.moreDetailsButtonText}
+                                    </Button>
                                 </div>
                             </Col>
                         </Row>

@@ -37,7 +37,7 @@ const Footer = () => {
                                 <Nav.Link href="#">{text.header.navbar.about}</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
-                                <Nav.Link href="#">{text.header.navbar.contact}</Nav.Link>
+                                <Nav.Link href="/contact">{text.header.navbar.contact}</Nav.Link>
                             </Nav.Item>
                             <Nav.Item>
                                 <Nav.Link href="#">{text.header.navbar.privacyPolicy}</Nav.Link>
@@ -54,8 +54,8 @@ const Footer = () => {
                             </div>
                         </div>
                         <div className="d-flex flex-column justify-content-between">
-                            <div>
-                                <FontAwesomeIcon icon={regular('envelope')} />
+                            <div className="d-flex align-items-center">
+                                <FontAwesomeIcon icon={regular('envelope')} /><Nav.Link href="mailto:service@simesim.co.il">service@simesim.co.il</Nav.Link>
                             </div>
                             <div>
                                 <FontAwesomeIcon icon={brands('whatsapp')} />

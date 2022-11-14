@@ -1,7 +1,7 @@
 @import "variables";
 
 .signIn {
-  height: 64vh;
+  height: $page-height;
   background-color: $background-color;
 
   :global * {

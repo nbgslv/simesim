@@ -9,7 +9,6 @@ import {useSession} from "next-auth/react";
 import Link from "next/link";
 
 const CustomNavbar = ({ background, height, hideJumbotron = false }: { background: string | null, height: string, hideJumbotron: boolean }) => {
-    const [activeSection, setActiveSection] = React.useState<string | null>(null)
     const { status } = useSession()
     const navbarRef: RefObject<HTMLElement> = useRef(null)
 
@@ -42,21 +41,24 @@ const CustomNavbar = ({ background, height, hideJumbotron = false }: { backgroun
             <Container>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav>
+                    <Nav defaultActiveKey="/">
+                        <Link href="/" passHref>
+                            <Nav.Link className="d-none" eventKey="/">בית</Nav.Link>
+                        </Link>
                         <Link href="/#bundles-section" passHref>
-                            <Nav.Link>{text.header.navbar.order}</Nav.Link>
+                            <Nav.Link eventKey="bundles-section">{text.header.navbar.order}</Nav.Link>
                         </Link>
                         <Link href="/info" passHref>
-                            <Nav.Link>{text.header.navbar.info}</Nav.Link>
+                            <Nav.Link eventKey="info">{text.header.navbar.info}</Nav.Link>
                         </Link>
                         <Link href="/guide" passHref>
-                            <Nav.Link>{text.header.navbar.guide}</Nav.Link>
+                            <Nav.Link eventKey="guide">{text.header.navbar.guide}</Nav.Link>
                         </Link>
                         <Link href="/about" passHref>
-                            <Nav.Link>{text.header.navbar.about}</Nav.Link>
+                            <Nav.Link eventKey="about">{text.header.navbar.about}</Nav.Link>
                         </Link>
                         <Link href="/contact" passHref>
-                            <Nav.Link>{text.header.navbar.contact}</Nav.Link>
+                            <Nav.Link eventKey="contact">{text.header.navbar.contact}</Nav.Link>
                         </Link>
                     </Nav>
                     <Nav className={`me-auto ${styles.login}`}>
@@ -69,7 +71,7 @@ const CustomNavbar = ({ background, height, hideJumbotron = false }: { backgroun
                             </NavDropdown>
                         ) : (
                             <Link href="/login" passHref>
-                                <Nav.Link>{text.header.navbar.login}</Nav.Link>
+                                <Nav.Link eventKey="login">{text.header.navbar.login}</Nav.Link>
                             </Link>
                         )}
                     </Nav>

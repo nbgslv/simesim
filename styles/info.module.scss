@@ -1,0 +1,16 @@
+@import "styles/variables";
+
+.wrapper {
+  padding: 1rem;
+  background-color: $background-color;
+  height: 100%;
+}
+
+.container {
+  color: $text-color;
+  width: 75%;
+
+  :global * {
+    color: $text-color;
+  }
+}

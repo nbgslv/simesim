@@ -1,16 +1,17 @@
-import React, {MutableRefObject, useEffect, useRef, useState} from 'react';
+import React, {MutableRefObject, ReactNode, useEffect, useRef, useState} from 'react';
 import styles from './TimelineItem.module.scss';
 import {AnimatePresence, motion, useAnimation} from "framer-motion";
 
 type TimelineItemProps = {
-    children: JSX.Element[] | JSX.Element | null,
+    children: ReactNode,
     tooltipText?: string,
     disableAnimation: (key: number) => void,
     animationKey: number,
     animate: boolean,
+    onHovered?: () => void,
 }
 
-const TimelineItem = ({ children, tooltipText, disableAnimation, animationKey, animate }: TimelineItemProps) => {
+const TimelineItem = ({ children, tooltipText, disableAnimation, animationKey, animate, onHovered }: TimelineItemProps) => {
     const [active, setActive] = useState<boolean>(false);
     const [animationActive, setAnimationActive] = useState<boolean>(false);
     const [showTooltip, setShowTooltip] = useState<boolean>(false);
@@ -39,6 +40,7 @@ const TimelineItem = ({ children, tooltipText, disableAnimation, animationKey, a
         setShowTooltip(false)
         controls.stop()
         disableAnimation(animationKey);
+        onHovered && onHovered();
     }
 
     const handleMouseLeave = () => {

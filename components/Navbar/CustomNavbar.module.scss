@@ -4,6 +4,11 @@
   height: 4rem;
   transition: all .6s;
   opacity: .8;
+
+  :global .navbar-nav .nav-link.active {
+    font-weight: 800;
+    font-size: 0.9rem;
+  }
 }
 
 .navLinkTextDark {
@@ -15,7 +20,7 @@
 }
 
 .navLinkTextLight {
-  color: #ffffff;
+  color: #ffffff !important;
 
   &:hover {
     color: map-get($theme-colors, 'primary') !important;

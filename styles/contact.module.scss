@@ -1,0 +1,29 @@
+@import "styles/variables";
+
+.main {
+  background-color: $background-color;
+  height: $page-height;
+
+  :global * {
+    color: $text-color;
+  }
+
+  :global .nav-link {
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
+.container {
+  width: 50%;
+  margin-left: auto;
+}
+
+.iconWrapper {
+  width: fit-content;
+}
+
+.iconContainer {
+  height: 2rem;
+}

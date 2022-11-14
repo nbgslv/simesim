@@ -1,3 +1,5 @@
+@import "styles/variables";
+
 .main {
   padding: 1rem;
   height: 30vh;
@@ -22,6 +24,12 @@
                   hsl(219deg 40% 36%) 100%
   );
   background-size: cover;
+
+  :global .nav-link {
+    &:hover {
+      color: $primary-color;
+    }
+  }
 }
 
 .footerDescription {

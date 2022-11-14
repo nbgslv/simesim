@@ -1,11 +1,15 @@
 import React from 'react';
 import {Button, Col, Modal, Row, Form} from "react-bootstrap";
-import DatePicker from "react-datepicker";
+import DatePicker, {registerLocale} from "react-datepicker";
 import { useForm, Controller } from "react-hook-form";
 import Input from "../Input/Input";
 import {Bundle, Refill} from "../../utils/api/sevices/keepGo/types";
 import styles from './OrderModal.module.scss';
 import "react-datepicker/dist/react-datepicker.css";
+import {yupResolver} from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import {AnimatePresence, motion} from "framer-motion";
+import he from "date-fns/locale/he";
 
 type BundlesSectionProps = {
     show: boolean,
@@ -15,10 +19,22 @@ type BundlesSectionProps = {
     country?: string,
 }
 
+const schema = yup.object().shape({
+    startDate: yup.date().min(new Date(), 'תאריך לא תקין').required('שדה חובה').nullable(true),
+    endDate: yup.date().min(yup.ref('startDate'), 'תאריך לא תקין').required('שדה חובה').nullable(true),
+    firstName: yup.string().required('שדה חובה'),
+    lastName: yup.string().required('שדה חובה'),
+    email: yup.string().email('דוא"ל לא תקין').required('שדה חובה'),
+    phone: yup.string().length(10, 'טלפון לא תקין').required('שדה חובה'),
+    terms: yup.boolean().oneOf([true]).required('שדה חובה'),
+})
+
 const OrderModal = ({ show, onHide, bundle, refill, country }: BundlesSectionProps) => {
-    const { control, handleSubmit, formState: { errors, isValidating } } = useForm({
+    registerLocale('he', he);
+    const { getValues, control, handleSubmit, formState: { errors, isValidating } } = useForm({
         mode: 'onBlur',
         reValidateMode: 'onChange',
+        resolver: yupResolver(schema),
         defaultValues: {
             startDate: null,
             endDate: null,
@@ -84,9 +100,20 @@ const OrderModal = ({ show, onHide, bundle, refill, country }: BundlesSectionPro
                                             onChange={field.onChange}
                                             dateFormat="dd/MM/yyyy"
                                             placeholderText="מתאריך"
+                                            minDate={new Date()}
+                                            openToDate={new Date()}
+                                            isClearable
+                                            locale="he"
                                         />
                                     }
                                 />
+                                {errors.startDate && (
+                                    <AnimatePresence>
+                                        <motion.div key={1} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className={styles.errorMessage}>
+                                            {errors.startDate.message as string}
+                                        </motion.div>
+                                    </AnimatePresence>
+                                )}
                             </Col>
                             <Col className={styles.dateInput}>
                                 <Controller
@@ -99,9 +126,21 @@ const OrderModal = ({ show, onHide, bundle, refill, country }: BundlesSectionPro
                                             onChange={field.onChange}
                                             dateFormat="dd/MM/yyyy"
                                             placeholderText="עד תאריך"
+                                            minDate={getValues('startDate')}
+                                            openToDate={getValues('startDate') || undefined}
+                                            isClearable
+                                            disabled={!getValues('startDate')}
+                                            locale="he"
                                         />
                                     }
                                 />
+                                {errors.endDate && (
+                                    <AnimatePresence>
+                                        <motion.div key={1} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className={styles.errorMessage}>
+                                            {errors.endDate.message as string}
+                                        </motion.div>
+                                    </AnimatePresence>
+                                )}
                             </Col>
                         </Row>
                         <Row className={styles.orderModalRow}>

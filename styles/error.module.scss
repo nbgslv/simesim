@@ -1,8 +1,10 @@
+@import "styles/variables";
+
 .container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 64vh;
+  height: $page-height;
   width: 100vw;
 }

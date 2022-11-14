@@ -63,7 +63,7 @@ const BundlesSection = ({ countriesList, bundlesList }: BundlesSectionProps) => 
                                 <div className={`${styles.infoPlate} p-1 mb-2`}>
                                     <h3>1. מספרים לנו לאן אתם טסים</h3>
                                 </div>
-                                <div className="h-100">
+                                <div className="h-100 p-2">
                                     <CountrySearch
                                         countriesList={countriesList}
                                         onSelect={handleCountrySelect}
