@@ -7,3 +7,13 @@ export const getObjectsDiff = (obj1: Record<string, unknown>, obj2: Record<strin
     }
     return result
 }
+
+export const getFormData = (data: Record<string, string | number | boolean>): string => {
+    const formData = []
+    for (const key in data) {
+        const encodedKey = encodeURIComponent(key);
+        const encodedValue = encodeURIComponent(data[key]);
+        formData.push(encodedKey + "=" + encodedValue);
+    }
+    return formData.join('&');
+}

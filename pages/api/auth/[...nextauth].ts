@@ -1,13 +1,14 @@
-import NextAuth from "next-auth"
+import NextAuth, {NextAuthOptions} from "next-auth"
 import EmailProvider from "next-auth/providers/email";
 import {PrismaAdapter} from "@next-auth/prisma-adapter";
 import prisma from "../../../lib/prisma";
 import TwilioApi, {Channel} from "../../../utils/api/sevices/twilio/twilio";
 import otpGenerator from "otp-generator";
+import {NextApiRequest, NextApiResponse} from "next";
 
-export default async function auth(req: any, res: any) {
-    const twilioApi = new TwilioApi(process.env.TWILIO_ACCOUNT_SID!, process.env.TWILIO_AUTH_TOKEN!, process.env.TWILIO_VERIFY_SID!);
-    return await NextAuth(req, res, {
+const twilioApi = new TwilioApi(process.env.TWILIO_ACCOUNT_SID!, process.env.TWILIO_AUTH_TOKEN!, process.env.TWILIO_VERIFY_SID!);
+
+export const authOptions = (req: NextApiRequest, res: NextApiResponse): NextAuthOptions => ({
     adapter: PrismaAdapter(prisma),
     providers: [
         EmailProvider({
@@ -15,7 +16,7 @@ export default async function auth(req: any, res: any) {
             server: '',
             maxAge: 60 * 60 * 2, // 2 hours
             sendVerificationRequest: async ({ identifier: phone, token, url }) => {
-                console.log({ token })
+                console.log({token})
                 const body = req.body;
                 let method = body.method;
                 if (method) {
@@ -31,16 +32,16 @@ export default async function auth(req: any, res: any) {
                 }
                 const user = await prisma.user.findUnique({
                     where: {
-                        phone
+                        email: phone
                     }
                 })
 
                 if (!user) {
-                    // res.redirect('error?error=invalid_phone')
+                    res.redirect('/error?error=Verification')
                 } else {
-                    // const message = await twilioApi.sendVerificationCodeWithVerify(phone, token, method);
+                    // const message = await twilioApi.sendVerificationCode(phone, token, method);
                     // if (message !== 'pending') {
-                    //     res.redirect('api/auth/error?error=general_error')
+                    //     res.redirect('/error?error=Configuration')
                     // }
                 }
             },
@@ -59,18 +60,29 @@ export default async function auth(req: any, res: any) {
     session: {
         strategy: "jwt",
     },
+    jwt: {
+        maxAge: 60 * 60 * 2, // 2 hours
+    },
     callbacks: {
-        async jwt({ token, account, profile }) {
+        async jwt({token}) {
             const user = await prisma.user.findUnique({
                 where: {
-                    email: account?.providerAccountId
+                    email: token.email!
                 }
             })
-            if (account && user) {
+            if (user) {
                 token.name = `${user.firstName} ${user.lastName}`;
-                token.rolw = user.role;
+                token.role = user.role;
+                token.id = user.id;
             }
             return token
+        },
+        async session({ session, token, user }) {
+            if (session && session.user) {
+                session.user.id = token.id;
+                return session;
+            }
+            return session;
         }
     },
     pages: {
@@ -80,4 +92,8 @@ export default async function auth(req: any, res: any) {
     }
 })
 
+export default async function auth(req: any, res: any) {
+    return await NextAuth(req, res, {
+        ...authOptions(req, res)
+    })
 }

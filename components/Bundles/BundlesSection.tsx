@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import Section from "../Section/Section";
-import CountrySearch, {Country} from "../CountrySearch/CountrySearch";
+import CountrySearch, {ExtendedCountry} from "../CountrySearch/CountrySearch";
 import {Bundle, Refill} from "../../utils/api/sevices/keepGo/types";
 import styles from './BundlesSection.module.scss';
 import {Row, Col, Button} from "react-bootstrap";
@@ -16,13 +16,13 @@ type BundlesSectionProps = {
 }
 
 const BundlesSection = ({ countriesList, bundlesList }: BundlesSectionProps) => {
-    const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+    const [selectedCountry, setSelectedCountry] = useState<ExtendedCountry | null>(null);
     const [selectedBundle, setSelectedBundle] = useState<number | null>(null);
     const [selectedRefill, setSelectedRefill] = useState<Refill | null>(null);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
 
-    const handleCountrySelect = (country: Country | null) => {
+    const handleCountrySelect = (country: ExtendedCountry | null) => {
         setSelectedCountry(country)
         if (country) {
             setCurrentStep(1)
@@ -82,7 +82,7 @@ const BundlesSection = ({ countriesList, bundlesList }: BundlesSectionProps) => 
                             </div>
                         ): null}
                         {currentStep >= 2 ? (
-                            <div>
+                            <>
                                 <Button variant="primary" size="lg" className={`${styles.orderButton} w-100`} onClick={() => setOrderModalOpen(true)}>3. מזמינים</Button>
                                 <OrderModal
                                     show={orderModalOpen}
@@ -91,7 +91,7 @@ const BundlesSection = ({ countriesList, bundlesList }: BundlesSectionProps) => 
                                     bundle={bundlesList.find((bundle) => bundle.id === selectedBundle)}
                                     refill={selectedRefill}
                                 />
-                            </div>
+                            </>
                         ): null}
                     </Col>
                     <Col>

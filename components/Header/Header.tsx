@@ -24,7 +24,9 @@ const Header = ({ hideJumbotron = false }: { hideJumbotron?: boolean }) => {
     useEffect(() => {
         window.addEventListener('scroll', handleScroll)
         handleScroll()
-        return () => window.removeEventListener('scroll', handleScroll)
+        return () => {
+            window.removeEventListener('scroll', handleScroll)
+        }
     }, [])
 
     return (

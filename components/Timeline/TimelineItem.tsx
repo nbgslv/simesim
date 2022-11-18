@@ -15,8 +15,6 @@ const TimelineItem = ({ children, tooltipText, disableAnimation, animationKey, a
     const [active, setActive] = useState<boolean>(false);
     const [animationActive, setAnimationActive] = useState<boolean>(false);
     const [showTooltip, setShowTooltip] = useState<boolean>(false);
-    const timelineOuterRef: MutableRefObject<HTMLDivElement | null> = useRef(null)
-    const timelineContentRef: MutableRefObject<HTMLDivElement | null> = useRef(null)
     const controls = useAnimation();
 
     useEffect(() => {
@@ -79,7 +77,6 @@ const TimelineItem = ({ children, tooltipText, disableAnimation, animationKey, a
             className={`${styles.timelineItem} ${active ? styles.active : ''}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            ref={timelineOuterRef}
         >
             <AnimatePresence initial={false} mode="wait">
                 {!active && (
@@ -94,7 +91,7 @@ const TimelineItem = ({ children, tooltipText, disableAnimation, animationKey, a
                     </motion.div>
                 )}
                 {active && (
-                    <motion.div key={2} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }} className={styles.timelineContent} ref={timelineContentRef}>
+                    <motion.div key={2} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }} className={styles.timelineContent}>
                         <p>{tooltipText}</p>
                     </motion.div>
                 )}

@@ -31,13 +31,37 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 0;
 }
 
+.navbar {
+  --bs-navbar-active-color: map-get($theme-colors, 'blue');
+}
+
+.navbar-nav {
+  --bs-nav-link-hover-color: map-get($theme-colors, 'blue');
+}
+
 .nav-link {
   color: map-get($theme-colors, 'light');
   padding: 0.2rem;
 
-  &:hover {
-    color: map-get($theme-colors, 'blue');
+  &.active {
+    color: map-get($theme-colors, 'primary');
   }
+
+  &:hover {
+    color: map-get($theme-colors, 'primary');
+  }
+
+  &:focus {
+    color: map-get($theme-colors, 'primary');
+  }
+
+  &:active {
+    color: map-get($theme-colors, 'primary');
+  }
+}
+
+a.dropdown-item {
+  text-align: right;
 }
 
 .modal-header .btn-close {
@@ -46,4 +70,14 @@ h1, h2, h3, h4, h5, h6 {
 
 .modal {
   --bs-modal-bg: #F5F5F5;
+}
+
+.MuiPopover-root {
+  & li {
+    color: $text-color;
+  }
+}
+
+.dropdown-toggle::after {
+  margin-right: 0.255rem;
 }

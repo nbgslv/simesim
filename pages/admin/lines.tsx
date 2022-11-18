@@ -118,7 +118,7 @@ const Lines = ({ lines }: LinesProps) => {
                 rowActions={[]}
             />
             <FormModal id="add-user" {...bootstrapDialog(modal)} header={'Add New User'}>
-                {/*<PlansModelForm />*/}
+
             </FormModal>
         </AdminLayout>
     );

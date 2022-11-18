@@ -9,7 +9,16 @@ export default async function handler(
     try {
         const { method } = req
         if (method === 'GET') {
-            // Return Order by ID
+            const countries: Partial<Country>[] = await prisma.country.findMany({
+                where: {
+                    show: true
+                },
+                select: {
+                    name: true,
+                    translation: true
+                }
+            });
+            res.status(200).json(countries)
         } else if (method === 'PUT') {
             const { body: { id, translation, lockTranslation, show }, method } = req
             const update: Country = await prisma.country.update({

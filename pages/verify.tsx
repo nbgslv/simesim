@@ -15,6 +15,7 @@ import {solid} from "@fortawesome/fontawesome-svg-core/import.macro";
 const Verify = ({ csrfToken }: { csrfToken: string }) => {
     const TIMER = 60000 // 60 seconds
     const [phoneNumber, setPhoneNumber] = React.useState<string>('')
+    const [callbackUrl, setCallbackUrl] = React.useState<string>('')
     const [otp, setOtp] = React.useState<string>('')
     const [showOtp, setShowOtp] = React.useState<boolean>(true)
     const [alertVariant, setAlertVariant] = React.useState<string>('')
@@ -23,16 +24,19 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
     const [loading, setLoading] = React.useState<boolean>(false)
     const [timer, setTimer] = React.useState<number>(Date.now() + TIMER)
     const [resendLoading, setResendLoading] = React.useState<boolean>(false)
-    const [ cookies, _, removeCookie ] = useCookies(['phoneNumber'])
+    const [ cookies, _, removeCookie ] = useCookies(['phoneNumber', 'simesim_callbackUrl'])
     const router = useRouter()
 
 
 
     useEffect(() => {
         const cookiePhoneNumber = cookies.phoneNumber
+        const cookieCallbackUrl = cookies.simesim_callbackUrl
         setPhoneNumber(cookiePhoneNumber)
+        setCallbackUrl(cookieCallbackUrl || 'http://localhost:3000')
+        removeCookie('simesim_callbackUrl')
         if (cookiePhoneNumber) {
-            // removeCookie('phoneNumber')
+            removeCookie('phoneNumber')
             setAlertVariant('success')
             setAlertMessage(`קוד האימות נשלח בהצלחה לוואצאפ ${cookiePhoneNumber}`)
             setShowOtp(true)
@@ -44,14 +48,34 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
     }, [])
 
     const handleVerification = async () => {
-        if (otp.length === 6 && phoneNumber) {
-            setLoading(true)
-            console.log(`/api/auth/callback/email?email=${phoneNumber}&token=${otp}&callbackUrl=${encodeURI(process.env.NEXTAUTH_URL || 'http://localhost:3000')}`)
-            await router.push(`/api/auth/callback/email?email=${phoneNumber}&token=${otp}&callbackUrl=${encodeURI(process.env.NEXTAUTH_URL || 'http://localhost:3000')}`)
+        try {
+            if (otp.length === 6 && phoneNumber) {
+                setLoading(true)
+                const res = await fetch(`/api/verify`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        phoneNumber,
+                        token: otp,
+                        callbackUrl,
+                    }),
+                    redirect: 'follow',
+                })
+                if (res.redirected) {
+                    await router.push(res.url)
+                }
+                setLoading(false)
+            } else if (!phoneNumber) {
+                setAlertVariant('danger')
+                setAlertMessage('אירעה שגיאה, נסה שנית')
+            }
+        } catch (e) {
+            console.error(e)
             setLoading(false)
-        } else if (!phoneNumber) {
             setAlertVariant('danger')
-            setAlertMessage('אירעה שגיאה, נסה שנית')
+            setAlertMessage('קוד האימות פג תוקף או שאינו נכון')
         }
     }
 
@@ -134,14 +158,14 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
                     ) : (
                         <>
                             {allowResend ? (
-                                <div>
+                                <>
                                     שלחו לי קוד אימות חדש
                                     <Nav className="d-flex flex-column">
                                         <Nav.Link onClick={() => handleReLogin('sms')}><FontAwesomeIcon icon={solid('caret-left')} /> באמצעות מסרון(הודעת SMS)</Nav.Link>
                                         <Nav.Link onClick={() => handleReLogin('whatsapp')}><FontAwesomeIcon icon={solid('caret-left')} /> או באמצעות וואצאפ</Nav.Link>
                                         <Nav.Link onClick={() => handleReLogin('voice')}><FontAwesomeIcon icon={solid('caret-left')} /> או באמצעות שיחה קולית</Nav.Link>
                                     </Nav>
-                                </div>
+                                </>
                             ) : (
                                 <>
                                     לא קיבלת קוד? ניתן יהיה לנסות שוב בעוד&nbsp;

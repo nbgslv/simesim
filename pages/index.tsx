@@ -9,6 +9,8 @@ import BundlesSection from "../components/Bundles/BundlesSection";
 import QnaSection from "../components/QnA/QnaSection";
 import Footer from "../components/Footer/Footer";
 import CheckPhoneSection, {PhonesList} from "../components/CheckPhone/CheckPhoneSection";
+import {Country} from "@prisma/client";
+import MainLayout from "../components/Layouts/MainLayout";
 
 type HomeProps = {
     countriesList: { [key: string]: string },
@@ -18,34 +20,23 @@ type HomeProps = {
 
 export default function Home({ countriesList, bundlesList, phonesList }: HomeProps): JSX.Element {
     return (
-    <Controller>
-        <Header />
-        <Scene duration={500}>
-            <TimelineSection />
-        </Scene>
-        <Scene duration={500}>
-            <BundlesSection countriesList={countriesList} bundlesList={bundlesList} />
-        </Scene>
-        <Scene duration={500}>
-            <QnaSection />
-        </Scene>
-        <Scene duration={500}>
-            <CheckPhoneSection phonesList={phonesList} />
-        </Scene>
-        <Scene duration={0} pin={false}>
-            <Footer />
-        </Scene>
-    </Controller>
+    <MainLayout>
+        <TimelineSection />
+        <BundlesSection countriesList={countriesList} bundlesList={bundlesList} />
+        <QnaSection />
+        <CheckPhoneSection phonesList={phonesList} />
+    </MainLayout>
   )
 }
 
 export async function getStaticProps() {
     const keepGoApi = new KeepGoApi(process.env.KEEPGO_BASE_URL || '', process.env.KEEPGO_API_KEY || '', process.env.KEEPGO_ACCESS_TOKEN || '');
-    const countriesList: KeepGoResponse | Error = await keepGoApi.getCountries();
+    const countriesListResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/country`);
+    const countriesList: Partial<Country>[] = await countriesListResponse.json()
     const bundlesList: KeepGoResponse | Error = await keepGoApi.getBundles();
     const phonesList: KeepGoResponse | Error = await keepGoApi.getEsimDevices();
 
-    if (countriesList instanceof Error || bundlesList instanceof Error || phonesList instanceof Error) {
+    if (bundlesList instanceof Error || phonesList instanceof Error) {
         return {
             props: {
                 countriesList: [],
@@ -57,7 +48,7 @@ export async function getStaticProps() {
 
     return {
         props: {
-            countriesList: countriesList.countries,
+            countriesList,
             bundlesList: bundlesList.bundles,
             phonesList: phonesList.data
         }

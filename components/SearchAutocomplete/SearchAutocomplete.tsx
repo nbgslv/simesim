@@ -12,6 +12,8 @@ import {AnimatePresence, motion} from "framer-motion";
 import CloseIcon from "../../public/close.svg";
 import styles from "./SearchAutocomplete.module.scss";
 import Input from "../Input/Input";
+import Fuse from "fuse.js";
+import FuseOptionKey = Fuse.FuseOptionKey;
 
 export type Item<T> = T & {
     id: string | number,
@@ -29,6 +31,7 @@ type SearchAutocompleteProps<T> = {
     clearSelectedItem?: boolean,
     focusedBorderColor?: string,
     ListBoxComponent?: ElementType,
+    searchFields?: Partial<keyof Item<T>>[]
 }
 
 type DefaultListBoxComponentProps = {
@@ -50,11 +53,29 @@ const SearchAutocompleteInner = <T extends object>({
     onQueryChange,
     focusedBorderColor = '#fff',
     ListBoxComponent,
+    searchFields = []
 }: SearchAutocompleteProps<T>, ref: ForwardedRef<any>) => {
     const [itemSelected, setItemSelected] = useState<Item<T> | null>(null)
     const [query, setQuery] = useState<string>('');
     const [filteredItems, setFilteredItems] = useState<Item<T>[]>([]);
+    const [searchInstance, setSearchInstance] = useState<Fuse<Item<T>>>(null)
     const mainInputRef = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        if (items && !searchInstance) {
+            setSearchInstance(
+                new Fuse(items, {
+                    keys: [...searchFields, 'displayValue'] as FuseOptionKey<Item<T>>[]
+                })
+            )
+        }
+    }, [searchFields, items])
+
+    useEffect(() => {
+        if (searchInstance) {
+            searchInstance.setCollection(items)
+        }
+    }, [searchInstance, items])
 
     const DefaultListBoxComponent: FC<DefaultListBoxComponentProps> = ({ children }) => {
         const variants = {
@@ -101,16 +122,16 @@ const SearchAutocompleteInner = <T extends object>({
                 onClick={() => selectItem(item)}
                 key={item.id}
             >
-                <div>
-                    {item.displayValue}
-                </div>
+                {item.displayValue}
             </motion.div>
         )
     }
 
     useEffect(() => {
-        if (query) {
-            const filteredItemsArr = items.filter((item) => item.displayValue.toLowerCase().includes(query.toLowerCase()))
+        if (query && searchInstance) {
+            console.log({ all: searchInstance.getIndex(), search: searchInstance.search(query) })
+            const filteredItemsArr = searchInstance.search(query).map(({ item }) => item)
+            setFilteredItems(filteredItemsArr.slice(0, maxResults))
             setFilteredItems(filteredItemsArr)
         } else {
             setFilteredItems([])

@@ -17,27 +17,37 @@ export default class TwilioApi {
         return phoneNumber.replace('0', '+972');
     }
 
-    async sendVerificationCode(phoneNumber: string, verificationCode: string) {
-        const validPhoneNumber = this.formatPhoneNumber(phoneNumber);
-        const { status } = await this.sdk.messages.create({
-            body: `קוד האימות שלך הוא: ${verificationCode}`,
-            messagingServiceSid: this.messagingServiceSid,
-            to: validPhoneNumber
-        });
-        return status;
+    async sendVerificationCode(phoneNumber: string, verificationCode: string, channel: Channel) {
+        try {
+            const validPhoneNumber = this.formatPhoneNumber(phoneNumber);
+            console.log({ verificationCode });
+            const verify = await this.sdk.verify.v2.services(this.messagingServiceSid)
+                .verifications
+                .create({
+                    to: validPhoneNumber,
+                    channel,
+                    customCode: verificationCode.toString(),
+                    locale: 'he'
+                });
+            console.log({ verify });
+            return verify.status;
+        } catch (e: any) {
+            console.error(e)
+            throw new Error(e.message);
+        }
     }
 
-    async sendVerificationCodeWithVerify(phoneNumber: string, verificationCode: string, channel: Channel) {
-        const validPhoneNumber = this.formatPhoneNumber(phoneNumber);
-        const verify = await this.sdk.verify.v2.services(this.messagingServiceSid)
-            .verifications
-            .create({
-                to: validPhoneNumber,
-                channel,
-                customCode: verificationCode,
-                locale: 'he'
-            });
-        console.log({ verify });
-        return verify.status;
+    async validateVerificationCode(phoneNumber: string, verificationCode: string) {
+        try {
+            const validPhoneNumber = this.formatPhoneNumber(phoneNumber);
+            const validation = await this.sdk.verify.v2.services(this.messagingServiceSid)
+                .verifications(validPhoneNumber)
+                .update({status: 'approved'})
+            return validation.status === 'approved';
+
+        } catch (e: any) {
+            console.error(e)
+            throw new Error(e.message);
+        }
     }
 }

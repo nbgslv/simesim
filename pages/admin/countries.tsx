@@ -23,11 +23,13 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
         {
             field: 'name',
             headerName: 'Country',
+            width: 200,
         },
         {
             field: 'translation',
             headerName: 'Translation',
             editable: true,
+            width: 200,
         },
         {
             field: 'lockTranslation',

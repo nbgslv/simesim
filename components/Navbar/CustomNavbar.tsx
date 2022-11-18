@@ -1,20 +1,33 @@
 import React, {RefObject, useEffect, useRef} from 'react';
-import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
+import {Container, Nav, Navbar, NavDropdown, Spinner} from "react-bootstrap";
 import Image from "next/image";
 import logoImageWhiteText from '../../public/logoWhite.png'
 import logoImageBlackText from '../../public/logo.png'
 import styles from './CustomNavbar.module.scss'
 import text from '../../lib/content/text.json';
-import {useSession} from "next-auth/react";
+import {useSession, signOut, getSession} from "next-auth/react";
 import Link from "next/link";
 
 const CustomNavbar = ({ background, height, hideJumbotron = false }: { background: string | null, height: string, hideJumbotron: boolean }) => {
-    const { status } = useSession()
+    const [loggedIn, setLoggedIn] = React.useState<boolean>(false)
     const navbarRef: RefObject<HTMLElement> = useRef(null)
+
+    useEffect(() => {
+        (async () => {
+            const session = await getSession()
+            console.log({ session })
+            if (session) {
+                setLoggedIn(true)
+            } else {
+                setLoggedIn(false)
+            }
+        })()
+    }, [])
 
     useEffect(() => {
         if (navbarRef.current) {
             const navLinks: HTMLCollectionOf<HTMLElement> = Array.from(navbarRef.current.querySelectorAll('a.nav-link')) as unknown as HTMLCollectionOf<HTMLElement>
+            const dropdowns: HTMLCollectionOf<HTMLElement> = Array.from(navbarRef.current.querySelectorAll('a.dropdown-toggle')) as unknown as HTMLCollectionOf<HTMLElement>
             if (background) {
                 navbarRef.current.classList.add(`bg-light`)
                 if (Array.isArray(navLinks) && navLinks.length) {
@@ -23,12 +36,24 @@ const CustomNavbar = ({ background, height, hideJumbotron = false }: { backgroun
                         link.classList.remove(styles.navLinkTextLight)
                     })
                 }
+                if (Array.isArray(dropdowns) && dropdowns.length) {
+                    dropdowns.forEach((dropdown: HTMLElement) => {
+                        dropdown.classList.add(styles.navLinkTextDark)
+                        dropdown.classList.remove(styles.navLinkTextLight)
+                    })
+                }
             } else {
                 navbarRef.current.classList.remove(`bg-light`)
                 if (Array.isArray(navLinks) && navLinks.length) {
                     navLinks.forEach((link: HTMLElement) => {
                         link.classList.add(styles.navLinkTextLight)
                         link.classList.remove(styles.navLinkTextDark)
+                    })
+                }
+                if (Array.isArray(dropdowns) && dropdowns.length) {
+                    dropdowns.forEach((dropdown: HTMLElement) => {
+                        dropdown.classList.add(styles.navLinkTextLight)
+                        dropdown.classList.remove(styles.navLinkTextDark)
                     })
                 }
             }
@@ -62,12 +87,12 @@ const CustomNavbar = ({ background, height, hideJumbotron = false }: { backgroun
                         </Link>
                     </Nav>
                     <Nav className={`me-auto ${styles.login}`}>
-                        {status === 'authenticated' ? (
+                        {loggedIn ? (
                             <NavDropdown title="אזור אישי">
-                                <NavDropdown.Item href="#action/3.1">הזמנות</NavDropdown.Item>
+                                <NavDropdown.Item href="/user/orders">הזמנות</NavDropdown.Item>
                                 <NavDropdown.Item href="#action/3.2">הגדרות</NavDropdown.Item>
                                 <NavDropdown.Divider />
-                                <NavDropdown.Item href="/api/auth/signout">התנתק</NavDropdown.Item>
+                                <NavDropdown.Item onClick={() => signOut()}>התנתק</NavDropdown.Item>
                             </NavDropdown>
                         ) : (
                             <Link href="/login" passHref>

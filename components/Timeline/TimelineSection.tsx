@@ -6,6 +6,7 @@ import styles from './TimelineSection.module.scss'
 import Section from "../Section/Section";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
+import { Nav } from 'react-bootstrap';
 
 const TimelineSection = () => {
     const [animateArray, setAnimateArray] = React.useState<boolean[]>([true, true, true]);
@@ -23,6 +24,7 @@ const TimelineSection = () => {
 
     return (
         <Section title={text.home.timelineSectionTitle} id="timeline-section" className={styles.timelineSection}>
+            <Nav.Link href="/guide">מדריך</Nav.Link>
             <Timeline>
                 <TimelineItem tooltipText={text.home.stepOneContentText} animationKey={0} disableAnimation={handleDisableAnimation} animate={animate}>
                     <h2>{text.home.stepOneText}</h2>

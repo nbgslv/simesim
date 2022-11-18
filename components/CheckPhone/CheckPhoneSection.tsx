@@ -1,4 +1,4 @@
-import React, {FC, ReactNode, useEffect, useRef} from 'react';
+import React, {ReactNode, useCallback, useEffect, useRef} from 'react';
 import Section from "../Section/Section";
 import SearchAutocomplete, {Item} from "../SearchAutocomplete/SearchAutocomplete";
 import {Col, Row} from "react-bootstrap";
@@ -161,14 +161,14 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
         return null
     }
 
-    const getRandomTransformOrigin = () => {
+    const getRandomTransformOrigin = useCallback(() => {
         const value = (16 + 40 * Math.random()) / 100;
         const value2 = (15 + 36 * Math.random()) / 100;
         return {
             originX: value,
             originY: value2
         };
-    };
+    }, []);
 
     const getRandomDelay = () => -(Math.random() * 0.7 + 0.05);
 
@@ -195,7 +195,7 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
     return (
         <Section id="check-phone-section" title={'הטלפון שלי תומך ב-eSim?'} className={styles.main}>
             <Row className="h-100 w-100 d-flex align-items-center">
-                <Col className="d-flex flex-column justify-content-center h-100 position-relative">
+                <Col className="d-flex flex-column justify-content-center position-relative" style={{ height: '80%' }}>
                     <div className={styles.titleWrapper}>
                         <h2 className={styles.title}>הטלפון שלך</h2>
                     </div>

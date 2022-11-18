@@ -113,7 +113,7 @@ const Users = ({ users }: UsersProps) => {
                 deleteRows={handleDeleteRows}
             />
             <FormModal id="add-user" {...bootstrapDialog(modal)} header={'Add New User'}>
-                {/*<PlansModelForm />*/}
+
             </FormModal>
         </AdminLayout>
     );
