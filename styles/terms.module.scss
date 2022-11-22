@@ -1,0 +1,38 @@
+@import 'styles/variables';
+
+.wrapper {
+  background-color: $background-color;
+  height: 100%;
+  padding: 1rem;
+
+  :global * {
+    color: $text-color;
+  }
+
+  :global ol {
+    margin-top: 0.5rem;
+    counter-reset: item;
+    padding-left: 10px;
+  }
+
+  :global li {
+    margin-top: 0.5rem;
+    display: block;
+  }
+  :global li:before {
+    font-weight: 800;
+    font-size: 1.1rem;
+    content: counters(item, '.') '. ';
+    counter-increment: item;
+  }
+
+  :global li span {
+    font-weight: 800;
+    color: map-get($theme-colors, 'primary');
+  }
+}
+
+.container {
+  width: 75%;
+  height: 100%;
+}

@@ -1,14 +1,14 @@
-import React, {ReactNode} from 'react';
-import AdminHeader from "../AdminHeader/AdminHeader";
-import styles from './AdminLayout.module.scss'
+import React, { ReactNode } from 'react';
+import AdminHeader from '../AdminHeader/AdminHeader';
+import styles from './AdminLayout.module.scss';
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
-    return (
-        <div className={styles.main}>
-            <AdminHeader />
-            {children}
-        </div>
-    );
+  return (
+    <div className={styles.main}>
+      <AdminHeader />
+      {children}
+    </div>
+  );
 };
 
 export default AdminLayout;

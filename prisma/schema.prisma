@@ -63,13 +63,15 @@ model PlanModel {
 
 model Plan {
   id          String    @id @default(cuid())
+  friendlyId  Int       @unique @default(autoincrement())
   planModel   PlanModel @relation(fields: [planModelId], references: [id])
   planModelId String
   price       Float
   user        User      @relation(fields: [userId], references: [id])
   userId      String
   payment     Payment?  @relation(fields: [paymentId], references: [id])
-  paymentId   String?
+  paymentId   String?   @unique
+  allowRefill Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   line        Line?     @relation(fields: [lineId], references: [id])
@@ -85,27 +87,30 @@ model Payment {
   externalId      String?        @unique
   amount          Float
   paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
-  paymentMethodId String?
+  paymentMethodId String?        @unique
   status          String
   user            User           @relation(fields: [userId], references: [id])
   userId          String
+  invoice         String?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
-  Plan            Plan[]
+  Plan            Plan?
+  planId          String?        @unique
 }
 
 model PaymentMethod {
-  id         String    @id @default(cuid())
-  cardNumber String
-  cardType   String
-  expMonth   String
-  expYear    String
-  last4      String
-  user       User      @relation(fields: [userId], references: [id])
-  userId     String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  Payment    Payment[]
+  id        String   @id @default(cuid())
+  token     String?  @unique
+  cardType  String
+  expMonth  String
+  expYear   String
+  last4     String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Payment   Payment?
+  paymentId String?  @unique
 }
 
 model Line {
@@ -268,4 +273,14 @@ model CouponUser {
   updatedAt DateTime @updatedAt
 
   @@id([couponId, userId])
+}
+
+model Inquiry {
+  id        String   @id @default(cuid())
+  message   String
+  name      String
+  phone     String?
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

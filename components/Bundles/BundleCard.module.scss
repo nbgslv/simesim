@@ -1,7 +1,7 @@
-@import "styles/variables";
+@import 'styles/variables';
 
 .bundleCardMain {
-  background-color: map-get($theme-colors, "light");
+  background-color: map-get($theme-colors, 'light');
   width: 100%;
 }
 
@@ -27,5 +27,5 @@
 }
 
 .bundleCardListItemActive {
-    background-color: $secondary-color;
+  background-color: $secondary-color;
 }

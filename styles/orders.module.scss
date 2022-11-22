@@ -1,0 +1,10 @@
+@import 'styles/variables';
+
+.main {
+  height: 100%;
+  background-color: $background-color;
+
+  :global * {
+    color: $text-color;
+  }
+}

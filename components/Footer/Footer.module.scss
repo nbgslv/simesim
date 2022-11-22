@@ -1,27 +1,27 @@
-@import "styles/variables";
+@import 'styles/variables';
 
 .main {
   padding: 1rem;
   height: 30vh;
   background-image: linear-gradient(
-                  145deg,
-                  hsl(13deg 100% 51%) 0%,
-                  hsl(1deg 96% 59%) 6%,
-                  hsl(352deg 93% 56%) 13%,
-                  hsl(345deg 90% 53%) 19%,
-                  hsl(336deg 100% 47%) 25%,
-                  hsl(335deg 79% 50%) 31%,
-                  hsl(331deg 70% 49%) 37%,
-                  hsl(326deg 63% 48%) 44%,
-                  hsl(319deg 56% 47%) 50%,
-                  hsl(314deg 48% 45%) 56%,
-                  hsl(304deg 40% 43%) 63%,
-                  hsl(289deg 35% 44%) 69%,
-                  hsl(269deg 32% 45%) 75%,
-                  hsl(261deg 30% 44%) 81%,
-                  hsl(250deg 28% 43%) 87%,
-                  hsl(234deg 29% 41%) 94%,
-                  hsl(219deg 40% 36%) 100%
+    145deg,
+    hsl(13deg 100% 51%) 0%,
+    hsl(1deg 96% 59%) 6%,
+    hsl(352deg 93% 56%) 13%,
+    hsl(345deg 90% 53%) 19%,
+    hsl(336deg 100% 47%) 25%,
+    hsl(335deg 79% 50%) 31%,
+    hsl(331deg 70% 49%) 37%,
+    hsl(326deg 63% 48%) 44%,
+    hsl(319deg 56% 47%) 50%,
+    hsl(314deg 48% 45%) 56%,
+    hsl(304deg 40% 43%) 63%,
+    hsl(289deg 35% 44%) 69%,
+    hsl(269deg 32% 45%) 75%,
+    hsl(261deg 30% 44%) 81%,
+    hsl(250deg 28% 43%) 87%,
+    hsl(234deg 29% 41%) 94%,
+    hsl(219deg 40% 36%) 100%
   );
   background-size: cover;
 

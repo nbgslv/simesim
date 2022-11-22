@@ -1,7 +1,7 @@
-@import "styles/variables";
+@import 'styles/variables';
 
 .main {
   :global * {
-    color: $text-color
+    color: $text-color;
   }
 }

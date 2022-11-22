@@ -1,4 +1,4 @@
-@import "styles/variables";
+@import 'styles/variables';
 
 .arrowButtonRight {
   position: absolute;
@@ -14,7 +14,7 @@
 }
 
 .arrowButtonRight svg {
-    fill: $background-color;
+  fill: $background-color;
 }
 
 .arrowButtonLeft {
@@ -33,7 +33,6 @@
 .arrowButtonLeft svg {
   fill: $background-color;
 }
-
 
 .bundleCardWrapper {
   position: absolute;

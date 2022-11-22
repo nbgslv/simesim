@@ -1,4 +1,4 @@
-@import "../../styles/variables.scss";
+@import '../../styles/variables.scss';
 
 .item {
   position: relative;
@@ -25,5 +25,6 @@
 }
 
 .countryMapImage {
-  filter: invert(60%) sepia(61%) saturate(608%) hue-rotate(178deg) brightness(95%) contrast(90%);
+  filter: invert(60%) sepia(61%) saturate(608%) hue-rotate(178deg)
+    brightness(95%) contrast(90%);
 }

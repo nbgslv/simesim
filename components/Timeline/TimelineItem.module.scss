@@ -1,4 +1,4 @@
-@import "styles/variables";
+@import 'styles/variables';
 
 .timelineItem {
   position: relative;
@@ -6,7 +6,7 @@
   width: 20%;
   border-radius: 2rem;
   background-color: $primary-color;
-  @include shadow
+  @include shadow;
 }
 
 .timelineItemText {
@@ -16,7 +16,8 @@
   padding: 2rem;
 }
 
-.timelineItemText h2, .timelineItemText p {
+.timelineItemText h2,
+.timelineItemText p {
   color: $background-color;
 }
 
@@ -26,7 +27,7 @@
   padding: 5px 10px;
   border-radius: 5px;
   text-align: center;
-  transition: display .3s;
+  transition: display 0.3s;
   width: 100%;
   height: 100%;
 }

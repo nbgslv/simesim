@@ -1,4 +1,4 @@
-@import "./variables.scss";
+@import './variables.scss';
 
 #qna-section {
   & .accordion-item {
@@ -13,7 +13,7 @@
 
       &:focus {
         box-shadow: none;
-        border-color: rgba(0,0,0,.125);
+        border-color: rgba(0, 0, 0, 0.125);
       }
 
       &:not(.collapsed) {

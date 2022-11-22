@@ -1,5 +1,5 @@
-@import "custom";
-@import "sections";
+@import 'custom';
+@import 'sections';
 
 * {
   font-family: 'Arimo', sans-serif;
@@ -27,16 +27,21 @@ html {
   color: #ffffff;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-bottom: 0;
 }
 
 .navbar {
-  --bs-navbar-active-color: map-get($theme-colors, 'blue');
+  --bs-navbar-active-color: map-get($theme-colors, 'primary');
 }
 
 .navbar-nav {
-  --bs-nav-link-hover-color: map-get($theme-colors, 'blue');
+  --bs-nav-link-hover-color: map-get($theme-colors, 'primary');
 }
 
 .nav-link {
@@ -44,11 +49,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0.2rem;
 
   &.active {
-    color: map-get($theme-colors, 'primary');
-  }
-
-  &:hover {
-    color: map-get($theme-colors, 'primary');
+    color: map-get($theme-colors, 'primary') !important;
   }
 
   &:focus {
@@ -60,16 +61,20 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+.dropdown-menu {
+  opacity: 1 !important;
+}
+
 a.dropdown-item {
   text-align: right;
 }
 
 .modal-header .btn-close {
-  margin: 0
+  margin: 0;
 }
 
 .modal {
-  --bs-modal-bg: #F5F5F5;
+  --bs-modal-bg: #f5f5f5;
 }
 
 .MuiPopover-root {
@@ -80,4 +85,12 @@ a.dropdown-item {
 
 .dropdown-toggle::after {
   margin-right: 0.255rem;
+}
+
+body.trigger-position-left #enable-toolbar-trigger {
+  left: 20px !important;
+}
+
+#enable-toolbar-trigger {
+  top: -15px !important;
 }

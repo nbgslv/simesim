@@ -1,13 +1,13 @@
 $theme-colors: (
-        "light":      #F5F5F5,
-        "dark":       #230007,
-        "primary":    #4502C6,
-        "secondary":  #8D99AE,
-        "info":       #946be4,
-        "success":    #589e00,
-        "warning":    #ffbd5e,
-        "danger":     #ef0064,
-        "orange":     #FF3904,
+  'light': #f5f5f5,
+  'dark': #230007,
+  'primary': #4502c6,
+  'secondary': #8d99ae,
+  'info': #946be4,
+  'success': #589e00,
+  'warning': #ffbd5e,
+  'danger': #ef0064,
+  'orange': #ff3904,
 );
 
 $text-color: map-get($theme-colors, 'dark');
@@ -18,6 +18,6 @@ $secondary-color: map-get($theme-colors, 'secondary');
 $page-height: 64.5vh;
 
 @mixin shadow {
-  -webkit-box-shadow: 0px 3px 15px 5px rgba(0,0,0,0.25);
-  box-shadow: 0px 3px 15px 5px rgba(0,0,0,0.25);
+  -webkit-box-shadow: 0 3px 15px 5px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 3px 15px 5px rgba(0, 0, 0, 0.25);
 }

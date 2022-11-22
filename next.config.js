@@ -7,22 +7,22 @@ const nextConfig = {
     // Dangerously allow production builds to successfully complete even if
     // your project has type errors.
     // !! WARN !!
-    ignoreBuildErrors: true
+    ignoreBuildErrors: true,
   },
   eslint: {
-    ignoreDuringBuilds: true
+    ignoreDuringBuilds: true,
   },
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/,
-      use: ["@svgr/webpack"]
+      use: ['@svgr/webpack'],
     });
 
     return config;
   },
   images: {
-    domains: ["mapsvg.com", "purecatamphetamine.github.io"]
-  }
-}
+    domains: ['mapsvg.com', 'purecatamphetamine.github.io'],
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

@@ -1,257 +1,288 @@
-import React, {ReactNode, useCallback, useEffect, useRef} from 'react';
-import Section from "../Section/Section";
-import SearchAutocomplete, {Item} from "../SearchAutocomplete/SearchAutocomplete";
-import {Col, Row} from "react-bootstrap";
-import styles from "./CheckPhoneSection.module.scss";
-import Image from "next/image";
-import {AnimatePresence, motion, useAnimation, Variants} from "framer-motion";
-import {solid} from "@fortawesome/fontawesome-svg-core/import.macro";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import React, { ReactNode, useCallback, useEffect, useRef } from 'react';
+import Section from '../Section/Section';
+import SearchAutocomplete, {
+  Item,
+} from '../SearchAutocomplete/SearchAutocomplete';
+import { Col, Row } from 'react-bootstrap';
+import styles from './CheckPhoneSection.module.scss';
+import Image from 'next/image';
+import { AnimatePresence, motion, useAnimation, Variants } from 'framer-motion';
+import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type Brand = {
-    exceptions: string[],
-    models: string[],
-    title: string
-}
+  exceptions: string[];
+  models: string[];
+  title: string;
+};
 
 export type PhonesList = {
-    type: string,
-    brands: Brand[]
-}
+  type: string;
+  brands: Brand[];
+};
 
 type ListItem = {
-    id: number,
-    displayValue: string
-}
+  id: number;
+  displayValue: string;
+};
 
 type BrandListItem = ListItem & {
-    exceptions: string
-}
+  exceptions: string;
+};
 
 type PhoneListItem = ListItem & {
-    brand: string
-}
+  brand: string;
+};
 
 const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
-    const [phonesBrands, setPhonesBrands] = React.useState<BrandListItem[]>([]);
-    const [phones, setPhones] = React.useState<PhoneListItem[]>([]);
-    const [filteredPhones, setFilteredPhones] = React.useState<PhoneListItem[]>([]);
-    const [selectedBrand, setSelectedBrand] = React.useState<BrandListItem | null>(null);
-    const [selectedPhone, setSelectedPhone] = React.useState<PhoneListItem | null>(null);
-    const phoneSearchRef = useRef<any>(null);
-    const controls = useAnimation();
+  const [phonesBrands, setPhonesBrands] = React.useState<BrandListItem[]>([]);
+  const [phones, setPhones] = React.useState<PhoneListItem[]>([]);
+  const [filteredPhones, setFilteredPhones] = React.useState<PhoneListItem[]>(
+    []
+  );
+  const [selectedBrand, setSelectedBrand] =
+    React.useState<BrandListItem | null>(null);
+  const [selectedPhone, setSelectedPhone] =
+    React.useState<PhoneListItem | null>(null);
+  const phoneSearchRef = useRef<any>(null);
+  const controls = useAnimation();
 
-    const ListBox = ({children}: { children: ReactNode | ReactNode[] }) => {
-        const variants = {
-            initial: {
-                height: 0,
-                transition: {
-                    when: 'afterChildren',
-                }
-            },
-            show: {
-                height: 'fit-content',
-                transition: {
-                    when: 'beforeChildren',
-                    staggerChildren: 0.5,
-                }
-            }
-        }
-
-        return (
-            <AnimatePresence>
-                <motion.div
-                    layout
-                    initial="initial"
-                    animate="show"
-                    exit="initial"
-                    variants={variants}
-                    role="listbox"
-                    className={`${styles.listBox}`}
-                >
-                    {children}
-                </motion.div>
-            </AnimatePresence>
-        )
-    }
-
-    const ListBoxItem = ({item, selectItem}: { item: Item<PhoneListItem>, selectItem: (item: Item<PhoneListItem>) => void }) => {
-        return (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} role="option" className={`${styles.listBoxItem}`} onClick={() => selectItem(item)}>
-                {item.displayValue}
-            </motion.div>
-        )
-    }
-
-    useEffect(() => {
-        controls.start('start')
-    }, [])
-
-    useEffect(() => {
-        const brandsArray: BrandListItem[] = []
-        const phonesArray: PhoneListItem[] = []
-        let index = 0;
-        phonesList.forEach((list) => {
-            list.brands.forEach((brand, id) => {
-                brandsArray.push({
-                    id,
-                    displayValue: brand.title,
-                    exceptions: brand.exceptions ? brand.exceptions.toString() : ''
-                })
-                brand.models.forEach((model) => {
-                    phonesArray.push({
-                        id: index++,
-                        displayValue: model,
-                        brand: brand.title
-                    })
-                })
-            })
-        });
-        setPhonesBrands(brandsArray);
-        setPhones(phonesArray);
-    }, [phonesList]);
-
-    useEffect(() => {
-        if (selectedBrand) {
-            setFilteredPhones(phones.filter((phone) => phone.brand === selectedBrand.displayValue))
-        }
-    }, [selectedBrand, phones]);
-
-    const handleBrandSelect = (brand: BrandListItem) => {
-        setSelectedBrand(brand);
-    }
-
-    const handleBrandCancel = () => {
-        setSelectedBrand(null);
-        setSelectedPhone(null);
-        setFilteredPhones([])
-        if (phoneSearchRef.current) {
-            phoneSearchRef.current.handleCancel();
-        }
-    }
-
-    const handlePhoneSelect = (phone: PhoneListItem) => {
-        setSelectedPhone(phone);
-    }
-
-    const handlePhoneCancel = () => {
-        setSelectedPhone(null);
-    }
-
-    const getResultText = () => {
-        if (selectedBrand && selectedPhone) {
-            return (
-                <div className="h-100 w-100 d-flex flex-column justify-content-center">
-                    <div className="d-flex flex-column justify-content-center">
-                        <div className={styles.resultsContainer}>
-                            מכשיר מדגם זה תומך ב-eSim!
-                        </div>
-                        {selectedBrand.exceptions && (
-                            <div className={styles.resultsContainer}>
-                                {selectedBrand.exceptions}
-                            </div>
-                        )}
-                    </div>
-                    <div className={`${styles.iconSuccess} h-100 w-100 position-relative`}>
-                        <FontAwesomeIcon icon={solid('check')} />
-                    </div>
-                </div>
-            )
-        }
-        return null
-    }
-
-    const getRandomTransformOrigin = useCallback(() => {
-        const value = (16 + 40 * Math.random()) / 100;
-        const value2 = (15 + 36 * Math.random()) / 100;
-        return {
-            originX: value,
-            originY: value2
-        };
-    }, []);
-
-    const getRandomDelay = () => -(Math.random() * 0.7 + 0.05);
-
-    const randomDuration = () => Math.random() * 0.07 + 0.23;
-
-    const variants: Variants = {
-        start: {
-            rotate: [-1, 1.3, 0],
-            transition: {
-                delay: getRandomDelay(),
-                repeat: 5,
-                duration: randomDuration(),
-                repeatType: 'reverse'
-            }
-        }
+  const ListBox = ({ children }: { children: ReactNode | ReactNode[] }) => {
+    const variants = {
+      initial: {
+        height: 0,
+        transition: {
+          when: 'afterChildren',
+        },
+      },
+      show: {
+        height: 'fit-content',
+        transition: {
+          when: 'beforeChildren',
+          staggerChildren: 0.5,
+        },
+      },
     };
 
-    const handleAnimationComplete = () => {
-        setTimeout(() => {
-            controls.start('start')
-        }, 1000)
-    }
-
     return (
-        <Section id="check-phone-section" title={'הטלפון שלי תומך ב-eSim?'} className={styles.main}>
-            <Row className="h-100 w-100 d-flex align-items-center">
-                <Col className="d-flex flex-column justify-content-center position-relative" style={{ height: '80%' }}>
-                    <div className={styles.titleWrapper}>
-                        <h2 className={styles.title}>הטלפון שלך</h2>
-                    </div>
-                    <motion.div layout="position" className={styles.brandSearch}>
-                        <SearchAutocomplete
-                            placeholder={'של איזו חברה?'}
-                            onSelect={handleBrandSelect}
-                            onCancel={handleBrandCancel}
-                            items={phonesBrands}
-                            focusedBorderColor={'#4502C6'}
-                            ListBoxComponent={ListBox}
-                            ItemComponent={ListBoxItem}
-                        />
-                    </motion.div>
-                    {selectedBrand && (
-                        <motion.div layout="position" className={styles.modelSearch}>
-                            <SearchAutocomplete
-                                placeholder={'איזה דגם?'}
-                                onSelect={handlePhoneSelect}
-                                onCancel={handlePhoneCancel}
-                                items={filteredPhones}
-                                ref={phoneSearchRef}
-                                focusedBorderColor={'#4502C6'}
-                                ListBoxComponent={ListBox}
-                                ItemComponent={ListBoxItem}
-                            />
-                        </motion.div>
-                    )}
-                    {selectedBrand && selectedPhone && (
-                            <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center h-100 d-flex flex-column justify-content-center align-items-center">
-                                {getResultText()}
-                            </motion.div>
-                        )
-                    }
-                    <div className={styles.disclaimer}>
-                        <small>
-                            הערת אזהרה
-                        </small>
-                    </div>
-                </Col>
-                <Col className="w-100 h-100 p-6">
-                    <motion.div
-                        style={{
-                            ...getRandomTransformOrigin()
-                        }}
-                        variants={variants}
-                        animate={controls}
-                        onAnimationComplete={handleAnimationComplete}
-                        className="w-100 h-100 d-flex justify-content-center align-items-center position-relative"
-                    >
-                        <Image src="/phone.svg" alt={'phone'} layout="fill" />
-                    </motion.div>
-                </Col>
-            </Row>
-        </Section>
+      <AnimatePresence>
+        <motion.div
+          layout
+          initial="initial"
+          animate="show"
+          exit="initial"
+          variants={variants}
+          role="listbox"
+          className={`${styles.listBox}`}
+        >
+          {children}
+        </motion.div>
+      </AnimatePresence>
     );
+  };
+
+  const ListBoxItem = ({
+    item,
+    selectItem,
+  }: {
+    item: Item<PhoneListItem>;
+    selectItem: (item: Item<PhoneListItem>) => void;
+  }) => {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        role="option"
+        className={`${styles.listBoxItem}`}
+        onClick={() => selectItem(item)}
+      >
+        {item.displayValue}
+      </motion.div>
+    );
+  };
+
+  useEffect(() => {
+    controls.start('start');
+  }, []);
+
+  useEffect(() => {
+    const brandsArray: BrandListItem[] = [];
+    const phonesArray: PhoneListItem[] = [];
+    let index = 0;
+    phonesList.forEach((list) => {
+      list.brands.forEach((brand, id) => {
+        brandsArray.push({
+          id,
+          displayValue: brand.title,
+          exceptions: brand.exceptions ? brand.exceptions.toString() : '',
+        });
+        brand.models.forEach((model) => {
+          phonesArray.push({
+            id: index++,
+            displayValue: model,
+            brand: brand.title,
+          });
+        });
+      });
+    });
+    setPhonesBrands(brandsArray);
+    setPhones(phonesArray);
+  }, [phonesList]);
+
+  useEffect(() => {
+    if (selectedBrand) {
+      setFilteredPhones(
+        phones.filter((phone) => phone.brand === selectedBrand.displayValue)
+      );
+    }
+  }, [selectedBrand, phones]);
+
+  const handleBrandSelect = (brand: BrandListItem) => {
+    setSelectedBrand(brand);
+  };
+
+  const handleBrandCancel = () => {
+    setSelectedBrand(null);
+    setSelectedPhone(null);
+    setFilteredPhones([]);
+    if (phoneSearchRef.current) {
+      phoneSearchRef.current.handleCancel();
+    }
+  };
+
+  const handlePhoneSelect = (phone: PhoneListItem) => {
+    setSelectedPhone(phone);
+  };
+
+  const handlePhoneCancel = () => {
+    setSelectedPhone(null);
+  };
+
+  const getResultText = () => {
+    if (selectedBrand && selectedPhone) {
+      return (
+        <div className="h-100 w-100 d-flex flex-column justify-content-center">
+          <div className="d-flex flex-column justify-content-center">
+            <div className={styles.resultsContainer}>
+              מכשיר מדגם זה תומך ב-eSim!
+            </div>
+            {selectedBrand.exceptions && (
+              <div className={styles.resultsContainer}>
+                {selectedBrand.exceptions}
+              </div>
+            )}
+          </div>
+          <div
+            className={`${styles.iconSuccess} h-100 w-100 position-relative`}
+          >
+            <FontAwesomeIcon icon={solid('check')} />
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const getRandomTransformOrigin = useCallback(() => {
+    const value = (16 + 40 * Math.random()) / 100;
+    const value2 = (15 + 36 * Math.random()) / 100;
+    return {
+      originX: value,
+      originY: value2,
+    };
+  }, []);
+
+  const getRandomDelay = () => -(Math.random() * 0.7 + 0.05);
+
+  const randomDuration = () => Math.random() * 0.07 + 0.23;
+
+  const variants: Variants = {
+    start: {
+      rotate: [-1, 1.3, 0],
+      transition: {
+        delay: getRandomDelay(),
+        repeat: 5,
+        duration: randomDuration(),
+        repeatType: 'reverse',
+      },
+    },
+  };
+
+  const handleAnimationComplete = () => {
+    setTimeout(() => {
+      controls.start('start');
+    }, 1000);
+  };
+
+  return (
+    <Section
+      id="check-phone-section"
+      title={'הטלפון שלי תומך ב-eSim?'}
+      className={styles.main}
+    >
+      <Row className="h-100 w-100 d-flex align-items-center">
+        <Col
+          className="d-flex flex-column justify-content-center position-relative"
+          style={{ height: '80%' }}
+        >
+          <div className={styles.titleWrapper}>
+            <h2 className={styles.title}>הטלפון שלך</h2>
+          </div>
+          <motion.div layout="position" className={styles.brandSearch}>
+            <SearchAutocomplete
+              placeholder={'של איזו חברה?'}
+              onSelect={handleBrandSelect}
+              onCancel={handleBrandCancel}
+              items={phonesBrands}
+              focusedBorderColor={'#4502C6'}
+              ListBoxComponent={ListBox}
+              ItemComponent={ListBoxItem}
+            />
+          </motion.div>
+          {selectedBrand && (
+            <motion.div layout="position" className={styles.modelSearch}>
+              <SearchAutocomplete
+                placeholder={'איזה דגם?'}
+                onSelect={handlePhoneSelect}
+                onCancel={handlePhoneCancel}
+                items={filteredPhones}
+                ref={phoneSearchRef}
+                focusedBorderColor={'#4502C6'}
+                ListBoxComponent={ListBox}
+                ItemComponent={ListBoxItem}
+              />
+            </motion.div>
+          )}
+          {selectedBrand && selectedPhone && (
+            <motion.div
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center h-100 d-flex flex-column justify-content-center align-items-center"
+            >
+              {getResultText()}
+            </motion.div>
+          )}
+          <div className={styles.disclaimer}>
+            <small>הערת אזהרה</small>
+          </div>
+        </Col>
+        <Col className="w-100 h-100 p-6">
+          <motion.div
+            style={{
+              ...getRandomTransformOrigin(),
+            }}
+            variants={variants}
+            animate={controls}
+            onAnimationComplete={handleAnimationComplete}
+            className="w-100 h-100 d-flex justify-content-center align-items-center position-relative"
+          >
+            <Image src="/phone.svg" alt={'phone'} layout="fill" />
+          </motion.div>
+        </Col>
+      </Row>
+    </Section>
+  );
 };
 
 export default CheckPhoneSection;

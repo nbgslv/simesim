@@ -1,4 +1,4 @@
-@import "styles/variables";
+@import 'styles/variables';
 
 .button {
   margin-left: 1rem;
@@ -8,7 +8,7 @@
   }
 
   :global path {
-    color: $background-color
+    color: $background-color;
   }
 }
 
