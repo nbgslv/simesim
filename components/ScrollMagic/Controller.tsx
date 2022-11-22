@@ -5,8 +5,10 @@ const Controller = ({
 }: {
   children: JSX.Element[] | JSX.Element;
 }) => {
-  const [controller, setController] =
-    React.useState<ScrollMagic.Controller | null>(null);
+  const [
+    controller,
+    setController,
+  ] = React.useState<ScrollMagic.Controller | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -21,9 +23,9 @@ const Controller = ({
 
   return (
     <>
-      {React.Children.map(children, (child) => {
-        return React.cloneElement(child, { controller });
-      })}
+      {React.Children.map(children, (child) =>
+        React.cloneElement(child, { controller })
+      )}
     </>
   );
 };

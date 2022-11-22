@@ -1,9 +1,9 @@
 import React from 'react';
 import { Prisma } from '@prisma/client';
+import { format } from 'date-fns';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
-import { format } from 'date-fns';
 
 const Bundles = ({ bundlesList }: { bundlesList: Prisma.BundleSelect[] }) => {
   const columns = [

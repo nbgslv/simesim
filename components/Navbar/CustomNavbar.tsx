@@ -1,16 +1,16 @@
 import React, { RefObject, useEffect, useRef } from 'react';
-import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { Container, Nav, NavDropdown, Navbar } from 'react-bootstrap';
 import Image from 'next/image';
+import { getSession, signOut } from 'next-auth/react';
+import Link from 'next/link';
 import logoImageWhiteText from '../../public/logoWhite.png';
 import logoImageBlackText from '../../public/logo.png';
 import styles from './CustomNavbar.module.scss';
 import text from '../../lib/content/text.json';
-import { signOut, getSession } from 'next-auth/react';
-import Link from 'next/link';
 import { Context, useUserStore } from '../../lib/context/UserStore';
 import { Action } from '../../lib/reducer/reducer';
 
-const CustomNavbar = ({
+function CustomNavbar({
   background,
   height,
   hideJumbotron = false,
@@ -18,7 +18,7 @@ const CustomNavbar = ({
   background: string | null;
   height: string;
   hideJumbotron: boolean;
-}) => {
+}) {
   const [loggedIn, setLoggedIn] = React.useState<boolean>(false);
   const { dispatch } = useUserStore() as Context<Action>;
   const navbarRef: RefObject<HTMLElement> = useRef(null);
@@ -38,14 +38,14 @@ const CustomNavbar = ({
 
   useEffect(() => {
     if (navbarRef.current) {
-      const navLinks: HTMLCollectionOf<HTMLElement> = Array.from(
+      const navLinks: HTMLCollectionOf<HTMLElement> = (Array.from(
         navbarRef.current.querySelectorAll('a.nav-link')
-      ) as unknown as HTMLCollectionOf<HTMLElement>;
-      const dropdowns: HTMLCollectionOf<HTMLElement> = Array.from(
+      ) as unknown) as HTMLCollectionOf<HTMLElement>;
+      const dropdowns: HTMLCollectionOf<HTMLElement> = (Array.from(
         navbarRef.current.querySelectorAll('a.dropdown-toggle')
-      ) as unknown as HTMLCollectionOf<HTMLElement>;
+      ) as unknown) as HTMLCollectionOf<HTMLElement>;
       if (background) {
-        navbarRef.current.classList.add(`bg-light`);
+        navbarRef.current.classList.add('bg-light');
         if (Array.isArray(navLinks) && navLinks.length) {
           navLinks.forEach((link: HTMLElement) => {
             link.classList.add(styles.navLinkTextDark);
@@ -59,7 +59,7 @@ const CustomNavbar = ({
           });
         }
       } else {
-        navbarRef.current.classList.remove(`bg-light`);
+        navbarRef.current.classList.remove('bg-light');
         if (Array.isArray(navLinks) && navLinks.length) {
           navLinks.forEach((link: HTMLElement) => {
             link.classList.add(styles.navLinkTextLight);
@@ -153,6 +153,6 @@ const CustomNavbar = ({
       </Container>
     </Navbar>
   );
-};
+}
 
 export default CustomNavbar;

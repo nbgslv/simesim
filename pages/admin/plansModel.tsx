@@ -1,14 +1,14 @@
 import React from 'react';
-import AdminLayout from '../../components/Layouts/AdminLayout';
-import AdminTable from '../../components/AdminTable/AdminTable';
 import { Prisma } from '@prisma/client';
 import { GridColumns, GridRowId, GridValidRowModel } from '@mui/x-data-grid';
-import prisma from '../../lib/prisma';
 import { format, parseISO } from 'date-fns';
+import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
+import AdminLayout from '../../components/Layouts/AdminLayout';
+import AdminTable from '../../components/AdminTable/AdminTable';
+import prisma from '../../lib/prisma';
 import AdminTableSwitch from '../../components/AdminTable/AdminTableSwitch';
 import FormModal from '../../components/AdminTable/FormModal';
 import PlansModelForm from '../../components/PlansModel/PlansModelForm';
-import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 
 type PlansModelAsAdminTableData = (GridValidRowModel &
   Prisma.PlanModelMaxAggregateOutputType)[];
@@ -26,14 +26,56 @@ const PlansModel = ({
   existingRefills,
   existingCoupons,
 }: PlansModelProps) => {
-  const [plansRows, setPlansRows] =
-    React.useState<PlansModelAsAdminTableData>(plansModel);
+  const [plansRows, setPlansRows] = React.useState<PlansModelAsAdminTableData>(
+    plansModel
+  );
   const [vatToggleLoading, setVatToggleLoading] = React.useState<GridRowId>('');
-  const [chosenBundle, setChosenBundle] =
-    React.useState<Prisma.BundleMaxAggregateOutputType | null>(null);
-  const [refills, setRefills] =
-    React.useState<Prisma.RefillMaxAggregateOutputType[]>(existingRefills);
+  const [
+    chosenBundle,
+    setChosenBundle,
+  ] = React.useState<Prisma.BundleMaxAggregateOutputType | null>(null);
+  const [refills, setRefills] = React.useState<
+    Prisma.RefillMaxAggregateOutputType[]
+  >(existingRefills);
   const modal = useModal('add-plansmodel');
+
+  const handleVatToggle = async (
+    checked: boolean,
+    rowId: GridRowId,
+    row: GridValidRowModel
+  ) => {
+    try {
+      setVatToggleLoading(rowId);
+      const update = await fetch('api/plansmodel', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...row,
+          vat: checked,
+          id: row.id,
+        }),
+      });
+      const updateJson = await update.json();
+      const serializedUpdate = { ...updateJson };
+      serializedUpdate.createdAt = format(
+        parseISO(serializedUpdate.createdAt),
+        'dd/MM/yy kk:mm'
+      );
+      serializedUpdate.updatedAt = format(
+        parseISO(serializedUpdate.updatedAt),
+        'dd/MM/yy kk:mm'
+      );
+      setPlansRows(
+        plansRows.map((plan) => (plan.id === rowId ? serializedUpdate : plan))
+      );
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setVatToggleLoading('');
+    }
+  };
 
   const columns: GridColumns = [
     {
@@ -91,46 +133,7 @@ const PlansModel = ({
     },
   ];
 
-  const handleVatToggle = async (
-    checked: boolean,
-    rowId: GridRowId,
-    row: GridValidRowModel
-  ) => {
-    try {
-      setVatToggleLoading(rowId);
-      const update = await fetch('api/plansmodel', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...row,
-          vat: checked,
-          id: row.id,
-        }),
-      });
-      const updateJson = await update.json();
-      const serializedUpdate = { ...updateJson };
-      serializedUpdate.createdAt = format(
-        parseISO(serializedUpdate.createdAt),
-        'dd/MM/yy kk:mm'
-      );
-      serializedUpdate.updatedAt = format(
-        parseISO(serializedUpdate.updatedAt),
-        'dd/MM/yy kk:mm'
-      );
-      setPlansRows(
-        plansRows.map((plan) => (plan.id === rowId ? serializedUpdate : plan))
-      );
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setVatToggleLoading('');
-    }
-  };
-
   const addRow = async (data: Prisma.PlanModelMaxAggregateOutputType) => {
-    console.log({ data });
     const newPlanModel = await fetch('/api/plansmodel', {
       method: 'POST',
       headers: {
@@ -139,7 +142,6 @@ const PlansModel = ({
       body: JSON.stringify(data),
     });
     const newPlanModelJson = await newPlanModel.json();
-    console.log({ newPlanModelJson });
     setPlansRows([...plansRows, newPlanModelJson]);
     return { id: newPlanModelJson.id, columnToFocus: undefined };
   };
@@ -159,11 +161,12 @@ const PlansModel = ({
   const showModal = async () => {
     try {
       const addData = await NiceModal.show('add-plansmodel');
-      return addRow(addData as Prisma.PlanModelMaxAggregateOutputType);
+      return await addRow(addData as Prisma.PlanModelMaxAggregateOutputType);
     } catch (e) {
       modal.reject(e);
-      modal.hide();
+      await modal.hide();
       modal.remove();
+      return e;
     }
   };
 

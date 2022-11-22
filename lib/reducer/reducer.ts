@@ -1,15 +1,11 @@
+import { Session } from 'next-auth';
+
 export type Action =
   | { type: 'SET_USER'; payload: State }
   | { type: 'REMOVE_USER' };
 
 export type State = {
-  user: {
-    email: string;
-    id: string;
-    image: null;
-    name: string;
-    role: string;
-  };
+  user: Session['user'];
 };
 
 export const initialState: State = {

@@ -11,8 +11,8 @@ import {
   GridValidRowModel,
   MuiEvent,
 } from '@mui/x-data-grid';
-import styles from './AdminTable.module.scss';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
+import styles from './AdminTable.module.scss';
 import EditToolbar from './EditToolbar';
 import useAddActions from './useAddActions';
 
@@ -27,13 +27,14 @@ type AdminTableProps<T extends GridValidRowModel> = {
   limit?: number;
   editMode?: 'row' | 'cell';
   addRow?: () => Promise<
-    { id: GridRowId; columnToFocus: string | undefined } | undefined
+    { id: GridRowId; columnToFocus: string | undefined } | undefined | Error
   >;
   deleteRows?: (ids: GridRowId[]) => Promise<void>;
 };
 
 function useApiRef({ columns }: { columns: any }) {
   const apiRef = useRef<GridApiCommunity>(null);
+  // eslint-disable-next-line @typescript-eslint/naming-convention,no-underscore-dangle
   const _columns = useMemo(
     () =>
       columns.concat({
@@ -60,32 +61,34 @@ const AdminTable = <T extends GridValidRowModel>({
   columns,
   multiActions = ['delete', 'add'],
   rowActions = ['delete', 'edit'],
-  limit,
+  limit = 15,
   editMode = 'cell',
   addRow,
   deleteRows,
 }: AdminTableProps<T>) => {
   const [dataRows, setDataRows] = React.useState<GridRowModel<T>[]>(data);
-  const [selectionModel, setSelectionModel] =
-    React.useState<GridSelectionModel>([]);
+  const [
+    selectionModel,
+    setSelectionModel,
+  ] = React.useState<GridSelectionModel>([]);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
   const {
-    apiRef,
     columns: columnsWithApi,
   }: { apiRef: RefObject<GridApiCommunity>; columns: GridColumns } = useApiRef({
     columns,
   });
-  const { columns: columnsWithActions }: { columns: GridColumns } =
-    useAddActions({
-      columns: columnsWithApi,
-      rowsActions: rowActions,
-      rowModesModel,
-      setRowModesModel,
-      setRows: setDataRows,
-      rows: dataRows,
-    });
+  const {
+    columns: columnsWithActions,
+  }: { columns: GridColumns } = useAddActions({
+    columns: columnsWithApi,
+    rowsActions: rowActions,
+    rowModesModel,
+    setRowModesModel,
+    setRows: setDataRows,
+    rows: dataRows,
+  });
 
   useEffect(() => {
     setDataRows(data);
@@ -108,6 +111,7 @@ const AdminTable = <T extends GridValidRowModel>({
     params: GridRowParams,
     event: MuiEvent<React.SyntheticEvent>
   ) => {
+    // eslint-disable-next-line no-param-reassign
     event.defaultMuiPrevented = true;
   };
 
@@ -115,6 +119,7 @@ const AdminTable = <T extends GridValidRowModel>({
     params,
     event
   ) => {
+    // eslint-disable-next-line no-param-reassign
     event.defaultMuiPrevented = true;
   };
 
@@ -123,6 +128,7 @@ const AdminTable = <T extends GridValidRowModel>({
       {title && <h2>{title}</h2>}
       <div className={styles.table} dir="ltr">
         <DataGrid
+          pageSize={limit}
           pagination
           columns={rowActions.length ? columnsWithActions : columnsWithApi}
           rows={dataRows}

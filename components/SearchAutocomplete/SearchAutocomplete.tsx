@@ -11,10 +11,10 @@ import React, {
   useState,
 } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import Fuse from 'fuse.js';
 import CloseIcon from '../../public/close.svg';
 import styles from './SearchAutocomplete.module.scss';
 import Input from '../Input/Input';
-import Fuse from 'fuse.js';
 import FuseOptionKey = Fuse.FuseOptionKey;
 
 export type Item<T> = T & {
@@ -31,7 +31,6 @@ type SearchAutocompleteProps<T> = {
   ItemComponent?: ElementType;
   onQueryChange?: (query: string) => void;
   clearSelectedItem?: boolean;
-  focusedBorderColor?: string;
   ListBoxComponent?: ElementType;
   searchFields?: Partial<keyof Item<T>>[];
 };
@@ -54,7 +53,6 @@ const SearchAutocompleteInner = <T extends object>(
     items,
     ItemComponent,
     onQueryChange,
-    focusedBorderColor = '#fff',
     ListBoxComponent,
     searchFields = [],
   }: SearchAutocompleteProps<T>,
@@ -141,14 +139,9 @@ const SearchAutocompleteInner = <T extends object>(
 
   useEffect(() => {
     if (query && searchInstance) {
-      console.log({
-        all: searchInstance.getIndex(),
-        search: searchInstance.search(query),
-      });
       const filteredItemsArr = searchInstance
         .search(query)
         .map(({ item }) => item);
-      const maxResultsToDisplay = maxResults || filteredItemsArr.length;
       setFilteredItems(filteredItemsArr);
     } else {
       setFilteredItems([]);
@@ -221,6 +214,7 @@ const SearchAutocompleteInner = <T extends object>(
           </motion.div>
         </button>
       </div>
+      {/* eslint-disable-next-line no-nested-ternary */}
       {filteredItems.length ? (
         ListBoxComponent ? (
           <ListBoxComponent
@@ -247,14 +241,13 @@ const SearchAutocompleteInner = <T extends object>(
                     selectItem={handleSelect}
                   />
                 );
-              else
-                return (
-                  <ItemComponentToUse
-                    key={i}
-                    item={item}
-                    selectItem={handleSelect}
-                  />
-                );
+              return (
+                <ItemComponentToUse
+                  key={i}
+                  item={item}
+                  selectItem={handleSelect}
+                />
+              );
             })}
           </DefaultListBoxComponent>
         )

@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import prisma from '../../lib/prisma';
 import { Inquiry } from '@prisma/client';
-import { getFormData } from '../../utils/objects';
+import prisma from '../../lib/prisma';
 
 export default async function handler(
   req: NextApiRequest,
@@ -22,8 +21,6 @@ export default async function handler(
       });
 
       res.status(200).json({ id: newInquiry.id });
-    } else if (method === 'PUT') {
-    } else if (method === 'DELETE') {
     }
   } catch (error: unknown) {
     console.error(error);

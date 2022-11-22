@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { CouponUser } from '@prisma/client';
+import { CouponUser, Coupon } from '@prisma/client';
 import prisma from '../../../../lib/prisma';
-import { Coupon } from '@prisma/client';
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,7 +11,7 @@ export default async function handler(
     method,
   } = req;
   if (method === 'GET') {
-    const user = await prisma.user.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: {
         email: phoneNumber as string,
       },
@@ -30,16 +29,13 @@ export default async function handler(
       coupon.validFrom < new Date() &&
       coupon.validTo > new Date()
     ) {
-      const userUsages = user
-        ? coupon.users.filter((user: CouponUser) => user.userId === user.id)
+      const userUsages = existingUser
+        ? coupon.users.filter(
+            (user: CouponUser) => user.userId === existingUser.id
+          )
         : [];
-      console.log({
-        maxUsesPerUser: coupon.maxUsesPerUser <= userUsages.length + 1,
-        userUsages:
-          coupon.maxUsesTotal > 0 && coupon.maxUsesTotal <= coupon.uses + 1,
-      });
       if (
-        user &&
+        existingUser &&
         (coupon.maxUsesPerUser < userUsages.length + 1 ||
           (coupon.maxUsesTotal > 0 && coupon.maxUsesTotal <= coupon.uses + 1))
       ) {

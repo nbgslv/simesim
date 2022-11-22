@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { Prisma } from '@prisma/client';
 import prisma from '../../lib/prisma';
-import { Prisma, Country } from '@prisma/client';
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,8 +9,15 @@ export default async function handler(
   try {
     const { method } = req;
     if (method === 'POST') {
-      const { bundleId, refillId, name, description, price, vat, couponsIds } =
-        req.body;
+      const {
+        bundleId,
+        refillId,
+        name,
+        description,
+        price,
+        vat,
+        couponsIds,
+      } = req.body;
       const planModel = await prisma.planModel.create({
         data: {
           bundle: {
@@ -40,11 +47,10 @@ export default async function handler(
     } else if (method === 'PUT') {
       const { id, ...planModel } = req.body;
       const updatedPlansModel = await prisma.planModel.update({
-        where: { id: id },
+        where: { id },
         data: planModel,
       });
       res.status(200).json(updatedPlansModel);
-    } else if (method === 'DELETE') {
     } else {
       res.status(405).json({ message: 'Method not allowed' });
     }

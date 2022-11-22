@@ -22,31 +22,29 @@ const ConfirmationModal = ({
   cancelButtonText,
   confirmAction,
   cancelAction,
-}: ConfirmationModalProps) => {
-  return (
-    <Modal show={show} onHide={cancelAction} className={styles.main}>
-      <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
-      </Modal.Header>
+}: ConfirmationModalProps) => (
+  <Modal show={show} onHide={cancelAction} className={styles.main}>
+    <Modal.Header closeButton>
+      <Modal.Title>{title}</Modal.Title>
+    </Modal.Header>
 
-      <Modal.Body>
-        <p>{body}</p>
-      </Modal.Body>
+    <Modal.Body>
+      <p>{body}</p>
+    </Modal.Body>
 
-      <Modal.Footer>
-        {cancelButtonText && (
-          <Button onClick={cancelAction} variant="secondary">
-            {cancelButtonText}
-          </Button>
-        )}
-        {confirmButtonText && (
-          <Button onClick={confirmAction} variant="primary">
-            {confirmButtonText}
-          </Button>
-        )}
-      </Modal.Footer>
-    </Modal>
-  );
-};
+    <Modal.Footer>
+      {cancelButtonText && (
+        <Button onClick={cancelAction} variant="secondary">
+          {cancelButtonText}
+        </Button>
+      )}
+      {confirmButtonText && (
+        <Button onClick={confirmAction} variant="primary">
+          {confirmButtonText}
+        </Button>
+      )}
+    </Modal.Footer>
+  </Modal>
+);
 
 export default ConfirmationModal;

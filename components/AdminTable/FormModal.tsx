@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import styles from './FormModal.module.scss';
+import { Modal } from 'react-bootstrap';
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
+import styles from './FormModal.module.scss';
 
 type FormModalProps = {
   header: string;
@@ -13,9 +13,9 @@ export default NiceModal.create(
   ({ header, children, id, ...restProps }: FormModalProps) => {
     const modal = useModal();
 
-    const handleHide = () => {
+    const handleHide = async () => {
       modal.reject();
-      modal.hide();
+      await modal.hide();
       modal.remove();
     };
     return (

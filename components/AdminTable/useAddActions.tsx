@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
-import RowActions from './RowActions';
 import {
   GridColumns,
   GridRowModel,
   GridRowModesModel,
   GridValidRowModel,
 } from '@mui/x-data-grid';
+import RowActions from './RowActions';
 
 type RowActionsProps<T extends GridValidRowModel> = {
   columns: GridColumns;
@@ -24,6 +24,7 @@ const useAddActions = <T extends GridValidRowModel>({
   setRows,
   rows,
 }: RowActionsProps<T>) => {
+  // eslint-disable-next-line @typescript-eslint/naming-convention,no-underscore-dangle
   const _columns = useMemo(
     () =>
       columns.concat({
@@ -32,10 +33,10 @@ const useAddActions = <T extends GridValidRowModel>({
         headerName: 'Actions',
         getActions: (row) => [
           <>
-            {/* @ts-ignore*/}
+            {/* @ts-ignore */}
             <RowActions
               rowsActions={rowsActions}
-              row={row as unknown as GridRowModel<T>}
+              row={(row as unknown) as GridRowModel<T>}
               rowModesModel={rowModesModel}
               setRowModesModel={setRowModesModel}
               setRows={setRows}

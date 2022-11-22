@@ -1,17 +1,18 @@
+import { Country } from '@prisma/client';
 import React, { useState } from 'react';
+import { Row, Col, Button } from 'react-bootstrap';
+import Lottie from 'react-lottie';
+import { AnimatePresence, motion } from 'framer-motion';
 import Section from '../Section/Section';
 import CountrySearch, { ExtendedCountry } from '../CountrySearch/CountrySearch';
 import { Bundle, Refill } from '../../utils/api/sevices/keepGo/types';
 import styles from './BundlesSection.module.scss';
-import { Row, Col, Button } from 'react-bootstrap';
 import * as travelImageData from '../../public/travel.json';
-import Lottie from 'react-lottie';
-import { AnimatePresence, motion } from 'framer-motion';
 import BundlesScroll from './BundlesScroll';
 import OrderModal from '../Order/OrderModal';
 
 type BundlesSectionProps = {
-  countriesList: { [key: string]: string };
+  countriesList: Country[];
   bundlesList: Bundle[];
 };
 
@@ -19,8 +20,10 @@ const BundlesSection = ({
   countriesList,
   bundlesList,
 }: BundlesSectionProps) => {
-  const [selectedCountry, setSelectedCountry] =
-    useState<ExtendedCountry | null>(null);
+  const [
+    selectedCountry,
+    setSelectedCountry,
+  ] = useState<ExtendedCountry | null>(null);
   const [selectedBundle, setSelectedBundle] = useState<number | null>(null);
   const [selectedRefill, setSelectedRefill] = useState<Refill | null>(null);
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -70,11 +73,7 @@ const BundlesSection = ({
             className={`d-flex justify-content-between flex-column ${styles.bundlesSearch}`}
           >
             {currentStep >= 0 ? (
-              <motion.div
-                className={styles.firstStepContainer}
-                layout
-                onAnimationComplete={(def) => console.log(def)}
-              >
+              <motion.div className={styles.firstStepContainer} layout>
                 <div className={`${styles.infoPlate} p-1 mb-2`}>
                   <h3>1. מספרים לנו לאן אתם טסים</h3>
                 </div>

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import MainLayout from '../components/Layouts/MainLayout';
 import { Alert, Container } from 'react-bootstrap';
 import { useRouter } from 'next/router';
+import MainLayout from '../components/Layouts/MainLayout';
 import styles from '../styles/error.module.scss';
 
 const Error = () => {

@@ -7,7 +7,6 @@ import {
   GridRowModes,
   GridRowModesModel,
   GridRowParams,
-  GridRowsProp,
   GridValidRowModel,
 } from '@mui/x-data-grid';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -38,40 +37,42 @@ const RowActions = <T extends GridValidRowModel>({
 
   useEffect(() => {
     setInEditMode(
-      rowModesModel[id as unknown as GridRowId]?.mode === GridRowModes.Edit
+      rowModesModel[(id as unknown) as GridRowId]?.mode === GridRowModes.Edit
     );
   }, [rowModesModel, id]);
 
-  const handleEditClick = (id: string | number) => () => {
+  const handleEditClick = (rowId: string | number) => () => {
     setRowModesModel({
       ...rowModesModel,
-      [id as unknown as GridRowId]: { mode: GridRowModes.Edit },
+      [(rowId as unknown) as GridRowId]: { mode: GridRowModes.Edit },
     });
   };
 
-  const handleSaveClick = (id: GridRowParams) => () => {
+  const handleSaveClick = (rowId: GridRowParams) => () => {
     setRowModesModel({
       ...rowModesModel,
-      [id as unknown as GridRowId]: { mode: GridRowModes.View },
+      [(rowId as unknown) as GridRowId]: { mode: GridRowModes.View },
     });
   };
 
-  const handleDeleteClick = (id: string | number) => () => {
-    setRows(rows.filter((row) => row.id !== id));
+  const handleDeleteClick = (rowId: string | number) => () => {
+    setRows(rows.filter((rowToDelete) => rowToDelete.id !== rowId));
   };
 
-  const handleCancelClick = (id: GridRowParams<T>) => () => {
+  const handleCancelClick = (rowId: GridRowParams<T>) => () => {
     setRowModesModel({
       ...rowModesModel,
-      [id as unknown as GridRowId]: {
+      [(rowId as unknown) as GridRowId]: {
         mode: GridRowModes.View,
         ignoreModifications: true,
       },
     });
 
-    const editedRow = rows.find((row: GridRowModel<T>) => row.id === id);
+    const editedRow = rows.find(
+      (rowEdited: GridRowModel<T>) => rowEdited.id === id
+    );
     if (editedRow?.isNew) {
-      setRows(rows.filter((row: GridRowModel<T>) => row.id !== id));
+      setRows(rows.filter((newRow: GridRowModel<T>) => newRow.id !== id));
     }
   };
 
@@ -80,12 +81,12 @@ const RowActions = <T extends GridValidRowModel>({
       <GridActionsCellItem
         label={'שמור'}
         icon={<FontAwesomeIcon icon={solid('floppy-disk')} />}
-        onClick={handleSaveClick(id as unknown as GridRowParams)}
+        onClick={handleSaveClick((id as unknown) as GridRowParams)}
       />,
       <GridActionsCellItem
         label={'בטל'}
         icon={<FontAwesomeIcon icon={solid('xmark')} />}
-        onClick={handleCancelClick(id as unknown as GridRowParams)}
+        onClick={handleCancelClick((id as unknown) as GridRowParams)}
       />,
     ];
   }
@@ -94,7 +95,7 @@ const RowActions = <T extends GridValidRowModel>({
     <GridActionsCellItem
       label={'שמור'}
       icon={<FontAwesomeIcon icon={solid('floppy-disk')} />}
-      onClick={handleSaveClick(id as unknown as GridRowParams)}
+      onClick={handleSaveClick((id as unknown) as GridRowParams)}
     />
   );
 
@@ -102,7 +103,7 @@ const RowActions = <T extends GridValidRowModel>({
     <GridActionsCellItem
       label={'בטל'}
       icon={<FontAwesomeIcon icon={solid('xmark')} />}
-      onClick={handleCancelClick(id as unknown as GridRowParams)}
+      onClick={handleCancelClick((id as unknown) as GridRowParams)}
     />
   );
 

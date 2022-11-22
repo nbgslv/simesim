@@ -4,6 +4,7 @@ export default function Document() {
   return (
     <Html dir="rtl" lang="he">
       <Head>
+        <title>שים eSim</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

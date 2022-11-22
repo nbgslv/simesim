@@ -1,24 +1,24 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import styles from './CountrySearch.module.scss';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import lookup from 'country-code-lookup';
+import { Country } from '@prisma/client';
+import styles from './CountrySearch.module.scss';
 import text from '../../lib/content/text.json';
 import { blurDataPlaceholder } from '../../lib/content/blurDataUri';
 import LoadingRings from '../../public/rings.svg';
 import SearchAutocomplete from '../SearchAutocomplete/SearchAutocomplete';
-import lookup from 'country-code-lookup';
-import { Country } from '@prisma/client';
 
 export type ExtendedCountry = {
   name?: string;
   translation?: string;
   displayValue: string;
-  id?: string;
+  id: string;
   iso2?: string;
 };
 
 type CountrySearchProps = {
-  countriesList: Partial<Country>[];
+  countriesList: Country[];
   onSelect: (country: ExtendedCountry | null) => void;
 };
 
@@ -28,37 +28,35 @@ const CountrySearchItem = ({
 }: {
   item: ExtendedCountry;
   selectItem: (item: ExtendedCountry) => void;
-}) => {
-  return (
+}) => (
+  <div
+    onClick={() => selectItem(item)}
+    role="option"
+    key={item.id}
+    className={`${styles.item} d-flex`}
+  >
     <div
-      onClick={() => selectItem(item)}
-      role="option"
-      key={item.id}
-      className={`${styles.item} d-flex`}
+      style={{
+        width: '30px',
+        height: '30px',
+        position: 'relative',
+      }}
     >
-      <div
-        style={{
-          width: '30px',
-          height: '30px',
-          position: 'relative',
-        }}
-      >
-        {item.iso2 ? (
-          <Image
-            src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${item.iso2.toUpperCase()}.svg`}
-            placeholder="blur"
-            blurDataURL={blurDataPlaceholder}
-            layout="intrinsic"
-            width="30px"
-            height="30px"
-            alt={item.displayValue}
-          />
-        ) : null}
-      </div>
-      <div className={`${styles.itemName}`}>{item.displayValue}</div>
+      {item.iso2 ? (
+        <Image
+          src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${item.iso2.toUpperCase()}.svg`}
+          placeholder="blur"
+          blurDataURL={blurDataPlaceholder}
+          layout="intrinsic"
+          width="30px"
+          height="30px"
+          alt={item.displayValue}
+        />
+      ) : null}
     </div>
-  );
-};
+    <div className={`${styles.itemName}`}>{item.displayValue}</div>
+  </div>
+);
 
 const CountrySearch = ({ countriesList, onSelect }: CountrySearchProps) => {
   const [itemSelected, setItemSelected] = useState<ExtendedCountry | null>(
@@ -93,16 +91,14 @@ const CountrySearch = ({ countriesList, onSelect }: CountrySearchProps) => {
     setCountryFlagError(false);
   };
 
-  const getRandomTextPhrase = () => {
-    return text.countrySearch.phrases[
+  const getRandomTextPhrase = () =>
+    text.countrySearch.phrases[
       Math.floor(Math.random() * text.countrySearch.phrases.length)
     ];
-  };
 
-  const cachedTextPhrased = useMemo(
-    () => getRandomTextPhrase(),
-    [itemSelected]
-  );
+  const cachedTextPhrased = useMemo(() => getRandomTextPhrase(), [
+    itemSelected,
+  ]);
 
   return (
     <>

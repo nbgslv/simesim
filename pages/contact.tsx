@@ -1,5 +1,4 @@
 import React from 'react';
-import MainLayout from '../components/Layouts/MainLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   brands,
@@ -15,11 +14,12 @@ import {
   Row,
   Spinner,
 } from 'react-bootstrap';
-import styles from '../styles/contact.module.scss';
-import text from '../lib/content/text.json';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import text from '../lib/content/text.json';
+import styles from '../styles/contact.module.scss';
+import MainLayout from '../components/Layouts/MainLayout';
 import Input from '../components/Input/Input';
 
 const schema = yup.object().shape({

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect } from 'react';
-import CustomNavbar from '../Navbar/CustomNavbar';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import styles from './Header.module.scss';
 import Image from 'next/image';
+import CustomNavbar from '../Navbar/CustomNavbar';
+import styles from './Header.module.scss';
 import coverImage from '../../public/esimOne.png';
 import logoTextWhite from '../../public/logoTextWhite.png';
 import text from '../../lib/content/text.json';

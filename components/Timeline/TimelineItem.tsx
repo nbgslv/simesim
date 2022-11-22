@@ -1,12 +1,6 @@
-import React, {
-  MutableRefObject,
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import styles from './TimelineItem.module.scss';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
+import styles from './TimelineItem.module.scss';
 
 type TimelineItemProps = {
   children: ReactNode;
@@ -31,10 +25,12 @@ const TimelineItem = ({
   const controls = useAnimation();
 
   useEffect(() => {
-    if (animate) {
-      controls.start('start');
-      setAnimationActive(true);
-    }
+    (async () => {
+      if (animate) {
+        await controls.start('start');
+        setAnimationActive(true);
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -51,13 +47,15 @@ const TimelineItem = ({
     setShowTooltip(false);
     controls.stop();
     disableAnimation(animationKey);
-    onHovered && onHovered();
+    if (onHovered) {
+      onHovered();
+    }
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = async () => {
     setActive(false);
     if (animate) {
-      controls.start('start');
+      await controls.start('start');
       setAnimationActive(true);
     }
   };
@@ -79,8 +77,8 @@ const TimelineItem = ({
 
   const handleAnimationComplete = () => {
     setAnimationActive(false);
-    setTimeout(() => {
-      if (animate) controls.start('start');
+    setTimeout(async () => {
+      if (animate) await controls.start('start');
       setAnimationActive(true);
     }, Math.abs(getRandomDelay()) * 10000);
   };

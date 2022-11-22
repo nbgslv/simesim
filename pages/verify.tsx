@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
-import MainLayout from '../components/Layouts/MainLayout';
 import { Alert, Button, Form, Nav, Spinner } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
 import OtpInput from 'react-otp-input';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
-import styles from '../styles/verify.module.scss';
 import Countdown, { zeroPad } from 'react-countdown';
 import { getCsrfToken } from 'next-auth/react';
 import { NextPageContext } from 'next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import styles from '../styles/verify.module.scss';
+import MainLayout from '../components/Layouts/MainLayout';
 
 const Verify = ({ csrfToken }: { csrfToken: string }) => {
   const TIMER = 60000; // 60 seconds
@@ -24,6 +24,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [timer, setTimer] = React.useState<number>(Date.now() + TIMER);
   const [resendLoading, setResendLoading] = React.useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/naming-convention,@typescript-eslint/no-unused-vars
   const [cookies, _, removeCookie] = useCookies([
     'phoneNumber',
     'simesim_callbackUrl',
@@ -52,7 +53,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
     try {
       if (otp.length === 6 && phoneNumber) {
         setLoading(true);
-        const res = await fetch(`/api/verify`, {
+        const res = await fetch('/api/verify', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -84,7 +85,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
     const params = {
       email: phoneNumber,
       method: method || 'whatsapp',
-      csrfToken: csrfToken,
+      csrfToken,
       callbackUrl: 'http://localhost:3000/login',
       json: 'true',
     };
@@ -97,7 +98,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
     }
 
     setResendLoading(true);
-    await fetch(`http://localhost:3000/api/auth/signin/email`, {
+    await fetch('http://localhost:3000/api/auth/signin/email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

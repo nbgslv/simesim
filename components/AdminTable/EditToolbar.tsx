@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   GridRowId,
-  GridRowModel,
   GridRowModes,
   GridRowModesModel,
   GridRowsProp,
@@ -9,30 +8,32 @@ import {
   GridValidRowModel,
 } from '@mui/x-data-grid';
 import { Button, Spinner } from 'react-bootstrap';
-import styles from './EditToolbar.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import styles from './EditToolbar.module.scss';
 import ConfirmationModal from './ConfirmationModal';
 
-interface EditToolbarProps<T extends GridValidRowModel> {
+interface EditToolbarProps {
   selectedRows: GridRowId[];
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
   setRowModesModel: (
     newModel: (oldModel: GridRowModesModel) => GridRowModesModel
   ) => void;
   multiActions?: string[];
-  addRow?: () => Promise<{ id: GridRowId; columnToFocus: string | undefined }>;
+  addRow?: () => Promise<
+    { id: GridRowId; columnToFocus: string | undefined } | Error
+  >;
   deleteRows?: (ids: GridRowId[]) => Promise<void>;
   loading: boolean;
 }
 
-const EditToolbar = <T extends GridValidRowModel>({
+const EditToolbar = ({
   selectedRows,
   setRowModesModel,
   multiActions = [],
   addRow,
   deleteRows,
-}: EditToolbarProps<T>) => {
+}: EditToolbarProps) => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = React.useState<boolean>(false);
 
@@ -41,7 +42,7 @@ const EditToolbar = <T extends GridValidRowModel>({
       setLoading(true);
       if (addRow) {
         const newRowData = await addRow();
-        if (newRowData) {
+        if (!(newRowData instanceof Error)) {
           setRowModesModel((oldModel) => ({
             ...oldModel,
             [newRowData.id]: {

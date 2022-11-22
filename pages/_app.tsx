@@ -12,7 +12,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       {/* @ts-ignore */}
       <SessionProvider session={pageProps.session}>
         <UserStoreProvider
-          initialState={{ user: initialState }}
+          initialState={{ user: initialState.user }}
           reducer={reducer}
         >
           <ThemeProvider dir="rtl">

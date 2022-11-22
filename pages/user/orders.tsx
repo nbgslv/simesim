@@ -1,27 +1,25 @@
 import React from 'react';
-import prisma from '../../lib/prisma';
 import { unstable_getServerSession } from 'next-auth';
 import { NextApiRequest, NextApiResponse, NextPageContext } from 'next';
-import { authOptions } from '../api/auth/[...nextauth]';
 import { Plan } from '@prisma/client';
-import MainLayout from '../../components/Layouts/MainLayout';
 import { Container } from 'react-bootstrap';
-import UserOrders from '../../components/User/UserOrders';
 import { format } from 'date-fns';
+import { authOptions } from '../api/auth/[...nextauth]';
+import MainLayout from '../../components/Layouts/MainLayout';
+import UserOrders from '../../components/User/UserOrders';
+import prisma from '../../lib/prisma';
 import styles from '../../styles/orders.module.scss';
 
-const Orders = ({ plans }: { plans: Plan[] }) => {
-  return (
-    <MainLayout hideJumbotron>
-      <div className={styles.main}>
-        <Container>
-          <h1 className="text-center mb-3 p-2">ההזמנות שלי</h1>
-          <UserOrders plans={plans} />
-        </Container>
-      </div>
-    </MainLayout>
-  );
-};
+const Orders = ({ plans }: { plans: Plan[] }) => (
+  <MainLayout hideJumbotron>
+    <div className={styles.main}>
+      <Container>
+        <h1 className="text-center mb-3 p-2">ההזמנות שלי</h1>
+        <UserOrders plans={plans} />
+      </Container>
+    </div>
+  </MainLayout>
+);
 
 export async function getServerSideProps(context: NextPageContext) {
   const session = await unstable_getServerSession(
@@ -36,7 +34,8 @@ export async function getServerSideProps(context: NextPageContext) {
         permanent: false,
       },
     };
-  } else if (session && session.user) {
+  }
+  if (session && session.user) {
     const plans = await prisma.plan.findMany({
       where: {
         userId: session.user.id,
@@ -79,6 +78,12 @@ export async function getServerSideProps(context: NextPageContext) {
       },
     };
   }
+
+  return {
+    props: {
+      plans: [],
+    },
+  };
 }
 
 export default Orders;

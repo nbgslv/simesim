@@ -1,12 +1,12 @@
 import React from 'react';
+import { Prisma } from '@prisma/client';
+import { GridColumns, GridValidRowModel } from '@mui/x-data-grid';
+import { format } from 'date-fns';
+import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
-import { Prisma } from '@prisma/client';
-import { GridColumns, GridRowId, GridValidRowModel } from '@mui/x-data-grid';
 import prisma from '../../lib/prisma';
-import { format } from 'date-fns';
 import FormModal from '../../components/AdminTable/FormModal';
-import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 
 type LineAsAdminTableData = (GridValidRowModel &
   Prisma.LineMaxAggregateOutputType)[];
@@ -98,11 +98,12 @@ const Lines = ({ lines }: LinesProps) => {
   const showModal = async () => {
     try {
       const addData = await NiceModal.show('add-users');
-      return addRow(addData as Prisma.LineMaxAggregateOutputType);
+      return await addRow(addData as Prisma.LineMaxAggregateOutputType);
     } catch (e) {
       modal.reject(e);
-      modal.hide();
+      await modal.hide();
       modal.remove();
+      return e;
     }
   };
 

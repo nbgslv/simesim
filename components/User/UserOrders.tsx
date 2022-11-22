@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { DataGrid, GridRowModel } from '@mui/x-data-grid';
 import { Plan } from '@prisma/client';
+import { Button } from 'react-bootstrap';
 import styles from './UserOrders.module.scss';
 import gridTranslation from '../../lib/content/mui-datagrid-translation.json';
-import { Button } from 'react-bootstrap';
 import PaymentDetailsModal from './PaymentDetailsModal';
 
 const UserOrders = ({ plans }: { plans: Plan[] }) => {
@@ -13,18 +13,29 @@ const UserOrders = ({ plans }: { plans: Plan[] }) => {
   );
 
   useEffect(() => {
-    const plansRows = plans.map((plan) => ({
-      ...plan,
-      planName: plan.planModel?.name,
-      status: plan.line?.status,
-      allowedUsageKb: plan.planModel?.allowedUsageKb,
-      remainingUsageKb: plan.line?.remainingUsageKb,
-      remainingDays: plan.line?.remainingDays,
-      qrCode: plan.line?.qrCode,
-    }));
-    console.log(plansRows);
-    setPlansRows(plansRows);
+    setPlansRows(
+      plans.map((plan) => ({
+        ...plan,
+        planName: plan.planModel?.name,
+        status: plan.line?.status,
+        allowedUsageKb: plan.planModel?.allowedUsageKb,
+        remainingUsageKb: plan.line?.remainingUsageKb,
+        remainingDays: plan.line?.remainingDays,
+        qrCode: plan.line?.qrCode,
+      }))
+    );
   }, [plans]);
+
+  const handleShowQr = (qrCode: string | null) => {
+    console.log(qrCode);
+  };
+
+  const handleShowPaymentModal = (id: string, payment: string) => {
+    setChosenRowPayment({
+      friendlyPlanId: id,
+      ...payment,
+    });
+  };
 
   const columns = [
     {
@@ -95,17 +106,6 @@ const UserOrders = ({ plans }: { plans: Plan[] }) => {
       ),
     },
   ];
-
-  const handleShowQr = (qrCode: string | null) => {
-    console.log(qrCode);
-  };
-
-  const handleShowPaymentModal = (id: string, payment: string) => {
-    setChosenRowPayment({
-      friendlyPlanId: id,
-      ...payment,
-    });
-  };
 
   const handlePaymentModalHide = () => {
     setChosenRowPayment(null);

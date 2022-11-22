@@ -1,6 +1,6 @@
+import Bottleneck from 'bottleneck';
 import KeepGoApi from '../../utils/api/sevices/keepGo/api';
 import prisma from '../prisma';
-import Bottleneck from 'bottleneck';
 
 const getCountries = async () => {
   const keepGoApi = new KeepGoApi(
@@ -8,8 +8,7 @@ const getCountries = async () => {
     process.env.KEEPGO_API_KEY || '',
     process.env.KEEPGO_ACCESS_TOKEN || ''
   );
-  const countries = await keepGoApi.getCountries();
-  return countries;
+  return keepGoApi.getCountries();
 };
 
 const syncCountries = async () => {

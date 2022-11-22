@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import prisma from '../../lib/prisma';
 import { Prisma, Country } from '@prisma/client';
+import prisma from '../../lib/prisma';
 
 export default async function handler(
   req: NextApiRequest,
@@ -22,7 +22,6 @@ export default async function handler(
     } else if (method === 'PUT') {
       const {
         body: { id, translation, lockTranslation, show },
-        method,
       } = req;
       const update: Country = await prisma.country.update({
         where: {

@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '../../lib/prisma';
-import { getFormData } from '../../utils/objects';
 
 export enum OrderStatus {
   READY = 'READY',
@@ -101,8 +100,6 @@ export default async function handler(
       // TODO: Add coupon registration
 
       // res.status(200).json(plan)
-    } else if (method === 'PUT') {
-    } else if (method === 'DELETE') {
     }
   } catch (error: unknown) {
     console.error(error);

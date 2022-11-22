@@ -1,10 +1,10 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import EmailProvider from 'next-auth/providers/email';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import prisma from '../../../lib/prisma';
-import TwilioApi, { Channel } from '../../../utils/api/sevices/twilio/twilio';
 import otpGenerator from 'otp-generator';
 import { NextApiRequest, NextApiResponse } from 'next';
+import prisma from '../../../lib/prisma';
+import TwilioApi, { Channel } from '../../../utils/api/sevices/twilio/twilio';
 
 const twilioApi = new TwilioApi(
   process.env.TWILIO_ACCOUNT_SID!,
@@ -22,10 +22,9 @@ export const authOptions = (
       name: 'Credentials',
       server: '',
       maxAge: 60 * 60 * 2, // 2 hours
-      sendVerificationRequest: async ({ identifier: phone, token, url }) => {
-        console.log({ token });
-        const body = req.body;
-        let method = body.method;
+      sendVerificationRequest: async ({ identifier: phone, token }) => {
+        const { body } = req;
+        let { method } = body;
         if (method) {
           if (method === 'sms') {
             method = Channel.SMS;
@@ -52,16 +51,13 @@ export const authOptions = (
           // }
         }
       },
-      generateVerificationToken: async () => {
-        return otpGenerator.generate(6, {
+      generateVerificationToken: async () =>
+        otpGenerator.generate(6, {
           upperCaseAlphabets: false,
           specialChars: false,
           lowerCaseAlphabets: false,
-        });
-      },
-      normalizeIdentifier: (identifier) => {
-        return identifier;
-      },
+        }),
+      normalizeIdentifier: (identifier) => identifier,
     }),
   ],
   session: {
@@ -78,15 +74,16 @@ export const authOptions = (
         },
       });
       if (user) {
+        /* eslint-disable no-param-reassign */
         token.name = `${user.firstName} ${user.lastName}`;
         token.role = user.role;
         token.id = user.id;
       }
       return token;
     },
-    async session({ session, token, user }) {
+    async session({ session, token }) {
       if (session && session.user) {
-        session.user.id = token.id;
+        session.user.id = token.id as string;
         return session;
       }
       return session;
@@ -100,7 +97,7 @@ export const authOptions = (
 });
 
 export default async function auth(req: any, res: any) {
-  return await NextAuth(req, res, {
+  return NextAuth(req, res, {
     ...authOptions(req, res),
   });
 }

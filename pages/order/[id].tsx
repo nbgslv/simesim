@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
-import MainLayout from '../../components/Layouts/MainLayout';
 import { Spinner } from 'react-bootstrap';
-import styles from './Checkout.module.scss';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import styles from './Checkout.module.scss';
+import MainLayout from '../../components/Layouts/MainLayout';
 
 const Checkout = () => {
   const [pageLoading, setPageLoading] = React.useState<boolean>(true);

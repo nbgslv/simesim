@@ -1,12 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { Prisma } from '@prisma/client';
-import {
-  FieldValues,
-  SubmitHandler,
-  useForm,
-  SubmitErrorHandler,
-} from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useModal } from '@ebay/nice-modal-react';
@@ -32,12 +27,7 @@ const schema = yup.object().shape({
   couponsIds: yup.string(),
 });
 
-const PlansModelForm = ({
-  bundles,
-  refills,
-  setBundle,
-  coupons,
-}: PlansModelFormProps) => {
+const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
   const { resolve, hide } = useModal('add-plansmodel');
   const {
     register,

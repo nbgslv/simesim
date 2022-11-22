@@ -15,18 +15,6 @@ html {
   --bs-nav-link-font-size: 0.875rem;
 }
 
-.auto-complete-input {
-  color: black;
-}
-
-.pin-space {
-  padding-bottom: 300px;
-}
-
-.close-button {
-  color: #ffffff;
-}
-
 h1,
 h2,
 h3,
@@ -59,10 +47,6 @@ h6 {
   &:active {
     color: map-get($theme-colors, 'primary');
   }
-}
-
-.dropdown-menu {
-  opacity: 1 !important;
 }
 
 a.dropdown-item {

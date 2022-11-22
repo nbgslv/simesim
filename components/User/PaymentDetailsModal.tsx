@@ -3,8 +3,7 @@ import { Button, Col, Container, Modal, Row } from 'react-bootstrap';
 import styles from '../AdminTable/FormModal.module.scss';
 
 const PaymentDetailsModal = ({ show, payment, handleModalHide }) => {
-  if (!payment) return;
-  console.log({ payment });
+  if (!payment) return null;
   return (
     <Modal
       show={show}

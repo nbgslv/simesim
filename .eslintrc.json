@@ -1,57 +1,7 @@
 {
-  "env": {
-    "browser": true,
-    "es6": true
-  },
-  "extends": [
-    "airbnb",
-    "prettier",
-    "plugin:prettier/recommended",
-    "plugin:react/recommended",
-    "eslint-config-prettier",
-    "next/core-web-vitals"
-  ],
-  "globals": {
-    "Atomics": "readonly",
-    "SharedArrayBuffer": "readonly"
-  },
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "ecmaVersion": 2018,
-    "sourceType": "module"
-  },
-  "plugins": [
-    "react",
-    "prettier",
-    "testing-library"
-  ],
+  "extends": ["typescript-airbnb-prettier"],
   "rules": {
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "react/jsx-props-no-spreading": [1,
-      {
-        "exceptions": [
-          "WrappedComponent"
-        ]
-      }
-    ],
-    "no-underscore-dangle": ["error", {
-      "allow": ["_id"]
-    }],
-    "prettier/prettier": [
-      "error",
-      {
-        "trailingComma": "es5",
-        "singleQuote": true,
-        "printWidth": 100,
-        "endOfLine": "crlf",
-        "arrowParens": "avoid"
-      }
-    ],
     "quotes": ["error", "single"],
-    "sort-imports": ["error"]
-  },
-  "reportUnusedDisableDirectives": true,
-  "parser": "babel-eslint"
+    "no-console": ["error", { "allow": ["warn", "error"] }]
+  }
 }

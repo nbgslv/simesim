@@ -1,14 +1,14 @@
 import React, { ReactNode, useCallback, useEffect, useRef } from 'react';
-import Section from '../Section/Section';
-import SearchAutocomplete, {
-  Item,
-} from '../SearchAutocomplete/SearchAutocomplete';
 import { Col, Row } from 'react-bootstrap';
-import styles from './CheckPhoneSection.module.scss';
 import Image from 'next/image';
 import { AnimatePresence, motion, useAnimation, Variants } from 'framer-motion';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import styles from './CheckPhoneSection.module.scss';
+import SearchAutocomplete, {
+  Item,
+} from '../SearchAutocomplete/SearchAutocomplete';
+import Section from '../Section/Section';
 
 type Brand = {
   exceptions: string[];
@@ -40,10 +40,14 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   const [filteredPhones, setFilteredPhones] = React.useState<PhoneListItem[]>(
     []
   );
-  const [selectedBrand, setSelectedBrand] =
-    React.useState<BrandListItem | null>(null);
-  const [selectedPhone, setSelectedPhone] =
-    React.useState<PhoneListItem | null>(null);
+  const [
+    selectedBrand,
+    setSelectedBrand,
+  ] = React.useState<BrandListItem | null>(null);
+  const [
+    selectedPhone,
+    setSelectedPhone,
+  ] = React.useState<PhoneListItem | null>(null);
   const phoneSearchRef = useRef<any>(null);
   const controls = useAnimation();
 
@@ -87,28 +91,28 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   }: {
     item: Item<PhoneListItem>;
     selectItem: (item: Item<PhoneListItem>) => void;
-  }) => {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        role="option"
-        className={`${styles.listBoxItem}`}
-        onClick={() => selectItem(item)}
-      >
-        {item.displayValue}
-      </motion.div>
-    );
-  };
+  }) => (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      role="option"
+      className={`${styles.listBoxItem}`}
+      onClick={() => selectItem(item)}
+    >
+      {item.displayValue}
+    </motion.div>
+  );
 
   useEffect(() => {
-    controls.start('start');
+    (async () => {
+      await controls.start('start');
+    })();
   }, []);
 
   useEffect(() => {
     const brandsArray: BrandListItem[] = [];
     const phonesArray: PhoneListItem[] = [];
-    let index = 0;
+    const index = 0;
     phonesList.forEach((list) => {
       list.brands.forEach((brand, id) => {
         brandsArray.push({
@@ -118,7 +122,7 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
         });
         brand.models.forEach((model) => {
           phonesArray.push({
-            id: index++,
+            id: index + 1,
             displayValue: model,
             brand: brand.title,
           });
@@ -209,8 +213,8 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   };
 
   const handleAnimationComplete = () => {
-    setTimeout(() => {
-      controls.start('start');
+    setTimeout(async () => {
+      await controls.start('start');
     }, 1000);
   };
 
@@ -233,10 +237,9 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
               placeholder={'של איזו חברה?'}
               onSelect={handleBrandSelect}
               onCancel={handleBrandCancel}
-              items={phonesBrands}
-              focusedBorderColor={'#4502C6'}
               ListBoxComponent={ListBox}
               ItemComponent={ListBoxItem}
+              items={phonesBrands}
             />
           </motion.div>
           {selectedBrand && (
@@ -247,7 +250,6 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
                 onCancel={handlePhoneCancel}
                 items={filteredPhones}
                 ref={phoneSearchRef}
-                focusedBorderColor={'#4502C6'}
                 ListBoxComponent={ListBox}
                 ItemComponent={ListBoxItem}
               />

@@ -1,17 +1,18 @@
 import React from 'react';
-import AdminLayout from '../../components/Layouts/AdminLayout';
-import AdminTable from '../../components/AdminTable/AdminTable';
 import { Prisma } from '@prisma/client';
 import { GridColumns, GridRowId, GridValidRowModel } from '@mui/x-data-grid';
-import prisma from '../../lib/prisma';
 import { format } from 'date-fns';
+import AdminLayout from '../../components/Layouts/AdminLayout';
+import AdminTable from '../../components/AdminTable/AdminTable';
+import prisma from '../../lib/prisma';
 
 type PlansAsAdminTableData = (GridValidRowModel &
   Prisma.PlanMaxAggregateOutputType)[];
 
 const Plans = ({ plans }: { plans: PlansAsAdminTableData }) => {
-  const [plansRows, setPlansRows] =
-    React.useState<PlansAsAdminTableData>(plans);
+  const [plansRows, setPlansRows] = React.useState<PlansAsAdminTableData>(
+    plans
+  );
 
   const columns: GridColumns = [
     {
@@ -66,13 +67,11 @@ const Plans = ({ plans }: { plans: PlansAsAdminTableData }) => {
       },
     });
     const newPlanJson = await newPlan.json();
-    console.log({ newPlanJson });
     setPlansRows([...plansRows, newPlanJson]);
     return { id: newPlanJson.id, columnToFocus: undefined };
   };
 
   const handleDeleteRows = async (ids: GridRowId[]) => {
-    console.log({ ids });
     const deleteCount = await fetch('/api/plans', {
       method: 'DELETE',
       headers: {
@@ -81,7 +80,6 @@ const Plans = ({ plans }: { plans: PlansAsAdminTableData }) => {
       body: JSON.stringify({ ids }),
     });
     const deleteCountJson = await deleteCount.json();
-    console.log({ deleteCountJson });
     setPlansRows(plansRows.filter((plan) => !ids.includes(plan.id!)));
   };
 

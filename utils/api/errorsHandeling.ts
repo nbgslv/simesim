@@ -1,13 +1,10 @@
 import { ErrorWithMessage } from './types';
 
-const isErrorWithMessage = (error: unknown): error is ErrorWithMessage => {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'message' in error &&
-    typeof (error as Record<string, unknown>).message === 'string'
-  );
-};
+const isErrorWithMessage = (error: unknown): error is ErrorWithMessage =>
+  typeof error === 'object' &&
+  error !== null &&
+  'message' in error &&
+  typeof (error as Record<string, unknown>).message === 'string';
 
 const toErrorWithMessage = (maybeError: unknown): Error => {
   if (isErrorWithMessage(maybeError)) return maybeError as Error;
@@ -21,6 +18,4 @@ const toErrorWithMessage = (maybeError: unknown): Error => {
   }
 };
 
-export const getErrorMessage = (error: unknown) => {
-  return toErrorWithMessage(error);
-};
+export const getErrorMessage = (error: unknown) => toErrorWithMessage(error);

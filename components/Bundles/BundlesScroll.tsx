@@ -1,10 +1,10 @@
 import React from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Bundle, Refill } from '../../utils/api/sevices/keepGo/types';
 import BundleCard from './BundleCard';
 import LeftArrow from '../../public/left-arrow.svg';
 import RightArrow from '../../public/right-arrow.svg';
 import styles from './BundlesScroll.module.scss';
-import { AnimatePresence, motion } from 'framer-motion';
 
 const BundlesScroll = ({
   bundlesList,
@@ -18,24 +18,20 @@ const BundlesScroll = ({
   const [currentBundle, setCurrentBundle] = React.useState<number>(0);
   const [direction, setDirection] = React.useState<number>(0);
   const variants = {
-    enter: (direction: number) => {
-      return {
-        x: direction > 0 ? 1000 : -1000,
-        opacity: 0,
-      };
-    },
+    enter: (direction: number) => ({
+      x: direction > 0 ? 1000 : -1000,
+      opacity: 0,
+    }),
     center: {
       zIndex: 1,
       x: 0,
       opacity: 1,
     },
-    exit: (direction: number) => {
-      return {
-        zIndex: 0,
-        x: direction < 0 ? 1000 : -1000,
-        opacity: 0,
-      };
-    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? 1000 : -1000,
+      opacity: 0,
+    }),
   };
 
   const paginate = (newDirection: number) => {

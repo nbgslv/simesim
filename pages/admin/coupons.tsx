@@ -1,15 +1,14 @@
 import React, { useEffect } from 'react';
-import AdminLayout from '../../components/Layouts/AdminLayout';
-import AdminTable from '../../components/AdminTable/AdminTable';
-import prisma from '../../lib/prisma';
 import { format, parse } from 'date-fns';
 import { Coupon, PlanModel } from '@prisma/client';
 import { GridColumns, GridValidRowModel } from '@mui/x-data-grid';
-import FormModal from '../../components/AdminTable/FormModal';
 import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
-import CouponsForm from '../../components/Coupons/CouponsForm';
 import DatePicker from 'react-datepicker';
-import styles from '../../styles/coupons.module.scss';
+import AdminLayout from '../../components/Layouts/AdminLayout';
+import AdminTable from '../../components/AdminTable/AdminTable';
+import prisma from '../../lib/prisma';
+import FormModal from '../../components/AdminTable/FormModal';
+import CouponsForm from '../../components/Coupons/CouponsForm';
 
 type CouponsAsAdminTableData = (GridValidRowModel & Coupon)[];
 
@@ -20,8 +19,9 @@ const Coupons = ({
   coupons: CouponsAsAdminTableData;
   plansModel: PlanModel[];
 }) => {
-  const [couponsRows, setCouponsRows] =
-    React.useState<CouponsAsAdminTableData>(coupons);
+  const [couponsRows, setCouponsRows] = React.useState<CouponsAsAdminTableData>(
+    coupons
+  );
   const [addRowLoading, setAddRowLoading] = React.useState<boolean>(false);
   const modal = useModal('add-coupons');
 
@@ -54,7 +54,6 @@ const Coupons = ({
       type: 'singleSelect',
       editable: true,
       valueOptions: ['PERCENT', 'AMOUNT'],
-      cellClassName: styles.cell,
     },
     {
       field: 'validFrom',
@@ -62,7 +61,6 @@ const Coupons = ({
       editable: true,
       renderEditCell: (params) => {
         const { id, field, value } = params;
-        console.log(value);
         return (
           <DatePicker
             selected={parse(value, 'dd/MM/yyyy kk:mm', new Date())}
@@ -96,8 +94,9 @@ const Coupons = ({
     },
   ];
 
-  const addRow = async (data: Coupon) => {
-    console.log({ data });
+  const addRow = async (
+    data: Coupon
+  ): Promise<{ id: string; columnToFocus: undefined }> => {
     setAddRowLoading(true);
     const newCoupon = await fetch('/api/coupon', {
       method: 'POST',
@@ -107,21 +106,23 @@ const Coupons = ({
       body: JSON.stringify(data),
     });
     const newCouponJson = await newCoupon.json();
-    console.log({ newCouponJson });
     setCouponsRows([...couponsRows, newCouponJson]);
     setAddRowLoading(false);
-    modal.hide();
+    await modal.hide();
     return { id: newCouponJson.id, columnToFocus: undefined };
   };
 
-  const showModal = async () => {
+  const showModal = async (): Promise<
+    { id: string; columnToFocus: undefined } | Error
+  > => {
     try {
       const addData = await NiceModal.show('add-coupons');
       return await addRow(addData as Coupon);
     } catch (e) {
       modal.reject(e);
-      modal.hide();
+      await modal.hide();
       modal.remove();
+      return e as Error;
     }
   };
 

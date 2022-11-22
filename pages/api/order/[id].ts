@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Plan, Prisma } from '@prisma/client';
-import prisma from '../../../lib/prisma';
 import { unstable_getServerSession } from 'next-auth';
+import prisma from '../../../lib/prisma';
 import { authOptions } from '../auth/[...nextauth]';
 
 export default async function handler(
@@ -92,7 +92,7 @@ export default async function handler(
               update: {
                 status: updatedPlanData.payment.status,
                 invoice: updatedPlanData.invoice,
-                paymentMethod: paymentMethod,
+                paymentMethod,
               },
             },
           },

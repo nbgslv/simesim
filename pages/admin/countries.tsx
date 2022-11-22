@@ -1,94 +1,36 @@
-import React, { RefObject, useCallback, useEffect } from 'react';
-import AdminLayout from '../../components/Layouts/AdminLayout';
-import AdminTable from '../../components/AdminTable/AdminTable';
-import prisma from '../../lib/prisma';
+import React, { useCallback, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
 import { Prisma } from '@prisma/client';
-import AdminTableSwitch from '../../components/AdminTable/AdminTableSwitch';
-import { GridApiCommunity } from '@mui/x-data-grid/internals';
 import {
   GridColumns,
   GridRowId,
   GridRowModel,
   GridValidRowModel,
 } from '@mui/x-data-grid';
+import AdminLayout from '../../components/Layouts/AdminLayout';
+import AdminTable from '../../components/AdminTable/AdminTable';
+import prisma from '../../lib/prisma';
+import AdminTableSwitch from '../../components/AdminTable/AdminTableSwitch';
 
 type CountriesAsAdminTableData = (GridValidRowModel &
   Prisma.CountryMaxAggregateOutputType)[];
 
 const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
-  const [countriesRows, setCountriesRows] =
-    React.useState<CountriesAsAdminTableData>(countries);
-  const [changeShowLoading, setChangeShowLoading] =
-    React.useState<GridRowId>('');
-  const [changeLockTranslationLoading, setChangeLockTranslationLoading] =
-    React.useState<GridRowId>('');
+  const [
+    countriesRows,
+    setCountriesRows,
+  ] = React.useState<CountriesAsAdminTableData>(countries);
+  const [changeShowLoading, setChangeShowLoading] = React.useState<GridRowId>(
+    ''
+  );
+  const [
+    changeLockTranslationLoading,
+    setChangeLockTranslationLoading,
+  ] = React.useState<GridRowId>('');
 
   useEffect(() => {
     setCountriesRows(countries);
   }, [countries]);
-
-  const columns: GridColumns = [
-    {
-      field: 'name',
-      headerName: 'Country',
-      width: 200,
-    },
-    {
-      field: 'translation',
-      headerName: 'Translation',
-      editable: true,
-      width: 200,
-    },
-    {
-      field: 'lockTranslation',
-      headerName: 'Lock Translation',
-      renderCell: (params: any) => {
-        return (
-          <AdminTableSwitch
-            checked={params.value}
-            onChange={handleLockTranslationToggle}
-            rowId={params.id}
-            row={params.row}
-            loading={changeLockTranslationLoading}
-          />
-        );
-      },
-    },
-    {
-      field: 'show',
-      headerName: 'Show',
-      renderCell: (params: any) => {
-        return (
-          <AdminTableSwitch
-            checked={params.value}
-            onChange={handleShowToggle}
-            rowId={params.id}
-            row={params.row}
-            loading={changeShowLoading}
-          />
-        );
-      },
-    },
-    {
-      field: 'updatedAt',
-      headerName: 'Updated At',
-      width: 150,
-    },
-  ];
-
-  const updateRow = useCallback(
-    async (data: BodyInit) => {
-      return fetch('/api/country', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: data,
-      });
-    },
-    [changeShowLoading, changeLockTranslationLoading]
-  );
 
   const handleLockTranslationToggle = async (
     checked: boolean,
@@ -162,6 +104,63 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     }
   };
 
+  const columns: GridColumns = [
+    {
+      field: 'name',
+      headerName: 'Country',
+      width: 200,
+    },
+    {
+      field: 'translation',
+      headerName: 'Translation',
+      editable: true,
+      width: 200,
+    },
+    {
+      field: 'lockTranslation',
+      headerName: 'Lock Translation',
+      renderCell: (params: any) => (
+        <AdminTableSwitch
+          checked={params.value}
+          onChange={handleLockTranslationToggle}
+          rowId={params.id}
+          row={params.row}
+          loading={changeLockTranslationLoading}
+        />
+      ),
+    },
+    {
+      field: 'show',
+      headerName: 'Show',
+      renderCell: (params: any) => (
+        <AdminTableSwitch
+          checked={params.value}
+          onChange={handleShowToggle}
+          rowId={params.id}
+          row={params.row}
+          loading={changeShowLoading}
+        />
+      ),
+    },
+    {
+      field: 'updatedAt',
+      headerName: 'Updated At',
+      width: 150,
+    },
+  ];
+
+  const updateRow = useCallback(
+    async (data: BodyInit) =>
+      fetch('/api/country', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: data,
+      }),
+    [changeShowLoading, changeLockTranslationLoading]
+  );
+
   const handleRowUpdate = async (
     newRow: GridRowModel<Prisma.CountryMaxAggregateOutputType>,
     oldRow: GridRowModel<Prisma.CountryMaxAggregateOutputType>
@@ -190,12 +189,8 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     }
   };
 
-  const handleRowsDelete = async (
-    rows: Map<GridRowId, GridValidRowModel>,
-    apiRef: RefObject<GridApiCommunity>
-  ) => {
+  const handleRowsDelete = async (rows: Map<GridRowId, GridValidRowModel>) => {
     try {
-      console.log({ rows });
       const deleteRes = await fetch('/api/country', {
         method: 'DELETE',
         headers: {

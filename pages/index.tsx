@@ -1,21 +1,17 @@
-import Header from '../components/Header/Header';
 import React from 'react';
+import { Country } from '@prisma/client';
 import TimelineSection from '../components/Timeline/TimelineSection';
 import KeepGoApi from '../utils/api/sevices/keepGo/api';
 import { Bundle, KeepGoResponse } from '../utils/api/sevices/keepGo/types';
-import Controller from '../components/ScrollMagic/Controller';
-import Scene from '../components/ScrollMagic/Scene';
 import BundlesSection from '../components/Bundles/BundlesSection';
 import QnaSection from '../components/QnA/QnaSection';
-import Footer from '../components/Footer/Footer';
 import CheckPhoneSection, {
   PhonesList,
 } from '../components/CheckPhone/CheckPhoneSection';
-import { Country } from '@prisma/client';
 import MainLayout from '../components/Layouts/MainLayout';
 
 type HomeProps = {
-  countriesList: { [key: string]: string };
+  countriesList: Country[];
   bundlesList: Bundle[];
   phonesList: PhonesList[];
 };

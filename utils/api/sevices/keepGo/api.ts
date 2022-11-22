@@ -3,8 +3,11 @@ import { getErrorMessage } from '../../errorsHandeling';
 
 export default class KeepGoApi {
   private readonly baseUrl: string;
+
   private readonly apiKey: string;
+
   private readonly accessToken: string;
+
   private readonly authHeaders: Record<string, string>;
 
   constructor(
@@ -54,7 +57,7 @@ export default class KeepGoApi {
           ...this.authHeaders,
         },
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -67,7 +70,7 @@ export default class KeepGoApi {
           ...this.authHeaders,
         },
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -85,7 +88,7 @@ export default class KeepGoApi {
           },
         }
       );
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -98,7 +101,7 @@ export default class KeepGoApi {
           ...this.authHeaders,
         },
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -122,7 +125,7 @@ export default class KeepGoApi {
           bundle_id: data.bundleId,
         }),
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -144,7 +147,7 @@ export default class KeepGoApi {
           amount_days: data.amountDays,
         }),
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -165,7 +168,7 @@ export default class KeepGoApi {
           notes,
         }),
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -191,7 +194,7 @@ export default class KeepGoApi {
           }),
         }
       );
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -204,7 +207,7 @@ export default class KeepGoApi {
           ...this.authHeaders,
         },
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -217,7 +220,7 @@ export default class KeepGoApi {
           ...this.authHeaders,
         },
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -230,7 +233,7 @@ export default class KeepGoApi {
           ...this.authHeaders,
         },
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -250,7 +253,7 @@ export default class KeepGoApi {
           },
         }
       );
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -263,7 +266,7 @@ export default class KeepGoApi {
           ...this.authHeaders,
         },
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -276,7 +279,7 @@ export default class KeepGoApi {
           ...this.authHeaders,
         },
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -289,7 +292,7 @@ export default class KeepGoApi {
           ...this.authHeaders,
         },
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }
@@ -302,7 +305,7 @@ export default class KeepGoApi {
           ...this.authHeaders,
         },
       });
-      return response.json();
+      return await response.json();
     } catch (error) {
       return getErrorMessage(error);
     }

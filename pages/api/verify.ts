@@ -1,10 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import TwilioApi from '../../utils/api/sevices/twilio/twilio';
 import prisma from '../../lib/prisma';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<any>
+  res: NextApiResponse
 ) {
   try {
     const { method } = req;
@@ -33,8 +32,6 @@ export default async function handler(
       }
     } else if (method === 'GET') {
       // Return Order by ID
-    } else if (method === 'PUT') {
-    } else if (method === 'DELETE') {
     } else {
       res.status(405).json({ message: 'Method not allowed' });
     }

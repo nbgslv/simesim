@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
-import MainLayout from '../components/Layouts/MainLayout';
 import { Alert, Button, Form, Spinner } from 'react-bootstrap';
-import styles from '../styles/login.module.scss';
 import { getCsrfToken, signIn, useSession } from 'next-auth/react';
 import { NextPageContext } from 'next';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
+import styles from '../styles/login.module.scss';
+import MainLayout from '../components/Layouts/MainLayout';
 
 const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
   const [phoneNumber, setPhoneNumber] = React.useState<string>('');
@@ -15,12 +15,12 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
   const [callbackUrl, setCallbackUrl] = React.useState<string>('');
   const [alertVariant, setAlertVariant] = React.useState<string>('');
   const [alertMessage, setAlertMessage] = React.useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/naming-convention,@typescript-eslint/no-unused-vars
   const [_, setCookie] = useCookies(['phoneNumber', 'simesim_callbackUrl']);
   const { status } = useSession();
   const router = useRouter();
 
   const handleLogin = async () => {
-    console.log({ callbackUrl });
     if (phoneNumber.length === 10) {
       setLoading(true);
       setCookie('phoneNumber', phoneNumber);
@@ -55,16 +55,18 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
   }, []);
 
   useEffect(() => {
-    if (
-      router.query.orderId &&
-      router.query.phone &&
-      phoneNumber !== '' &&
-      callbackUrl !== ''
-    ) {
-      handleLogin();
-    } else {
-      setPageLoading(false);
-    }
+    (async () => {
+      if (
+        router.query.orderId &&
+        router.query.phone &&
+        phoneNumber !== '' &&
+        callbackUrl !== ''
+      ) {
+        await handleLogin();
+      } else {
+        setPageLoading(false);
+      }
+    })();
   }, [phoneNumber, callbackUrl]);
 
   if (status === 'loading' || pageLoading)
@@ -118,6 +120,8 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
         </Form>
       </MainLayout>
     );
+
+  return null;
 };
 
 export async function getServerSideProps(context: NextPageContext) {

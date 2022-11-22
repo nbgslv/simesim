@@ -1,21 +1,18 @@
 import React from 'react';
-import prisma from '../../lib/prisma';
-import AdminTable from '../../components/AdminTable/AdminTable';
-import styles from '../../styles/main.module.scss';
-import AdminLayout from '../../components/Layouts/AdminLayout';
 import { unstable_getServerSession } from 'next-auth';
 import { NextApiRequest, NextApiResponse } from 'next';
+import prisma from '../../lib/prisma';
+import styles from '../../styles/main.module.scss';
+import AdminLayout from '../../components/Layouts/AdminLayout';
 import { authOptions } from '../api/auth/[...nextauth]';
 
-const Main = ({ lastLines }) => {
-  return (
-    <AdminLayout>
-      <div className={styles.main}>
-        {/*<AdminTable data={lastLines} limit={10} />*/}
-      </div>
-    </AdminLayout>
-  );
-};
+const Main = () => (
+  <AdminLayout>
+    <div className={styles.main}>
+      {/* <AdminTable data={lastLines} limit={10} /> */}
+    </div>
+  </AdminLayout>
+);
 
 export async function getServerSideProps(context) {
   const session = await unstable_getServerSession(
@@ -30,7 +27,8 @@ export async function getServerSideProps(context) {
         permanent: false,
       },
     };
-  } else if (session && session.user) {
+  }
+  if (session && session.user) {
     const user = await prisma.user.findUnique({
       where: {
         id: session.user.id,
@@ -56,6 +54,12 @@ export async function getServerSideProps(context) {
       },
     };
   }
+
+  return {
+    props: {
+      lastLines: [],
+    },
+  };
 }
 
 export default Main;

@@ -2,9 +2,6 @@ import React from 'react';
 import { Button, Col, Modal, Row, Form, Spinner } from 'react-bootstrap';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { useForm, Controller } from 'react-hook-form';
-import Input from '../Input/Input';
-import { Bundle, Refill } from '../../utils/api/sevices/keepGo/types';
-import styles from './OrderModal.module.scss';
 import 'react-datepicker/dist/react-datepicker.css';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -13,6 +10,9 @@ import he from 'date-fns/locale/he';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { useRouter } from 'next/router';
+import styles from './OrderModal.module.scss';
+import { Bundle, Refill } from '../../utils/api/sevices/keepGo/types';
+import Input from '../Input/Input';
 
 type BundlesSectionProps = {
   show: boolean;
@@ -62,7 +62,7 @@ const OrderModal = ({
     watch,
     control,
     handleSubmit,
-    formState: { errors, isValidating },
+    formState: { errors },
   } = useForm({
     mode: 'onBlur',
     reValidateMode: 'onChange',
@@ -151,7 +151,6 @@ const OrderModal = ({
   };
 
   const onSubmit = async (data: any) => {
-    console.log(data);
     refill!.id = 'clamghwdk00e1544knz513j4r'; // TODO: remove this
     const res = await fetch('/api/order', {
       method: 'POST',

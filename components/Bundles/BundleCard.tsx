@@ -32,19 +32,17 @@ const BundleCard = ({
           {bundle.description}
         </Card.Text>
         <ListGroup>
-          {bundle.refills.map((refill, index) => {
-            return (
-              <ListGroup.Item
-                key={`${bundle.id}-${refill.title}`}
-                className={`${styles.bundleCardListItem} ${
-                  chosenRefill === index ? styles.bundleCardListItemActive : ''
-                }`}
-                onClick={() => handleRefillSelect(index)}
-              >
-                {refill.title} - {refill.price_usd + 1.2}$
-              </ListGroup.Item>
-            );
-          })}
+          {bundle.refills.map((refill, index) => (
+            <ListGroup.Item
+              key={`${bundle.id}-${refill.title}`}
+              className={`${styles.bundleCardListItem} ${
+                chosenRefill === index ? styles.bundleCardListItemActive : ''
+              }`}
+              onClick={() => handleRefillSelect(index)}
+            >
+              {refill.title} - {refill.price_usd + 1.2}$
+            </ListGroup.Item>
+          ))}
         </ListGroup>
       </Card.Body>
     </Card>
