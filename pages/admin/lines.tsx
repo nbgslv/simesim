@@ -82,13 +82,16 @@ const Lines = ({ lines }: LinesProps) => {
   ];
 
   const addRow = async (data: Prisma.LineMaxAggregateOutputType) => {
-    const newLine = await fetch('/api/lines', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const newLine = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/lines`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
     const newLineJson = await newLine.json();
     setLineRows([...lineRows, newLineJson]);
     return { id: newLineJson.id, columnToFocus: undefined };

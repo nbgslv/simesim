@@ -46,12 +46,13 @@ const Header = ({ hideJumbotron = false }: { hideJumbotron?: boolean }) => {
           <Container className="d-flex mt-auto mb-auto text-center">
             <Row className="d-flex mr-auto justify-content-between align-items-center">
               <Col>
-                <Image src={coverImage} />
+                <Image alt="תמונת קאבר" src={coverImage} />
               </Col>
               <Col>
                 <div>
                   <Image
                     src={logoTextWhite}
+                    alt="שים eSim"
                     layout="fixed"
                     width={300}
                     height={55}

@@ -79,11 +79,13 @@ const RowActions = <T extends GridValidRowModel>({
   if (inEditMode) {
     return [
       <GridActionsCellItem
+        key={0}
         label={'שמור'}
         icon={<FontAwesomeIcon icon={solid('floppy-disk')} />}
         onClick={handleSaveClick((id as unknown) as GridRowParams)}
       />,
       <GridActionsCellItem
+        key={1}
         label={'בטל'}
         icon={<FontAwesomeIcon icon={solid('xmark')} />}
         onClick={handleCancelClick((id as unknown) as GridRowParams)}

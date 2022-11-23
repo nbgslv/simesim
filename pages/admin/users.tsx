@@ -65,26 +65,32 @@ const Users = ({ users }: UsersProps) => {
   ];
 
   const addRow = async (data: Prisma.UserMaxAggregateOutputType) => {
-    const newUser = await fetch('/api/users', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const newUser = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
     const newUserJson = await newUser.json();
     setUserRows([...userRows, newUserJson]);
     return { id: newUserJson.id, columnToFocus: 'firstName' };
   };
 
   const handleDeleteRows = async (ids: GridRowId[]) => {
-    const deleteCount = await fetch('/api/users', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ids }),
-    });
+    const deleteCount = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ids }),
+      }
+    );
     await deleteCount.json();
     setUserRows(userRows.filter((user) => !ids.includes(user.id!)));
   };

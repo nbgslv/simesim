@@ -57,6 +57,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^13.0.4",
     "@svgr/webpack": "^6.5.0",
     "@types/node": "18.7.23",
     "@types/otp-generator": "^4.0.0",
@@ -68,6 +69,7 @@
     "@typescript-eslint/eslint-plugin": "^4.30.0",
     "@typescript-eslint/parser": "^4.30.0",
     "eslint": "^7.32.0",
+    "eslint-config-next": "^13.0.4",
     "eslint-config-typescript-airbnb-prettier": "^1.1.5",
     "prettier": "~2.2.1",
     "prisma": "^4.6.0",

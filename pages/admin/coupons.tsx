@@ -98,13 +98,16 @@ const Coupons = ({
     data: Coupon
   ): Promise<{ id: string; columnToFocus: undefined }> => {
     setAddRowLoading(true);
-    const newCoupon = await fetch('/api/coupon', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const newCoupon = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/coupon`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
     const newCouponJson = await newCoupon.json();
     setCouponsRows([...couponsRows, newCouponJson]);
     setAddRowLoading(false);

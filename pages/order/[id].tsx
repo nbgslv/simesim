@@ -14,7 +14,7 @@ const Checkout = () => {
   useEffect(() => {
     if (id) {
       (async () => {
-        await fetch(`/api/order/${id}`, {
+        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/order/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ const Checkout = () => {
       ) : (
         <div className={styles.main}>
           <h1>הזמנתך נקלטה בהצלחה</h1>
-          <p>פרטים מלאים על החבילה שלך ממתינים לך בדוא"ל.</p>
+          <p>פרטים מלאים על החבילה שלך ממתינים לך בדוא&quot;ל.</p>
           <p>שתהיה לך נסיעה טובה!</p>
           <motion.div
             className={styles.qnaImage}

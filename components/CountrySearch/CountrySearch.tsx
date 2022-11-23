@@ -25,13 +25,16 @@ type CountrySearchProps = {
 const CountrySearchItem = ({
   item,
   selectItem,
+  selectedItem,
 }: {
   item: ExtendedCountry;
   selectItem: (item: ExtendedCountry) => void;
+  selectedItem: ExtendedCountry | null;
 }) => (
   <div
     onClick={() => selectItem(item)}
     role="option"
+    aria-selected={selectedItem?.id === item.id}
     key={item.id}
     className={`${styles.item} d-flex`}
   >
@@ -139,6 +142,7 @@ const CountrySearch = ({ countriesList, onSelect }: CountrySearchProps) => {
                 objectFit="contain"
                 onLoadingComplete={() => setCountryMapLoading(false)}
                 onError={() => setCountryMapError(true)}
+                alt={`Map of ${itemSelected.name}`}
               />
             </div>
             <motion.div

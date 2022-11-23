@@ -53,18 +53,21 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
     try {
       if (otp.length === 6 && phoneNumber) {
         setLoading(true);
-        const res = await fetch('/api/verify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            phoneNumber,
-            token: otp,
-            callbackUrl,
-          }),
-          redirect: 'follow',
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/verify`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              phoneNumber,
+              token: otp,
+              callbackUrl,
+            }),
+            redirect: 'follow',
+          }
+        );
         if (res.redirected) {
           await router.push(res.url);
         }
@@ -98,7 +101,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
     }
 
     setResendLoading(true);
-    await fetch('http://localhost:3000/api/auth/signin/email', {
+    await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/signin/email`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

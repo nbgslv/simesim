@@ -1,6 +1,7 @@
 import React from 'react';
 import { Country, Prisma, Bundle } from '@prisma/client';
 import TimelineSection from '../components/Timeline/TimelineSection';
+import prisma from '../lib/prisma';
 import KeepGoApi from '../utils/api/sevices/keepGo/api';
 import { KeepGoResponse } from '../utils/api/sevices/keepGo/types';
 import BundlesSection from '../components/Bundles/BundlesSection';
@@ -38,10 +39,15 @@ export async function getStaticProps() {
     process.env.KEEPGO_API_KEY || '',
     process.env.KEEPGO_ACCESS_TOKEN || ''
   );
-  const countriesListResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/country`
-  );
-  const countriesList: Partial<Country>[] = await countriesListResponse.json();
+  const countriesListResponse = await prisma.country.findMany({
+    where: {
+      show: true,
+    },
+    select: {
+      name: true,
+      translation: true,
+    },
+  });
   const bundlesList: KeepGoResponse | Error = await keepGoApi.getBundles();
   const phonesList: KeepGoResponse | Error = await keepGoApi.getEsimDevices();
 
@@ -57,7 +63,7 @@ export async function getStaticProps() {
 
   return {
     props: {
-      countriesList,
+      countriesListResponse,
       bundlesList: bundlesList.bundles,
       phonesList: phonesList.data,
     },

@@ -91,7 +91,7 @@ const OrderModal = ({
         setCouponSet(coupon);
         setLoadingCoupon(true);
         const couponResult = await fetch(
-          `/api/coupon/${coupon}/${phoneNumber}`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/coupon/${coupon}/${phoneNumber}`
         );
         if (couponResult.status === 200) {
           setCouponError('');
@@ -153,7 +153,7 @@ const OrderModal = ({
   const onSubmit = async (data: any) => {
     // eslint-disable-next-line no-param-reassign
     refill!.id = 'clamghwdk00e1544knz513j4r'; // TODO: remove this
-    const res = await fetch('/api/order', {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/order`, {
       method: 'POST',
       body: JSON.stringify({
         ...data,
@@ -355,7 +355,7 @@ const OrderModal = ({
                   />
                 )}
               />
-              <small>לכתובת דוא"ל זו ישלח קוד QR להפעלת הכרטיס</small>
+              <small>לכתובת דוא&quot;ל זו ישלח קוד QR להפעלת הכרטיס</small>
             </Col>
           </Row>
           <Row className={styles.orderModalRow}>

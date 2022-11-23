@@ -15,7 +15,12 @@ const Footer = () => (
     <Container className="h-100 d-flex flex-column justify-content-between">
       <Row>
         <Col className="m-auto">
-          <Image src={'/logoTextWhite.png'} height={46} width={250} />
+          <Image
+            src={'/logoTextWhite.png'}
+            alt="שים eSim"
+            height={46}
+            width={250}
+          />
           <p className={styles.footerDescription}>
             שים eSim מציעה ללקוחותיה רכישה של כרטיס סים(sim) ווירטואלי. לכרטיסי
             הסים הווירטואליים חבילות גלישה זולות בנפחי גלישה שונים.

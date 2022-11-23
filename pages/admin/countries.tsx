@@ -35,7 +35,7 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
 
   const updateRow = useCallback(
     async (data: BodyInit) =>
-      fetch('/api/country', {
+      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/country`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -192,15 +192,18 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
 
   const handleRowsDelete = async (rows: GridSelectionModel) => {
     try {
-      const deleteRes = await fetch('/api/country', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          id: Array.from(rows.keys()),
-        }),
-      });
+      const deleteRes = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/country`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            id: Array.from(rows.keys()),
+          }),
+        }
+      );
       const deleteJson = await deleteRes.json();
       return deleteJson.count;
     } catch (e) {

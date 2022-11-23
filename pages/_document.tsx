@@ -1,10 +1,10 @@
 import { Html, Head, Main, NextScript } from 'next/document';
+import Script from 'next/script';
 
 export default function Document() {
   return (
     <Html dir="rtl" lang="he">
       <Head>
-        <title>שים eSim</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -19,7 +19,7 @@ export default function Document() {
       <body>
         <Main />
         <NextScript />
-        <script src="https://cdn.enable.co.il/licenses/enable-L15802dmirvhc1a8-1122-37877/init.js"></script>
+        <Script src="https://cdn.enable.co.il/licenses/enable-L15802dmirvhc1a8-1122-37877/init.js"></Script>
       </body>
     </Html>
   );

@@ -60,25 +60,31 @@ const Plans = ({ plans }: { plans: PlansAsAdminTableData }) => {
   ];
 
   const handleAddRow = async () => {
-    const newPlan = await fetch('/api/plans', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const newPlan = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/plans`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
     const newPlanJson = await newPlan.json();
     setPlansRows([...plansRows, newPlanJson]);
     return { id: newPlanJson.id, columnToFocus: undefined };
   };
 
   const handleDeleteRows = async (ids: GridRowId[]) => {
-    const deleteCount = await fetch('/api/plans', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ids }),
-    });
+    const deleteCount = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/plans`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ids }),
+      }
+    );
     await deleteCount.json();
     setPlansRows(plansRows.filter((plan) => !ids.includes(plan.id!)));
   };

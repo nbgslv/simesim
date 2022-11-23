@@ -48,13 +48,16 @@ const Contact = () => {
   const submitForm = async (data: any) => {
     try {
       setLoading(true);
-      const inquiryId = await fetch('/api/inquiry', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      const inquiryId = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/inquiry`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        }
+      );
       if (inquiryId) {
         setSuccess(true);
       }

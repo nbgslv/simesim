@@ -24,7 +24,9 @@ const Guide = () => (
             <li>
               גשו להגדרות(Settings) -{'>'} כללי(General) -{'>'} אודות(About)
             </li>
-            <li>גללו עד לתחתית המסך עד לחלק "נעילת ספקים"(Carrier Lock)</li>
+            <li>
+              גללו עד לתחתית המסך עד לחלק &quot;נעילת ספקים&quot;(Carrier Lock)
+            </li>
             <li>
               אם חלק זה מציין שאין נעלת ספקים(No SIM restrictions), מכשירכם אינו
               נעול
@@ -44,7 +46,9 @@ const Guide = () => (
               תוכנית סלולרית(Add Cellular Plan)
             </li>
             <li>במסך זה תוכלו לראות את כרטיסי הסים הפעילים במכשירכם</li>
-            <li>לחצו על כפתור "הוסף תוכנית סלולרית"(Add Cellular Plan)</li>
+            <li>
+              לחצו על כפתור &quot;הוסף תוכנית סלולרית&quot;(Add Cellular Plan)
+            </li>
             <li>
               אם תתבקשו לבחור באפשרות לסרוק קוד QR להפעלת הכרטיס, סימן שמכשירכם
               תומך בוודאות בטכנולוגיית eSim
@@ -64,8 +68,8 @@ const Guide = () => (
               SIM(SIM Card Manager)
             </li>
             <li>
-              אם האפשרות "הוסף eSim"(Add eSim) מופיעה על המסך, סימן שמכשירכם
-              תומך בטכנולוגיית eSim.
+              אם האפשרות &quot;הוסף eSim&quot;(Add eSim) מופיעה על המסך, סימן
+              שמכשירכם תומך בטכנולוגיית eSim.
             </li>
           </ol>
           <h3 className="mt-3 mb-2">
@@ -85,7 +89,9 @@ const Guide = () => (
               תוכנית סלולרית(Add Cellular Plan)
             </li>
             <li>במסך זה תוכלו לראות את כרטיסי הסים הפעילים במכשירכם</li>
-            <li>לחצו על כפתור "הוסף תוכנית סלולרית"(Add Cellular Plan)</li>
+            <li>
+              לחצו על כפתור &quot;הוסף תוכנית סלולרית&quot;(Add Cellular Plan)
+            </li>
             <li>בחרו באפשרות לסרוק קוד QR</li>
             <li>סירקו את קוד ה-QR</li>
           </ol>
@@ -97,8 +103,8 @@ const Guide = () => (
             </li>
             <li>ליחצו על האפשרות הוספת eSim(Add eSim)</li>
             <li>
-              לאחר מספר שניות יופיע לפניכם הכפתור "סרוק קוד QR מספק"(Scan QR
-              from provider)
+              לאחר מספר שניות יופיע לפניכם הכפתור &quot;סרוק קוד QR
+              מספק&quot;(Scan QR from provider)
             </li>
             <li>סירקו את קוד ה-QR </li>
           </ol>

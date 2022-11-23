@@ -60,17 +60,20 @@ const PlansModel = ({
   ) => {
     try {
       setVatToggleLoading(rowId);
-      const update = await fetch('api/plansmodel', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...row,
-          vat: checked,
-          id: row.id,
-        }),
-      });
+      const update = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/plansmodel`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...row,
+            vat: checked,
+            id: row.id,
+          }),
+        }
+      );
       const updateJson = await update.json();
       const serializedUpdate = { ...updateJson };
       serializedUpdate.createdAt = format(
@@ -148,26 +151,32 @@ const PlansModel = ({
   ];
 
   const addRow = async (data: Prisma.PlanModelMaxAggregateOutputType) => {
-    const newPlanModel = await fetch('/api/plansmodel', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+    const newPlanModel = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/plansmodel`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
     const newPlanModelJson = await newPlanModel.json();
     setPlansRows([...plansRows, newPlanModelJson]);
     return { id: newPlanModelJson.id, columnToFocus: undefined };
   };
 
   const handleDeleteRows = async (ids: GridRowId[]) => {
-    const deleteCount = await fetch('/api/plansmodel', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ids }),
-    });
+    const deleteCount = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/plansmodel`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ids }),
+      }
+    );
     await deleteCount.json();
     setPlansRows(plansRows.filter((plan) => !ids.includes(plan.id!)));
   };

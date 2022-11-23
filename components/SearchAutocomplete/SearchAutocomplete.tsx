@@ -42,6 +42,7 @@ type DefaultListBoxComponentProps = {
 type DefaultCountrySearchItemProps<T> = {
   item: Item<T>;
   selectItem: (item: Item<T>) => void;
+  selectedItem: T | null;
 };
 
 const SearchAutocompleteInner = <T extends object>(
@@ -219,8 +220,8 @@ const SearchAutocompleteInner = <T extends object>(
       {/* eslint-disable-next-line no-nested-ternary */}
       {filteredItems.length ? (
         ListBoxComponent ? (
-          <ListBoxComponent
-            children={filteredItems.slice(0, maxResults).map((item, i) => {
+          <ListBoxComponent>
+            {filteredItems.slice(0, maxResults).map((item, i) => {
               const ItemComponentToUse = ItemComponent || DefaultItemComponent;
               return (
                 <ItemComponentToUse
@@ -230,7 +231,7 @@ const SearchAutocompleteInner = <T extends object>(
                 />
               );
             })}
-          />
+          </ListBoxComponent>
         ) : (
           <DefaultListBoxComponent>
             {filteredItems.map((item, i) => {
@@ -241,6 +242,7 @@ const SearchAutocompleteInner = <T extends object>(
                     key={i}
                     item={item}
                     selectItem={handleSelect}
+                    selectedItem={itemSelected}
                   />
                 );
               return (
@@ -248,6 +250,7 @@ const SearchAutocompleteInner = <T extends object>(
                   key={i}
                   item={item}
                   selectItem={handleSelect}
+                  selectedItem={itemSelected}
                 />
               );
             })}
