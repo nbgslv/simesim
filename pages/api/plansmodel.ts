@@ -18,6 +18,7 @@ export default async function handler(
         vat,
         couponsIds,
       } = req.body;
+      const couponsRecord = couponsIds ? { connect: couponsIds } : undefined;
       const planModel = await prisma.planModel.create({
         data: {
           bundle: {
@@ -34,11 +35,7 @@ export default async function handler(
           description,
           price,
           vat,
-          coupons: {
-            connect: {
-              id: couponsIds,
-            },
-          },
+          coupons: couponsRecord,
         },
       });
       res.status(200).json(planModel);
