@@ -63,7 +63,7 @@ export async function getStaticProps() {
 
   return {
     props: {
-      countriesListResponse,
+      countriesList: countriesListResponse,
       bundlesList: bundlesList.bundles,
       phonesList: phonesList.data,
     },
