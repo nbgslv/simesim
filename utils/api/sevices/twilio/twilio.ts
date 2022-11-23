@@ -29,7 +29,7 @@ export default class TwilioApi {
     channel: Channel
   ) {
     try {
-      const validPhoneNumber = this.formatPhoneNumber(phoneNumber);
+      const validPhoneNumber = TwilioApi.formatPhoneNumber(phoneNumber);
       const verify = await this.sdk.verify.v2
         .services(this.messagingServiceSid)
         .verifications.create({
@@ -47,7 +47,7 @@ export default class TwilioApi {
 
   async validateVerificationCode(phoneNumber: string) {
     try {
-      const validPhoneNumber = this.formatPhoneNumber(phoneNumber);
+      const validPhoneNumber = TwilioApi.formatPhoneNumber(phoneNumber);
       const validation = await this.sdk.verify.v2
         .services(this.messagingServiceSid)
         .verifications(validPhoneNumber)

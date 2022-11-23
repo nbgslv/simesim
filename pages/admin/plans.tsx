@@ -79,7 +79,7 @@ const Plans = ({ plans }: { plans: PlansAsAdminTableData }) => {
       },
       body: JSON.stringify({ ids }),
     });
-    const deleteCountJson = await deleteCount.json();
+    await deleteCount.json();
     setPlansRows(plansRows.filter((plan) => !ids.includes(plan.id!)));
   };
 

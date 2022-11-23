@@ -2,11 +2,10 @@ import React from 'react';
 import { Prisma } from '@prisma/client';
 import { GridColumns, GridValidRowModel } from '@mui/x-data-grid';
 import { format } from 'date-fns';
-import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
+import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
-import FormModal from '../../components/AdminTable/FormModal';
 
 type LineAsAdminTableData = (GridValidRowModel &
   Prisma.LineMaxAggregateOutputType)[];
@@ -103,7 +102,7 @@ const Lines = ({ lines }: LinesProps) => {
       modal.reject(e);
       await modal.hide();
       modal.remove();
-      return e;
+      return e as Error;
     }
   };
 
@@ -116,11 +115,6 @@ const Lines = ({ lines }: LinesProps) => {
         multiActions={['add']}
         rowActions={[]}
       />
-      <FormModal
-        id="add-user"
-        {...bootstrapDialog(modal)}
-        header={'Add New User'}
-      ></FormModal>
     </AdminLayout>
   );
 };

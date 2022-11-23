@@ -45,10 +45,14 @@ export const authOptions = (
         if (!user) {
           res.redirect('/error?error=Verification');
         } else {
-          // const message = await twilioApi.sendVerificationCode(phone, token, method);
-          // if (message !== 'pending') {
-          //     res.redirect('/error?error=Configuration')
-          // }
+          const message = await twilioApi.sendVerificationCode(
+            phone,
+            token,
+            method
+          );
+          if (message !== 'pending') {
+            res.redirect('/error?error=Configuration');
+          }
         }
       },
       generateVerificationToken: async () =>

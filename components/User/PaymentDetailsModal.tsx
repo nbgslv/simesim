@@ -1,8 +1,26 @@
 import React from 'react';
 import { Button, Col, Container, Modal, Row } from 'react-bootstrap';
+import { Payment, Prisma } from '@prisma/client';
 import styles from '../AdminTable/FormModal.module.scss';
 
-const PaymentDetailsModal = ({ show, payment, handleModalHide }) => {
+export interface ExtendedPayment extends Payment {
+  friendlyPlanId: string;
+}
+
+type PaymentDetailsModalProps = {
+  show: boolean;
+  handleModalHide: () => void;
+  payment:
+    | (ExtendedPayment &
+        Prisma.PaymentGetPayload<{ select: { paymentMethod: true } }>)
+    | null;
+};
+
+const PaymentDetailsModal = ({
+  show,
+  payment,
+  handleModalHide,
+}: PaymentDetailsModalProps) => {
   if (!payment) return null;
   return (
     <Modal
@@ -33,7 +51,7 @@ const PaymentDetailsModal = ({ show, payment, handleModalHide }) => {
           </Row>
           <Row>
             <Col>תאריך תשלום</Col>
-            <Col>{payment.createdAt}</Col>
+            <Col>{(payment.createdAt as unknown) as string}</Col>
           </Row>
           <Row>
             <Col>פרטי אמצעי תשלום</Col>
@@ -64,7 +82,7 @@ const PaymentDetailsModal = ({ show, payment, handleModalHide }) => {
               <Button
                 className="w-100 mt-2"
                 variant="primary"
-                href={payment.invoice}
+                href={payment.invoice as string}
                 disabled={!payment.invoice}
               >
                 קבלה

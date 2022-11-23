@@ -10,8 +10,8 @@ import he from 'date-fns/locale/he';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { useRouter } from 'next/router';
+import { Bundle, Refill } from '@prisma/client';
 import styles from './OrderModal.module.scss';
-import { Bundle, Refill } from '../../utils/api/sevices/keepGo/types';
 import Input from '../Input/Input';
 
 type BundlesSectionProps = {
@@ -151,6 +151,7 @@ const OrderModal = ({
   };
 
   const onSubmit = async (data: any) => {
+    // eslint-disable-next-line no-param-reassign
     refill!.id = 'clamghwdk00e1544knz513j4r'; // TODO: remove this
     const res = await fetch('/api/order', {
       method: 'POST',

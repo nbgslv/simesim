@@ -14,7 +14,7 @@ const Checkout = () => {
   useEffect(() => {
     if (id) {
       (async () => {
-        const orderUpdate = await fetch(`/api/order/${id}`, {
+        await fetch(`/api/order/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

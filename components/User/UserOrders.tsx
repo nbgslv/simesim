@@ -1,16 +1,23 @@
 import React, { useEffect } from 'react';
-import { DataGrid, GridRowModel } from '@mui/x-data-grid';
-import { Plan } from '@prisma/client';
+import { DataGrid, GridCellParams, GridRowModel } from '@mui/x-data-grid';
+import { Plan, Prisma } from '@prisma/client';
 import { Button } from 'react-bootstrap';
 import styles from './UserOrders.module.scss';
 import gridTranslation from '../../lib/content/mui-datagrid-translation.json';
-import PaymentDetailsModal from './PaymentDetailsModal';
+import PaymentDetailsModal, { ExtendedPayment } from './PaymentDetailsModal';
 
-const UserOrders = ({ plans }: { plans: Plan[] }) => {
+const UserOrders = ({
+  plans,
+}: {
+  plans: (Plan &
+    Prisma.PlanGetPayload<{ select: { planModel: true; line: true } }>)[];
+}) => {
   const [plansRows, setPlansRows] = React.useState<GridRowModel[]>([]);
-  const [chosenRowPayment, setChosenRowPayment] = React.useState<string | null>(
-    null
-  );
+  const [chosenRowPayment, setChosenRowPayment] = React.useState<
+    | (ExtendedPayment &
+        Prisma.PaymentGetPayload<{ select: { paymentMethod: true } }>)
+    | null
+  >(null);
 
   useEffect(() => {
     setPlansRows(
@@ -18,7 +25,7 @@ const UserOrders = ({ plans }: { plans: Plan[] }) => {
         ...plan,
         planName: plan.planModel?.name,
         status: plan.line?.status,
-        allowedUsageKb: plan.planModel?.allowedUsageKb,
+        allowedUsageKb: plan.line?.allowedUsageKb,
         remainingUsageKb: plan.line?.remainingUsageKb,
         remainingDays: plan.line?.remainingDays,
         qrCode: plan.line?.qrCode,
@@ -27,11 +34,18 @@ const UserOrders = ({ plans }: { plans: Plan[] }) => {
   }, [plans]);
 
   const handleShowQr = (qrCode: string | null) => {
+    // TODO add QR code modal
+    // eslint-disable-next-line no-console
     console.log(qrCode);
   };
 
-  const handleShowPaymentModal = (id: string, payment: string) => {
+  const handleShowPaymentModal = (
+    id: string,
+    payment: ExtendedPayment &
+      Prisma.PaymentGetPayload<{ select: { paymentMethod: true } }>
+  ) => {
     setChosenRowPayment({
+      // @ts-ignore
       friendlyPlanId: id,
       ...payment,
     });
@@ -45,7 +59,7 @@ const UserOrders = ({ plans }: { plans: Plan[] }) => {
     {
       field: 'price',
       headerName: 'מחיר',
-      valueFormatter: ({ value }) => `${value}₪`,
+      valueFormatter: ({ value }: { value: string }) => `${value}₪`,
     },
     {
       field: 'status',
@@ -66,7 +80,7 @@ const UserOrders = ({ plans }: { plans: Plan[] }) => {
     {
       field: 'qrCode',
       headerName: 'קוד QR',
-      renderCell: (params) => (
+      renderCell: (params: GridCellParams) => (
         <Button
           variant="outline-primary"
           className={styles.button}
@@ -80,7 +94,7 @@ const UserOrders = ({ plans }: { plans: Plan[] }) => {
     {
       field: 'payment',
       headerName: 'פרטי תשלום',
-      renderCell: (params) => (
+      renderCell: (params: GridCellParams) => (
         <Button
           variant="outline-primary"
           className={styles.button}
@@ -95,7 +109,7 @@ const UserOrders = ({ plans }: { plans: Plan[] }) => {
     {
       field: 'refill',
       headerName: 'טעינה',
-      renderCell: (params) => (
+      renderCell: (params: GridCellParams) => (
         <Button
           variant="outline-primary"
           className={styles.button}

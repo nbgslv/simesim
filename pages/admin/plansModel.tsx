@@ -1,5 +1,5 @@
-import React from 'react';
-import { Prisma } from '@prisma/client';
+import React, { useEffect } from 'react';
+import { Prisma, PlanModel, Bundle, Refill, Coupon } from '@prisma/client';
 import { GridColumns, GridRowId, GridValidRowModel } from '@mui/x-data-grid';
 import { format, parseISO } from 'date-fns';
 import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
@@ -10,14 +10,14 @@ import AdminTableSwitch from '../../components/AdminTable/AdminTableSwitch';
 import FormModal from '../../components/AdminTable/FormModal';
 import PlansModelForm from '../../components/PlansModel/PlansModelForm';
 
-type PlansModelAsAdminTableData = (GridValidRowModel &
-  Prisma.PlanModelMaxAggregateOutputType)[];
+type PlansModelAsAdminTableData = (GridValidRowModel & PlanModel)[];
 
 type PlansModelProps = {
   plansModel: PlansModelAsAdminTableData;
-  existingBundles: Prisma.BundleMaxAggregateOutputType[];
-  existingRefills: Prisma.RefillMaxAggregateOutputType[];
-  existingCoupons: Prisma.CouponMaxAggregateOutputType[];
+  existingBundles: (Bundle &
+    Prisma.BundleGetPayload<{ select: { refills: true } }>)[];
+  existingRefills: Refill[];
+  existingCoupons: Coupon[];
 };
 
 const PlansModel = ({
@@ -30,14 +30,28 @@ const PlansModel = ({
     plansModel
   );
   const [vatToggleLoading, setVatToggleLoading] = React.useState<GridRowId>('');
-  const [
-    chosenBundle,
-    setChosenBundle,
-  ] = React.useState<Prisma.BundleMaxAggregateOutputType | null>(null);
-  const [refills, setRefills] = React.useState<
-    Prisma.RefillMaxAggregateOutputType[]
-  >(existingRefills);
+  const [chosenBundle, setChosenBundle] = React.useState<
+    (Bundle & Prisma.BundleGetPayload<{ select: { refills: true } }>) | null
+  >(null);
+  const [refills, setRefills] = React.useState<Refill[]>(existingRefills);
   const modal = useModal('add-plansmodel');
+
+  useEffect(() => {
+    setRefills((oldRefills) =>
+      oldRefills.filter(
+        (refill) =>
+          !chosenBundle?.refills
+            .map((refillInRefills) => refillInRefills.id)
+            .includes(refill.id)
+      )
+    );
+  }, [chosenBundle]);
+
+  const handleBundleSet = (
+    bundle: Bundle & Prisma.BundleGetPayload<{ select: { refills: true } }>
+  ) => {
+    setChosenBundle(bundle);
+  };
 
   const handleVatToggle = async (
     checked: boolean,
@@ -63,7 +77,7 @@ const PlansModel = ({
         parseISO(serializedUpdate.createdAt),
         'dd/MM/yy kk:mm'
       );
-      serializedUpdate.updatedAt = format(
+      serializedUpdate.updatBatchPayloadedAt = format(
         parseISO(serializedUpdate.updatedAt),
         'dd/MM/yy kk:mm'
       );
@@ -158,7 +172,9 @@ const PlansModel = ({
     setPlansRows(plansRows.filter((plan) => !ids.includes(plan.id!)));
   };
 
-  const showModal = async () => {
+  const showModal = async (): Promise<
+    Error | { id: GridRowId; columnToFocus: string | undefined }
+  > => {
     try {
       const addData = await NiceModal.show('add-plansmodel');
       return await addRow(addData as Prisma.PlanModelMaxAggregateOutputType);
@@ -166,7 +182,7 @@ const PlansModel = ({
       modal.reject(e);
       await modal.hide();
       modal.remove();
-      return e;
+      return e as Error;
     }
   };
 
@@ -187,7 +203,7 @@ const PlansModel = ({
           bundles={existingBundles}
           refills={refills}
           coupons={existingCoupons}
-          setBundle={setChosenBundle}
+          setBundle={handleBundleSet}
         />
       </FormModal>
     </AdminLayout>

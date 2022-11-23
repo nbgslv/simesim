@@ -29,6 +29,7 @@ type AdminTableProps<T extends GridValidRowModel> = {
   addRow?: () => Promise<
     { id: GridRowId; columnToFocus: string | undefined } | undefined | Error
   >;
+  onDelete?: (ids: GridSelectionModel) => Promise<{ ids: GridSelectionModel }>;
   deleteRows?: (ids: GridRowId[]) => Promise<void>;
 };
 

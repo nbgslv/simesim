@@ -18,4 +18,5 @@ const toErrorWithMessage = (maybeError: unknown): Error => {
   }
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export const getErrorMessage = (error: unknown) => toErrorWithMessage(error);

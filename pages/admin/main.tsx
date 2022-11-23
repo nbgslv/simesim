@@ -1,6 +1,6 @@
 import React from 'react';
 import { unstable_getServerSession } from 'next-auth';
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse, NextPageContext } from 'next';
 import prisma from '../../lib/prisma';
 import styles from '../../styles/main.module.scss';
 import AdminLayout from '../../components/Layouts/AdminLayout';
@@ -14,7 +14,7 @@ const Main = () => (
   </AdminLayout>
 );
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps(context: NextPageContext) {
   const session = await unstable_getServerSession(
     context.req as NextApiRequest,
     context.res as NextApiResponse,

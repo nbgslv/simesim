@@ -1,8 +1,8 @@
 import React from 'react';
-import { Country } from '@prisma/client';
+import { Country, Prisma, Bundle } from '@prisma/client';
 import TimelineSection from '../components/Timeline/TimelineSection';
 import KeepGoApi from '../utils/api/sevices/keepGo/api';
-import { Bundle, KeepGoResponse } from '../utils/api/sevices/keepGo/types';
+import { KeepGoResponse } from '../utils/api/sevices/keepGo/types';
 import BundlesSection from '../components/Bundles/BundlesSection';
 import QnaSection from '../components/QnA/QnaSection';
 import CheckPhoneSection, {
@@ -12,7 +12,8 @@ import MainLayout from '../components/Layouts/MainLayout';
 
 type HomeProps = {
   countriesList: Country[];
-  bundlesList: Bundle[];
+  bundlesList: (Bundle &
+    Prisma.BundleGetPayload<{ select: { refills: true } }>)[];
   phonesList: PhonesList[];
 };
 

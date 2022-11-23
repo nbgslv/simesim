@@ -5,6 +5,7 @@ import {
   GridColumns,
   GridRowId,
   GridRowModel,
+  GridSelectionModel,
   GridValidRowModel,
 } from '@mui/x-data-grid';
 import AdminLayout from '../../components/Layouts/AdminLayout';
@@ -32,6 +33,18 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     setCountriesRows(countries);
   }, [countries]);
 
+  const updateRow = useCallback(
+    async (data: BodyInit) =>
+      fetch('/api/country', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: data,
+      }),
+    [changeShowLoading, changeLockTranslationLoading]
+  );
+
   const handleLockTranslationToggle = async (
     checked: boolean,
     rowId: GridRowId,
@@ -56,8 +69,8 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
         parseISO(serializedUpdate.updatedAt),
         'dd/MM/yy kk:mm'
       );
-      setCountriesRows((countries) =>
-        countries.map((country) =>
+      setCountriesRows((oldCountries) =>
+        oldCountries.map((country) =>
           country.id === rowId ? serializedUpdate : country
         )
       );
@@ -92,8 +105,8 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
         parseISO(serializedUpdate.updatedAt),
         'dd/MM/yy kk:mm'
       );
-      setCountriesRows((countries) =>
-        countries.map((country) =>
+      setCountriesRows((oldCountries) =>
+        oldCountries.map((country) =>
           country.id === rowId ? serializedUpdate : country
         )
       );
@@ -149,18 +162,6 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     },
   ];
 
-  const updateRow = useCallback(
-    async (data: BodyInit) =>
-      fetch('/api/country', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: data,
-      }),
-    [changeShowLoading, changeLockTranslationLoading]
-  );
-
   const handleRowUpdate = async (
     newRow: GridRowModel<Prisma.CountryMaxAggregateOutputType>,
     oldRow: GridRowModel<Prisma.CountryMaxAggregateOutputType>
@@ -189,7 +190,7 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     }
   };
 
-  const handleRowsDelete = async (rows: Map<GridRowId, GridValidRowModel>) => {
+  const handleRowsDelete = async (rows: GridSelectionModel) => {
     try {
       const deleteRes = await fetch('/api/country', {
         method: 'DELETE',

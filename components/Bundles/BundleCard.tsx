@@ -1,14 +1,15 @@
+import { GridRowId } from '@mui/x-data-grid';
 import React from 'react';
 import { Card, ListGroup } from 'react-bootstrap';
-import { Bundle, Refill } from '../../utils/api/sevices/keepGo/types';
+import { Bundle, Refill, Prisma } from '@prisma/client';
 import styles from './BundleCard.module.scss';
 
 const BundleCard = ({
   bundle,
   setRefill,
 }: {
-  bundle: Bundle;
-  setRefill: (refill: Refill | null, bundleId: number | null) => void;
+  bundle: Bundle & Prisma.BundleGetPayload<{ select: { refills: true } }>;
+  setRefill: (refill: Refill | null, bundleId: GridRowId | null) => void;
 }) => {
   const [chosenRefill, setChosenRefill] = React.useState<number>(-1);
 

@@ -61,7 +61,9 @@ const SearchAutocompleteInner = <T extends object>(
   const [itemSelected, setItemSelected] = useState<Item<T> | null>(null);
   const [query, setQuery] = useState<string>('');
   const [filteredItems, setFilteredItems] = useState<Item<T>[]>([]);
-  const [searchInstance, setSearchInstance] = useState<Fuse<Item<T>>>(null);
+  const [searchInstance, setSearchInstance] = useState<Fuse<Item<T>> | null>(
+    null
+  );
   const mainInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

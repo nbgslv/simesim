@@ -2,11 +2,10 @@ import React from 'react';
 import { Prisma } from '@prisma/client';
 import { GridColumns, GridRowId, GridValidRowModel } from '@mui/x-data-grid';
 import { format } from 'date-fns';
-import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
+import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
-import FormModal from '../../components/AdminTable/FormModal';
 
 type UserAsAdminTableData = (GridValidRowModel &
   Prisma.UserMaxAggregateOutputType)[];
@@ -90,7 +89,9 @@ const Users = ({ users }: UsersProps) => {
     setUserRows(userRows.filter((user) => !ids.includes(user.id!)));
   };
 
-  const showModal = async () => {
+  const showModal = async (): Promise<
+    Error | { id: GridRowId; columnToFocus: string | undefined }
+  > => {
     try {
       const addData = await NiceModal.show('add-users');
       return await addRow(addData as Prisma.UserMaxAggregateOutputType);
@@ -98,7 +99,7 @@ const Users = ({ users }: UsersProps) => {
       modal.reject(e);
       await modal.hide();
       modal.remove();
-      return e;
+      return e as Error;
     }
   };
 
@@ -110,11 +111,6 @@ const Users = ({ users }: UsersProps) => {
         addRow={showModal}
         deleteRows={handleDeleteRows}
       />
-      <FormModal
-        id="add-user"
-        {...bootstrapDialog(modal)}
-        header={'Add New User'}
-      ></FormModal>
     </AdminLayout>
   );
 };

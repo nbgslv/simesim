@@ -15,7 +15,7 @@ type ConfirmationModalProps = {
 
 const ConfirmationModal = ({
   show,
-  onHide,
+  // onHide,
   title,
   body,
   confirmButtonText,

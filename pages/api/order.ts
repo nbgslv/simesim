@@ -22,7 +22,7 @@ export type Order = {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Partial<Order>>
+  res: NextApiResponse<Partial<Order> | Error>
 ) {
   try {
     const { method } = req;
@@ -103,6 +103,6 @@ export default async function handler(
     }
   } catch (error: unknown) {
     console.error(error);
-    res.status(500).json(error);
+    res.status(500).json(error as Error);
   }
 }

@@ -1,11 +1,11 @@
-import { Country } from '@prisma/client';
+import { GridRowId } from '@mui/x-data-grid';
+import { Country, Bundle, Refill, Prisma } from '@prisma/client';
 import React, { useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import Lottie from 'react-lottie';
 import { AnimatePresence, motion } from 'framer-motion';
 import Section from '../Section/Section';
 import CountrySearch, { ExtendedCountry } from '../CountrySearch/CountrySearch';
-import { Bundle, Refill } from '../../utils/api/sevices/keepGo/types';
 import styles from './BundlesSection.module.scss';
 import * as travelImageData from '../../public/travel.json';
 import BundlesScroll from './BundlesScroll';
@@ -13,7 +13,8 @@ import OrderModal from '../Order/OrderModal';
 
 type BundlesSectionProps = {
   countriesList: Country[];
-  bundlesList: Bundle[];
+  bundlesList: (Bundle &
+    Prisma.BundleGetPayload<{ select: { refills: true } }>)[];
 };
 
 const BundlesSection = ({
@@ -24,7 +25,7 @@ const BundlesSection = ({
     selectedCountry,
     setSelectedCountry,
   ] = useState<ExtendedCountry | null>(null);
-  const [selectedBundle, setSelectedBundle] = useState<number | null>(null);
+  const [selectedBundle, setSelectedBundle] = useState<GridRowId | null>(null);
   const [selectedRefill, setSelectedRefill] = useState<Refill | null>(null);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
@@ -46,7 +47,7 @@ const BundlesSection = ({
 
   const handleRefillSelect = (
     refill: Refill | null,
-    bundleId: number | null
+    bundleId: GridRowId | null
   ) => {
     setSelectedBundle(bundleId);
     setSelectedRefill(refill);

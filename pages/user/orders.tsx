@@ -1,7 +1,7 @@
 import React from 'react';
 import { unstable_getServerSession } from 'next-auth';
 import { NextApiRequest, NextApiResponse, NextPageContext } from 'next';
-import { Plan } from '@prisma/client';
+import { Plan, Prisma } from '@prisma/client';
 import { Container } from 'react-bootstrap';
 import { format } from 'date-fns';
 import { authOptions } from '../api/auth/[...nextauth]';
@@ -10,7 +10,12 @@ import UserOrders from '../../components/User/UserOrders';
 import prisma from '../../lib/prisma';
 import styles from '../../styles/orders.module.scss';
 
-const Orders = ({ plans }: { plans: Plan[] }) => (
+const Orders = ({
+  plans,
+}: {
+  plans: (Plan &
+    Prisma.PlanGetPayload<{ select: { planModel: true; line: true } }>)[];
+}) => (
   <MainLayout hideJumbotron>
     <div className={styles.main}>
       <Container>

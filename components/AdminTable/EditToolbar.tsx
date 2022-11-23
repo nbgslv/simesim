@@ -5,7 +5,6 @@ import {
   GridRowModesModel,
   GridRowsProp,
   GridToolbarContainer,
-  GridValidRowModel,
 } from '@mui/x-data-grid';
 import { Button, Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/prefer-default-export
 export const getFormData = (
   data: Record<string, string | number | boolean>
 ): string => {

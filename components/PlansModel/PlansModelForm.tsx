@@ -1,16 +1,18 @@
 import React from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
-import { Prisma } from '@prisma/client';
+import { Prisma, Bundle, Refill, Coupon } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useModal } from '@ebay/nice-modal-react';
 
 type PlansModelFormProps = {
-  bundles: Prisma.BundleMaxAggregateOutputType[];
-  refills: Prisma.RefillMaxAggregateOutputType[];
-  setBundle: (bundle: Prisma.BundleMaxAggregateOutputType) => void;
-  coupons: Prisma.CouponMaxAggregateOutputType[];
+  bundles: Bundle[];
+  refills: Refill[];
+  setBundle: (
+    bundle: Bundle & Prisma.BundleGetPayload<{ select: { refills: true } }>
+  ) => void;
+  coupons: Coupon[];
 };
 
 const schema = yup.object().shape({

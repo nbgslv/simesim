@@ -1,6 +1,7 @@
+import { GridRowId } from '@mui/x-data-grid';
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bundle, Refill } from '../../utils/api/sevices/keepGo/types';
+import { Bundle, Prisma, Refill } from '@prisma/client';
 import BundleCard from './BundleCard';
 import LeftArrow from '../../public/left-arrow.svg';
 import RightArrow from '../../public/right-arrow.svg';
@@ -11,15 +12,16 @@ const BundlesScroll = ({
   setRefill,
   resetRefill,
 }: {
-  bundlesList: Bundle[];
-  setRefill: (refill: Refill | null, bundleId: number | null) => void;
+  bundlesList: (Bundle &
+    Prisma.BundleGetPayload<{ select: { refills: true } }>)[];
+  setRefill: (refill: Refill | null, bundleId: GridRowId | null) => void;
   resetRefill: () => void;
 }) => {
   const [currentBundle, setCurrentBundle] = React.useState<number>(0);
   const [direction, setDirection] = React.useState<number>(0);
   const variants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
+    enter: (slideDirection: number) => ({
+      x: slideDirection > 0 ? 1000 : -1000,
       opacity: 0,
     }),
     center: {
@@ -27,9 +29,9 @@ const BundlesScroll = ({
       x: 0,
       opacity: 1,
     },
-    exit: (direction: number) => ({
+    exit: (slideDirection: number) => ({
       zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
+      x: slideDirection < 0 ? 1000 : -1000,
       opacity: 0,
     }),
   };
