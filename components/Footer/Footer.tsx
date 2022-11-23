@@ -50,7 +50,9 @@ const Footer = () => (
               <Nav.Link href="/contact">{text.header.navbar.contact}</Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#">{text.header.navbar.privacyPolicy}</Nav.Link>
+              <Nav.Link href="/terms">
+                {text.header.navbar.privacyPolicy}
+              </Nav.Link>
             </Nav.Item>
             <Nav.Item>
               <Nav.Link href="#">{text.header.navbar.accessibility}</Nav.Link>
