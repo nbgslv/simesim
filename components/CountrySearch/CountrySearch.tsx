@@ -47,7 +47,7 @@ const CountrySearchItem = ({
     >
       {item.iso2 ? (
         <Image
-          src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${item.iso2.toUpperCase()}.svg`}
+          src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${item.iso2.toUpperCase()}.svg`}
           placeholder="blur"
           blurDataURL={blurDataPlaceholder}
           layout="intrinsic"

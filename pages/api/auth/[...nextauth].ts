@@ -28,6 +28,8 @@ export const authOptions = (
           let { method } = body;
           const { recaptchaToken } = body;
 
+          // eslint-disable-next-line no-console
+          console.log({ recaptchaToken });
           const googleRecaptchaResponse = await fetch(
             `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.GOOGLE_RECAPTCHA_SECRET}&response=${recaptchaToken}`,
             {

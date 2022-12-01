@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Alert, Button, Form, Spinner } from 'react-bootstrap';
 import { getCsrfToken, signIn, useSession } from 'next-auth/react';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { NextPageContext } from 'next';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
@@ -18,6 +19,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
   // eslint-disable-next-line @typescript-eslint/naming-convention,@typescript-eslint/no-unused-vars
   const [_, setCookie] = useCookies(['phoneNumber', 'simesim_callbackUrl']);
   const { status } = useSession();
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -29,9 +31,14 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
           'simesim_callbackUrl',
           callbackUrl || 'https://simesim.co.il'
         );
+        if (!executeRecaptcha) {
+          throw new Error('Recaptcha not loaded');
+        }
+        const token = await executeRecaptcha('login');
         await signIn('email', {
           email: phoneNumber,
           callbackUrl: callbackUrl || 'https://simesim.co.il',
+          recaptchaToken: token,
         });
         setLoading(false);
       }
