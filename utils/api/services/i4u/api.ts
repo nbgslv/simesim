@@ -25,7 +25,7 @@ export default class Invoice4UClearing {
 
   private readonly returnUrl = 'https://simesim.co.il/order';
 
-  private readonly callbackUrl = 'https://simesim.co.il/order/payment';
+  private readonly callbackUrl = 'https://simesim.co.il/api/order/payment';
 
   constructor(
     private readonly apiKeyToUse: string,
