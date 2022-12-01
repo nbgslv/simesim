@@ -93,6 +93,8 @@ export default async function handler(
       // Create order with pending payment(plan)
       const plan = await prisma.plan.create({
         data: {
+          startDate: newOrderData.startDate,
+          endDate: newOrderData.endDate,
           planModel: {
             connect: {
               id: newOrderData.planModel,

@@ -73,7 +73,7 @@ model Plan {
   paymentId   String?   @unique
   allowRefill Boolean   @default(false)
   startDate   DateTime
-    endDate     DateTime
+  endDate     DateTime
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   line        Line?     @relation(fields: [lineId], references: [id])
