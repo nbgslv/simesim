@@ -23,52 +23,58 @@ export const authOptions = (
       server: '',
       maxAge: 60 * 60 * 2, // 2 hours
       sendVerificationRequest: async ({ identifier: phone, token }) => {
-        const { body } = req;
-        let { method } = body;
-        const { recaptchaToken } = body;
+        try {
+          const { body } = req;
+          let { method } = body;
+          const { recaptchaToken } = body;
 
-        const googleRecaptchaResponse = await fetch(
-          `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.GOOGLE_RECAPTCHA_SECRET}&response=${recaptchaToken}`,
-          {
-            method: 'POST',
+          const googleRecaptchaResponse = await fetch(
+            `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.GOOGLE_RECAPTCHA_SECRET}&response=${recaptchaToken}`,
+            {
+              method: 'POST',
+            }
+          );
+          const googleRecaptchaResponseData = await googleRecaptchaResponse.json();
+          // eslint-disable-next-line no-console
+          console.log({ googleRecaptchaResponseData });
+          if (
+            !googleRecaptchaResponseData.success ||
+            googleRecaptchaResponseData.score < 0.5
+          ) {
+            throw new Error('Google reCAPTCHA verification failed');
           }
-        );
-        const googleRecaptchaResponseData = await googleRecaptchaResponse.json();
-        if (
-          !googleRecaptchaResponseData.success ||
-          googleRecaptchaResponseData.score < 0.5
-        ) {
-          throw new Error('Google reCAPTCHA verification failed');
-        }
 
-        if (method) {
-          if (method === 'sms') {
-            method = Channel.SMS;
-          } else if (method === 'voice') {
-            method = Channel.VOICE;
-          } else if (method === 'whatsapp') {
+          if (method) {
+            if (method === 'sms') {
+              method = Channel.SMS;
+            } else if (method === 'voice') {
+              method = Channel.VOICE;
+            } else if (method === 'whatsapp') {
+              method = Channel.WHATSAPP;
+            }
+          } else {
             method = Channel.WHATSAPP;
           }
-        } else {
-          method = Channel.WHATSAPP;
-        }
-        const user = await prisma.user.findUnique({
-          where: {
-            email: phone,
-          },
-        });
+          const user = await prisma.user.findUnique({
+            where: {
+              email: phone,
+            },
+          });
 
-        if (!user) {
-          res.redirect('/error?error=Verification');
-        } else {
-          const message = await twilioApi.sendVerificationCode(
-            phone,
-            token,
-            method
-          );
-          if (message !== 'pending') {
-            res.redirect('/error?error=Configuration');
+          if (!user) {
+            res.redirect('/error?error=Verification');
+          } else {
+            const message = await twilioApi.sendVerificationCode(
+              phone,
+              token,
+              method
+            );
+            if (message !== 'pending') {
+              res.redirect('/error?error=Configuration');
+            }
           }
+        } catch (error) {
+          console.error(error);
         }
       },
       generateVerificationToken: async () =>
