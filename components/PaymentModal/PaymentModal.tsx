@@ -16,8 +16,6 @@ const PaymentModal = ({
   const handleIframeSrcChane = async () => {
     if (iframeRef.current) {
       const iframeUrl = iframeRef.current.contentWindow?.location.href;
-      // eslint-disable-next-line no-console
-      console.log({ iframeUrl });
       if (iframeUrl && iframeUrl !== paymentUrl) {
         await router.push(iframeUrl);
       }
