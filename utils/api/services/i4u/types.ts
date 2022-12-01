@@ -117,5 +117,6 @@ export type GetClearingLogResponse = {
     PaymentId: string;
     PaymentNumber: number;
     UpdateRequestLog: boolean;
+    DocCreated?: boolean;
   };
 };

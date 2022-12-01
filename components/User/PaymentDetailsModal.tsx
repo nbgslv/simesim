@@ -75,11 +75,9 @@ const PaymentDetailsModal = ({
             {payment.paymentMethod ? (
               <Col>
                 <Row>
-                  <Col>סוג כרטיס</Col>
-                  <Col>{payment.paymentMethod.cardType}</Col>
-                </Row>
-                <Row>
-                  <Col colspan={2}>{payment.paymentMethod.last4}</Col>
+                  <Col colspan={2}>
+                    ****-****-****-{payment.paymentMethod.last4}
+                  </Col>
                 </Row>
               </Col>
             ) : (

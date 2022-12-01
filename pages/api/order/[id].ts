@@ -36,16 +36,18 @@ export default async function handler(
         process.env.INVOICE4U_PASSWORD!,
         process.env.INVOICE4U_TEST === 'true'
       );
-      await i4uApi.verifyLogin();
-      const clearingLog = await i4uApi.getClearingLog(
-        plan.payment.I4UClearingLogId as string
+      if (!i4uApi.isVerified) {
+        await i4uApi.verifyLogin();
+      }
+      const clearingLog = await i4uApi.getClearingLogByParams(
+        plan.payment.paymentId as string
       );
       // eslint-disable-next-line no-console
       console.log({ clearingLog });
       if (!clearingLog) {
         throw new Error('No clearing log found');
-      } else if (clearingLog.d.ErrorMessage) {
-        console.error(clearingLog.d.ErrorMessage);
+      } else if (clearingLog.d.Errors.length) {
+        console.error(clearingLog.d.Errors);
         throw new Error(clearingLog.d.ErrorMessage);
       }
 

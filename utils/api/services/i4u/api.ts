@@ -119,6 +119,10 @@ export default class Invoice4UClearing {
     }
   }
 
+  public get isVerified(): boolean {
+    return !!this.token;
+  }
+
   public async verifyLogin(): Promise<string | undefined> {
     try {
       const response = await fetch(
@@ -171,6 +175,44 @@ export default class Invoice4UClearing {
           },
           body: JSON.stringify({
             clearingLogId,
+            token: this.token,
+          }),
+        }
+      );
+
+      /** * Testing ** */
+      if (this.test) {
+        const responseJson = await response.json();
+        return { d: responseJson };
+      }
+      /** * Testing ** */
+
+      return await response.json();
+    } catch (e: unknown) {
+      console.error(e);
+      throw new Error((e as Error).message);
+    }
+  }
+
+  public async getClearingLogByParams(
+    paymentId: string
+  ): Promise<GetClearingLogResponse> {
+    try {
+      if (!this.token) {
+        throw new Error('You must verify your login first');
+      }
+
+      const response = await fetch(
+        `${this.isTest ? this.apiTestUrl : this.apiUrl}/GetClearingLogByParams`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            searchParams: {
+              PaymentId: paymentId,
+            },
             token: this.token,
           }),
         }
