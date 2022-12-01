@@ -1,4 +1,5 @@
-import React from 'react';
+import { useRouter } from 'next/router';
+import React, { LegacyRef, useRef } from 'react';
 import { Modal, Spinner } from 'react-bootstrap';
 import styles from './PaymentModal.module.scss';
 
@@ -9,13 +10,17 @@ const PaymentModal = ({
   show: boolean;
   paymentUrl: string;
 }) => {
-  const handleIframeSrcChane = async (
-    e: React.ChangeEvent<HTMLIFrameElement>
-  ) => {
-    // eslint-disable-next-line no-console
-    console.log({ src: e.target.src });
-    if (e.target.src !== paymentUrl && window.top) {
-      window.top.location.href = e.target.src;
+  const router = useRouter();
+  const iframeRef: LegacyRef<HTMLIFrameElement> = useRef(null);
+
+  const handleIframeSrcChane = async () => {
+    if (iframeRef.current) {
+      const iframeUrl = iframeRef.current.contentWindow?.location.href;
+      // eslint-disable-next-line no-console
+      console.log({ iframeUrl });
+      if (iframeUrl && iframeUrl !== paymentUrl) {
+        await router.push(iframeUrl);
+      }
     }
   };
 
@@ -27,6 +32,7 @@ const PaymentModal = ({
       <Modal.Body>
         {paymentUrl ? (
           <iframe
+            ref={iframeRef}
             src={paymentUrl}
             onLoad={handleIframeSrcChane}
             className={styles.iframe}
