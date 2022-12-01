@@ -1,5 +1,5 @@
 import React from 'react';
-import { Country, PlanModel } from '@prisma/client';
+import { Country, PlanModel, Prisma } from '@prisma/client';
 import TimelineSection from '../components/Timeline/TimelineSection';
 import prisma from '../lib/prisma';
 import KeepGoApi from '../utils/api/services/keepGo/api';
@@ -13,7 +13,8 @@ import MainLayout from '../components/Layouts/MainLayout';
 
 type HomeProps = {
   countriesList: Country[];
-  bundlesList: PlanModel[];
+  bundlesList: (PlanModel &
+    Prisma.PlanModelGetPayload<{ select: { bundle: true } }>)[];
   phonesList: PhonesList[];
 };
 
@@ -70,7 +71,7 @@ export async function getStaticProps() {
     props: {
       countriesList: countriesListResponse,
       bundlesList,
-      phonesList: phonesList.data,
+      phonesList: (phonesList as KeepGoResponse)?.data,
     },
   };
 }

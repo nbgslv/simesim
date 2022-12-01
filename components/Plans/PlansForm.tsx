@@ -144,7 +144,7 @@ const PlansForm = ({
             {payments.length ? (
               payments.map((payment) => (
                 <option key={payment.id} value={payment.id}>
-                  {`${payment.user.firstName} ${payment.user.lastName} - ${payment.externalId}`}
+                  {`${payment.user.firstName} ${payment.user.lastName} - ${payment.I4UClearingLogId}/${payment.paymentDate}`}
                 </option>
               ))
             ) : (

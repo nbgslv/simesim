@@ -96,7 +96,7 @@ type Transactions = {
   };
 };
 
-export type KeepGoResponse = Partial<Pagination> & {
+export type KeepGoResponseParams = {
   ack: string;
   sim_cards?: [Line];
   filters?: [FilterData];
@@ -111,3 +111,5 @@ export type KeepGoResponse = Partial<Pagination> & {
   regions?: [string];
   data: [string];
 };
+
+export type KeepGoResponse = Partial<Pagination> & KeepGoResponseParams;
