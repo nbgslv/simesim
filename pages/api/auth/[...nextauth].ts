@@ -59,6 +59,7 @@ export const authOptions = (
           },
         });
 
+        // TODO handle other way with errors, not with redirect
         if (!user) {
           res.redirect('/error?error=Verification');
         } else {

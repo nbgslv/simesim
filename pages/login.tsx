@@ -72,7 +72,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
       );
       setPhoneNumber(router.query.phone as string);
     }
-  }, []);
+  }, [router.query]);
 
   useEffect(() => {
     (async () => {
