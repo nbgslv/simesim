@@ -48,7 +48,7 @@ export default async function handler(
         throw new Error('No clearing log found');
       } else if (clearingLog.d.Errors && clearingLog.d.Errors.length > 0) {
         console.error(clearingLog.d.Errors);
-        throw new Error(clearingLog.d.ErrorMessage);
+        throw new Error(clearingLog.d.Errors.toString());
       }
 
       if (

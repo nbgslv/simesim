@@ -81,7 +81,7 @@ export default class Invoice4UClearing {
         IsGeneralClient: 'true',
         IsBitPayment: 'false',
         CallBackUrl: this.callbackUrl,
-        ReturnUrl: `${this.returnUrl}/${planId}`,
+        ReturnUrl: `${this.returnUrl}/${planId}/`,
         AddToken: 'false',
         AddTokenAndCharge: 'false',
         ChargeWithToken: 'false',
