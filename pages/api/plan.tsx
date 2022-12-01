@@ -33,7 +33,10 @@ export default async function handler(
       if (!existingPlanModel) {
         throw new Error('Plan Model not found');
       }
+
       const newPlan = await prisma.plan.create({
+        // TODO add startDate and endDate
+        // @ts-ignore
         data: {
           planModel,
           price,
