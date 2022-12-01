@@ -10,8 +10,6 @@ const PaymentModal = ({
   show: boolean;
   paymentUrl: string;
 }) => {
-  const router = useRouter();
-
   const handleIframeSrcChane = async (
     e: React.ChangeEvent<HTMLIFrameElement>
   ) => {
