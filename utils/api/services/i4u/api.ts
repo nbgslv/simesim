@@ -79,7 +79,7 @@ export default class Invoice4UClearing {
           .reduce((acc: string[], item) => [...acc, item.name], [])
           .join(' | '),
         IsGeneralClient: 'true',
-        IsBitPayment: 'true',
+        IsBitPayment: 'false',
         CallBackUrl: this.callbackUrl,
         ReturnUrl: `${this.returnUrl}/${planId}`,
         AddToken: 'false',

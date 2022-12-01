@@ -8,6 +8,8 @@ export default async function handler(
 ) {
   try {
     const { method } = req;
+    // eslint-disable-next-line no-console
+    console.log({ req, body: req.body });
     if (method === 'POST') {
       // eslint-disable-next-line no-console
       console.log({ method, body: req.body });
