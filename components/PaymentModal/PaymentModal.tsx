@@ -15,8 +15,10 @@ const PaymentModal = ({
   const handleIframeSrcChane = async (
     e: React.ChangeEvent<HTMLIFrameElement>
   ) => {
-    if (e.target.src !== paymentUrl) {
-      await router.push(e.target.src);
+    // eslint-disable-next-line no-console
+    console.log({ src: e.target.src });
+    if (e.target.src !== paymentUrl && window.top) {
+      window.top.location.href = e.target.src;
     }
   };
 
