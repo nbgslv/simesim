@@ -22,6 +22,23 @@ const PaymentDetailsModal = ({
   handleModalHide,
 }: PaymentDetailsModalProps) => {
   if (!payment) return null;
+
+  let paymentStatus;
+
+  switch (payment.status) {
+    case 'PENDING':
+      paymentStatus = 'ממתין לאישור';
+      break;
+    case 'PAID':
+      paymentStatus = 'שולם';
+      break;
+    case 'FAILED':
+      paymentStatus = 'נכשל';
+      break;
+    default:
+      paymentStatus = 'לא ידוע';
+  }
+
   return (
     <Modal
       show={show}
@@ -47,11 +64,11 @@ const PaymentDetailsModal = ({
           </Row>
           <Row>
             <Col>סטטוס</Col>
-            <Col>{payment.status}</Col>
+            <Col>{paymentStatus}</Col>
           </Row>
           <Row>
             <Col>תאריך תשלום</Col>
-            <Col>{(payment.createdAt as unknown) as string}</Col>
+            <Col>{(payment.paymentDate as unknown) as string}</Col>
           </Row>
           <Row>
             <Col>פרטי אמצעי תשלום</Col>
@@ -62,15 +79,7 @@ const PaymentDetailsModal = ({
                   <Col>{payment.paymentMethod.cardType}</Col>
                 </Row>
                 <Row>
-                  <Col>4 ספרות אחרונות</Col>
-                  <Col>{payment.paymentMethod.last4}</Col>
-                </Row>
-                <Row>
-                  <Col>תוקף</Col>
-                  <Col>
-                    {payment.paymentMethod.expMonth}/
-                    {payment.paymentMethod.expYear}
-                  </Col>
+                  <Col colspan={2}>{payment.paymentMethod.last4}</Col>
                 </Row>
               </Col>
             ) : (
@@ -82,8 +91,10 @@ const PaymentDetailsModal = ({
               <Button
                 className="w-100 mt-2"
                 variant="primary"
-                href={payment.invoice as string}
-                disabled={!payment.invoice}
+                href={`https://newview.invoice4u.co.il/Views/PDF.aspx?docid=${
+                  payment.DocId as string
+                }`}
+                disabled={!payment.IsDocumentCreated}
               >
                 קבלה
               </Button>

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Country, Prisma, Bundle } from '@prisma/client';
+import { Country, PlanModel } from '@prisma/client';
 import TimelineSection from '../components/Timeline/TimelineSection';
 import prisma from '../lib/prisma';
-import KeepGoApi from '../utils/api/sevices/keepGo/api';
-import { KeepGoResponse } from '../utils/api/sevices/keepGo/types';
+import KeepGoApi from '../utils/api/services/keepGo/api';
+import { KeepGoResponse } from '../utils/api/services/keepGo/types';
 import BundlesSection from '../components/Bundles/BundlesSection';
 import QnaSection from '../components/QnA/QnaSection';
 import CheckPhoneSection, {
@@ -13,8 +13,7 @@ import MainLayout from '../components/Layouts/MainLayout';
 
 type HomeProps = {
   countriesList: Country[];
-  bundlesList: (Bundle &
-    Prisma.BundleGetPayload<{ select: { refills: true } }>)[];
+  bundlesList: PlanModel[];
   phonesList: PhonesList[];
 };
 
@@ -48,23 +47,29 @@ export async function getStaticProps() {
       translation: true,
     },
   });
-  const bundlesList: KeepGoResponse | Error = await keepGoApi.getBundles();
-  const phonesList: KeepGoResponse | Error = await keepGoApi.getEsimDevices();
-
-  if (bundlesList instanceof Error || phonesList instanceof Error) {
-    return {
-      props: {
-        countriesList: [],
-        bundlesList: [],
-        phonesList: [],
+  const bundlesList = await prisma.planModel.findMany({
+    select: {
+      id: true,
+      name: true,
+      bundle: {
+        select: {
+          id: true,
+          name: true,
+          typeId: true,
+          coverage: true,
+        },
       },
-    };
-  }
+      description: true,
+      price: true,
+      vat: true,
+    },
+  });
+  const phonesList: KeepGoResponse | Error = await keepGoApi.getEsimDevices();
 
   return {
     props: {
       countriesList: countriesListResponse,
-      bundlesList: bundlesList.bundles,
+      bundlesList,
       phonesList: phonesList.data,
     },
   };

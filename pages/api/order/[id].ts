@@ -1,12 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Plan, Prisma } from '@prisma/client';
+import { Plan } from '@prisma/client';
 import { unstable_getServerSession } from 'next-auth';
 import prisma from '../../../lib/prisma';
+import { ApiResponse } from '../../../lib/types/api';
+import Invoice4UClearing from '../../../utils/api/services/i4u/api';
 import { authOptions } from '../auth/[...nextauth]';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Plan | { message: string }>
+  res: NextApiResponse<ApiResponse<Partial<Plan>>>
 ) {
   try {
     const session = await unstable_getServerSession(
@@ -14,17 +16,9 @@ export default async function handler(
       res,
       authOptions(req, res)
     );
-    const {
-      query: { id },
-      method,
-    } = req;
-    if (method === 'GET') {
-      // Return Order by ID
-    } else if (method === 'PUT') {
-      const updatedPlanData = req.body;
-      let paymentMethod:
-        | Prisma.PaymentMethodUpdateOneWithoutPaymentNestedInput
-        | undefined;
+    const { method } = req;
+    if (method === 'PUT') {
+      const { id } = req.query;
       const plan = await prisma.plan.findUnique({
         where: {
           id: id as string,
@@ -33,79 +27,87 @@ export default async function handler(
           payment: true,
         },
       });
+      if (!plan || !plan.payment) {
+        throw new Error('No plan found');
+      }
+      const i4uApi = new Invoice4UClearing(
+        process.env.INVOICE4U_API_KEY!,
+        process.env.INVOICE4U_USER!,
+        process.env.INVOICE4U_PASSWORD!,
+        process.env.INVOICE4U_TEST === 'true'
+      );
+      await i4uApi.verifyLogin();
+      const clearingLog = await i4uApi.getClearingLog(
+        plan.payment.I4UClearingLogId as string
+      );
+      console.log({ clearingLog });
+      if (!clearingLog) {
+        throw new Error('No clearing log found');
+      } else if (clearingLog.d.ErrorMessage) {
+        console.error(clearingLog.d.ErrorMessage);
+        throw new Error(clearingLog.d.ErrorMessage);
+      }
+
       if (
         plan &&
         plan.userId === session?.user?.id &&
         plan.payment?.status !== 'PAID'
       ) {
-        if (updatedPlanData.payment.paymentMethod.token) {
-          const existingPaymentMethod = await prisma.paymentMethod.findUnique({
-            where: {
-              token: updatedPlanData.payment.paymentMethod.token,
-            },
-          });
-          if (existingPaymentMethod) {
-            paymentMethod = {
-              connect: {
-                id: existingPaymentMethod.id,
-              },
-            };
-          } else {
-            paymentMethod = {
+        const paymentDate = new Date(
+          Number(clearingLog.d.Date.match(/\d+/)?.[0])
+        );
+        const updatedPayment = await prisma.payment.update({
+          where: {
+            id: plan.paymentId as string,
+          },
+          data: {
+            ClearingConfirmationNumber:
+              clearingLog.d.ClearingConfirmationNumber,
+            paymentDate,
+            DocId: clearingLog.d.DocId,
+            IsDocumentCreated: clearingLog.d.IsDocumentCreated,
+            status: 'PAID',
+            paymentMethod: {
               create: {
-                token: updatedPlanData.payment.paymentMethod.token,
-                cardType: updatedPlanData.payment.paymentMethod.cardType,
-                expMonth: updatedPlanData.payment.paymentMethod.expMonth,
-                expYear: updatedPlanData.payment.paymentMethod.expYear,
-                last4: updatedPlanData.payment.paymentMethod.last4,
+                IsBitPayment: clearingLog.d.IsBitPayment,
+                cardType: clearingLog.d.CreditTypeName,
+                last4: clearingLog.d.CreditNumber,
                 user: {
                   connect: {
                     id: session?.user?.id,
                   },
                 },
               },
-            };
-          }
-        } else {
-          paymentMethod = {
-            create: {
-              token: updatedPlanData.payment.paymentMethod.token,
-              cardType: updatedPlanData.payment.paymentMethod.cardType,
-              expMonth: updatedPlanData.payment.paymentMethod.expMonth,
-              expYear: updatedPlanData.payment.paymentMethod.expYear,
-              last4: updatedPlanData.payment.paymentMethod.last4,
-              user: {
-                connect: {
-                  id: session?.user?.id,
-                },
-              },
-            },
-          };
-        }
-        const updatedPlan = await prisma.plan.update({
-          where: {
-            id: id as string,
-          },
-
-          data: {
-            payment: {
-              update: {
-                status: updatedPlanData.payment.status,
-                invoice: updatedPlanData.invoice,
-                paymentMethod,
-              },
             },
           },
         });
-        res.status(200).json(updatedPlan);
+        if (updatedPayment) {
+          res
+            .status(200)
+            .json({ success: true, data: { friendlyId: plan.friendlyId } });
+        } else {
+          throw new Error('Payment failed');
+        }
       } else {
-        res.status(403).json({ message: 'Plan not found' });
+        res.status(403).json({
+          name: 'ORDER_CREATION_ERR',
+          message: 'Plan not found',
+          success: false,
+        });
       }
-    } else if (method === 'DELETE') {
-      // Delete Draft Order
+    } else {
+      res.status(405).json({
+        name: 'METHOD_NOT_ALLOWED',
+        success: false,
+        message: 'Method not allowed',
+      });
     }
   } catch (e: unknown) {
     console.error(e);
-    res.status(500).json({ message: 'Something went wrong' });
+    res.status(500).json({
+      name: 'ORDER_UPDATE_ERR',
+      message: 'Something went wrong',
+      success: false,
+    });
   }
 }

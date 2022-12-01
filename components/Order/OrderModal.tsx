@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Col, Modal, Row, Form, Spinner } from 'react-bootstrap';
 import DatePicker, { registerLocale } from 'react-datepicker';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useForm, Controller } from 'react-hook-form';
 import 'react-datepicker/dist/react-datepicker.css';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -10,15 +11,14 @@ import he from 'date-fns/locale/he';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { useRouter } from 'next/router';
-import { Bundle, Refill } from '@prisma/client';
+import { Coupon, PlanModel } from '@prisma/client';
 import styles from './OrderModal.module.scss';
 import Input from '../Input/Input';
 
 type BundlesSectionProps = {
   show: boolean;
   onHide: () => void;
-  bundle?: Bundle;
-  refill?: Refill | null;
+  bundle?: PlanModel;
   country?: string;
 };
 
@@ -40,21 +40,40 @@ const schema = yup.object().shape({
   terms: yup.boolean().oneOf([true]).required('שדה חובה'),
 });
 
-const OrderModal = ({
-  show,
-  onHide,
-  bundle,
-  refill,
-  country,
-}: BundlesSectionProps) => {
+const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
+  const [price, setPrice] = React.useState<number>(0);
   const [coupon, setCoupon] = React.useState<string>('');
+  const [loading, setLoading] = React.useState<boolean>(false);
   const [couponSet, setCouponSet] = React.useState<string>('');
+  const [
+    couponDetails,
+    setCouponDetails,
+  ] = React.useState<Partial<Coupon> | null>(null);
   const [couponError, setCouponError] = React.useState<string>('');
   const [loadingCoupon, setLoadingCoupon] = React.useState<boolean>(false);
   const [couponStatus, setCouponStatus] = React.useState<
     'valid' | 'invalid' | 'none'
   >('none');
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const router = useRouter();
+
+  useEffect(() => {
+    if (bundle) {
+      setPrice(bundle.price);
+    }
+  }, [bundle]);
+
+  useEffect(() => {
+    if (couponDetails && couponDetails.discount && bundle) {
+      if (couponDetails.discountType === 'PERCENT') {
+        setPrice(bundle.price - (bundle.price * couponDetails.discount) / 100);
+      } else if (couponDetails.discountType === 'AMOUNT') {
+        setPrice(bundle.price - couponDetails.discount);
+      }
+    } else if (bundle) {
+      setPrice(bundle.price);
+    }
+  }, [couponDetails]);
 
   registerLocale('he', he);
   const {
@@ -94,16 +113,20 @@ const OrderModal = ({
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/coupon/${coupon}/${phoneNumber}`
         );
         if (couponResult.status === 200) {
+          const { data } = await couponResult.json();
+          setCouponDetails(data);
           setCouponError('');
           setCouponStatus('valid');
           setCouponSet(coupon);
         } else {
           const couponErrorMessages = await couponResult.json();
+          setCouponDetails(null);
           setCouponStatus('invalid');
           setCouponError(couponErrorMessages.message);
         }
       }
     } catch (e) {
+      setCouponDetails(null);
       setCouponError('');
       setCouponStatus('invalid');
     } finally {
@@ -135,8 +158,8 @@ const OrderModal = ({
     }
     return (
       <Button
-        variant="secondary"
-        className={`${styles.submitButton} w-100 h-100`}
+        variant="outline-success"
+        className={`${styles.couponButton} w-100 h-100`}
         onClick={() => handleCoupon()}
       >
         הפעל קופון
@@ -145,27 +168,42 @@ const OrderModal = ({
   };
 
   const handleCouponClear = () => {
+    setCouponDetails(null);
     setCouponStatus('none');
     setCouponError('');
     setCouponSet('');
   };
 
   const onSubmit = async (data: any) => {
-    // eslint-disable-next-line no-param-reassign
-    refill!.id = 'clamghwdk00e1544knz513j4r'; // TODO: remove this
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/order`, {
-      method: 'POST',
-      body: JSON.stringify({
-        ...data,
-        coupon: couponSet,
-        bundle: 'clamghwdj00e0544kl4ezigs8', // TODO: change to real bundle id
-        refill: refill?.id,
-        price: refill?.price_usd ?? 1.2, // TODO: change to real planModel price
-        planModel: 'clamhftss000054f8ca66alty', // TODO: change to real planModel id
-      }),
-    });
-    if (res.redirected) {
-      await router.push(res.url);
+    try {
+      setLoading(true);
+      if (!executeRecaptcha) {
+        throw new Error('Recaptcha not loaded');
+      }
+      const token = await executeRecaptcha('order');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/order`, {
+        method: 'POST',
+        body: JSON.stringify({
+          ...data,
+          price,
+          recaptchaToken: token,
+          coupon: couponDetails?.id,
+          planModel: bundle?.id,
+        }),
+      });
+      if (res.redirected) {
+        await router.push(res.url);
+      } else {
+        const json = await res.json();
+        if (!json.success) {
+          await router.push('/error?error=Order');
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      await router.push('/error?error=Order');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -188,11 +226,18 @@ const OrderModal = ({
             <Col className={styles.omFieldTitle} lg={3}>
               פרטי החבילה
             </Col>
-            <Col className="d-flex">
-              <div className={styles.bundleText}>{bundle?.name} -</div>
-              <div className={styles.bundleText}>{refill?.title}</div>
-              <div className={styles.bundleText}>
-                {refill ? refill.price_usd + 1.2 : ''}$
+            <Col className="d-flex justify-content-between">
+              <div className="d-flex">
+                <div className={styles.bundleText}>{bundle?.name} -</div>
+                <div className={styles.bundleText}>{bundle?.description}</div>
+              </div>
+              <div
+                className={`${styles.bundleTextPrice} ${
+                  couponDetails ? styles.couponSuccess : ''
+                }`}
+              >
+                סה&quot;כ: {price}
+                {'\u20AA'}
               </div>
             </Col>
           </Row>
@@ -404,7 +449,15 @@ const OrderModal = ({
               onClick={handleSubmit(onSubmit)}
               className={styles.submitButton}
             >
-              המשך
+              {loading ? (
+                <Spinner
+                  animation="border"
+                  size="sm"
+                  style={{ color: '#ffffff' }}
+                />
+              ) : (
+                <>המשך</>
+              )}
             </Button>
           </div>
         </Modal.Footer>

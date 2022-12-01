@@ -1,0 +1,18 @@
+@import "styles/variables";
+
+.main {
+  :global * {
+    color: $text-color;
+  }
+
+  :global .modal-content {
+    height: 82vh;
+  }
+}
+
+.iframe {
+  height: 100%;
+  width: 100%;
+  border: none;
+  overflow: auto;
+}

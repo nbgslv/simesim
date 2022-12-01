@@ -1,0 +1,17 @@
+@import "styles/variables";
+
+.main {
+  :global * {
+    color: $text-color;
+  }
+}
+
+.coverageButton {
+  color: #fff;
+}
+
+.goToButton {
+  color: #fff;
+  width: 100%;
+  margin-top: 1rem;
+}

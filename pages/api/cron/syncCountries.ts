@@ -8,7 +8,7 @@ export default async function handler(
   if (req.method === 'POST') {
     try {
       await syncCountries();
-      res.status(200).json({ success: true });
+      res.status(201).json({ success: true });
     } catch (err: Error | any) {
       console.error(err);
       res.status(500).json({ statusCode: 500, message: err.message });

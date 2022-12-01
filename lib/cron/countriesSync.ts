@@ -1,5 +1,5 @@
 import Bottleneck from 'bottleneck';
-import KeepGoApi from '../../utils/api/sevices/keepGo/api';
+import KeepGoApi from '../../utils/api/services/keepGo/api';
 import prisma from '../prisma';
 
 const getCountries = async () => {

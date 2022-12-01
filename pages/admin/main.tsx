@@ -1,10 +1,9 @@
+import { NextPageContext } from 'next';
 import React from 'react';
-import { unstable_getServerSession } from 'next-auth';
-import { NextApiRequest, NextApiResponse, NextPageContext } from 'next';
 import prisma from '../../lib/prisma';
 import styles from '../../styles/main.module.scss';
 import AdminLayout from '../../components/Layouts/AdminLayout';
-import { authOptions } from '../api/auth/[...nextauth]';
+import { verifyAdmin } from '../../utils/auth';
 
 const Main = () => (
   <AdminLayout>
@@ -15,49 +14,16 @@ const Main = () => (
 );
 
 export async function getServerSideProps(context: NextPageContext) {
-  const session = await unstable_getServerSession(
-    context.req as NextApiRequest,
-    context.res as NextApiResponse,
-    authOptions(context.req as NextApiRequest, context.res as NextApiResponse)
-  );
-  if (!session) {
-    return {
-      redirect: {
-        destination: '/',
-        permanent: false,
-      },
-    };
-  }
-  if (session && session.user) {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: session.user.id,
-      },
-    });
-    if (user && user.role !== 'ADMIN') {
-      return {
-        redirect: {
-          destination: '/',
-          permanent: false,
-        },
-      };
-    }
-    const lines = await prisma.line.findMany({
-      take: 10,
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-    return {
-      props: {
-        lastLines: lines,
-      },
-    };
-  }
-
+  await verifyAdmin(context);
+  const lines = await prisma.line.findMany({
+    take: 10,
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
   return {
     props: {
-      lastLines: [],
+      lastLines: lines || [],
     },
   };
 }

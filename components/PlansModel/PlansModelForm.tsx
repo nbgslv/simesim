@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { Prisma, Bundle, Refill, Coupon } from '@prisma/client';
 import { useForm } from 'react-hook-form';
@@ -30,9 +30,13 @@ const schema = yup.object().shape({
 });
 
 const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
+  const [filteredRefills, setFilteredRefills] = React.useState<Refill[]>(
+    refills
+  );
   const { resolve, hide } = useModal('add-plansmodel');
   const {
     register,
+    watch,
     formState: { errors },
     handleSubmit,
   } = useForm({
@@ -49,6 +53,15 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
       couponsIds: 'none',
     },
   });
+  const selectedBundle = watch('bundleId');
+
+  useEffect(() => {
+    if (selectedBundle !== 'none') {
+      setFilteredRefills(
+        refills.filter((refill) => refill.bundleId === selectedBundle)
+      );
+    }
+  }, [selectedBundle]);
 
   return (
     <Form>
@@ -72,8 +85,8 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
       <Form.Group>
         <Form.Label>Refill</Form.Label>
         <Form.Select {...register('refillId')} isInvalid={!!errors.refillId}>
-          {refills.length ? (
-            refills.map((refill) => (
+          {filteredRefills.length ? (
+            filteredRefills.map((refill) => (
               <option key={refill.id} value={refill.id as string}>
                 {refill.title}
               </option>

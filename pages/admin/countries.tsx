@@ -1,3 +1,4 @@
+import { NextPageContext } from 'next';
 import React, { useCallback, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
 import { Prisma } from '@prisma/client';
@@ -12,6 +13,7 @@ import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
 import AdminTableSwitch from '../../components/AdminTable/AdminTableSwitch';
+import { verifyAdmin } from '../../utils/auth';
 
 type CountriesAsAdminTableData = (GridValidRowModel &
   Prisma.CountryMaxAggregateOutputType)[];
@@ -60,7 +62,9 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
         })
       );
       const updateJson = await update.json();
-      const serializedUpdate = { ...updateJson };
+      if (!updateJson.success)
+        throw new Error('Failed to update lockTranslation');
+      const serializedUpdate = { ...updateJson.data };
       serializedUpdate.createdAt = format(
         parseISO(serializedUpdate.createdAt),
         'dd/MM/yy kk:mm'
@@ -96,7 +100,9 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
         })
       );
       const updateJson = await update.json();
-      const serializedUpdate = { ...updateJson };
+      if (!updateJson.success)
+        throw new Error('Failed to update lockTranslation');
+      const serializedUpdate = { ...updateJson.data };
       serializedUpdate.createdAt = format(
         parseISO(serializedUpdate.createdAt),
         'dd/MM/yy kk:mm'
@@ -174,7 +180,9 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
         })
       );
       const updateJson = await update.json();
-      const serializedUpdate = { ...updateJson };
+      if (!updateJson.success)
+        throw new Error('Failed to update lockTranslation');
+      const serializedUpdate = { ...updateJson.data };
       serializedUpdate.createdAt = format(
         parseISO(serializedUpdate.createdAt),
         'dd/MM/yy kk:mm'
@@ -205,7 +213,8 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
         }
       );
       const deleteJson = await deleteRes.json();
-      return deleteJson.count;
+      if (!deleteJson.success) throw new Error('Country deletion failed');
+      return deleteJson.data.count;
     } catch (e) {
       console.error(e);
       return 0;
@@ -225,7 +234,8 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
   );
 };
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context: NextPageContext) {
+  await verifyAdmin(context);
   const countries = await prisma.country.findMany({
     orderBy: {
       updatedAt: 'desc',

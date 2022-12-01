@@ -50,7 +50,11 @@ export async function getServerSideProps(context: NextPageContext) {
       },
       include: {
         planModel: true,
-        payment: true,
+        payment: {
+          include: {
+            paymentMethod: true,
+          },
+        },
         line: true,
       },
     });
@@ -62,19 +66,32 @@ export async function getServerSideProps(context: NextPageContext) {
         ...plan.planModel,
         createdAt: plan.planModel
           ? format(plan.planModel.createdAt, 'dd/MM/yy kk:mm')
-          : undefined,
+          : null,
         updatedAt: plan.planModel
           ? format(plan.planModel.updatedAt, 'dd/MM/yy kk:mm')
-          : undefined,
+          : null,
       },
       payment: {
         ...plan.payment,
+        paymentMethod: {
+          ...plan.payment?.paymentMethod,
+          createdAt: plan.payment?.paymentMethod
+            ? format(plan.payment?.paymentMethod.createdAt, 'dd/MM/yy kk:mm')
+            : null,
+          updatedAt: plan.payment?.paymentMethod
+            ? format(plan.payment?.paymentMethod.updatedAt, 'dd/MM/yy kk:mm')
+            : null,
+        },
+        paymentDate:
+          plan.payment && plan.payment.paymentDate
+            ? format(plan.payment.paymentDate, 'dd/MM/yy kk:mm')
+            : null,
         createdAt: plan.payment
           ? format(plan.payment.createdAt, 'dd/MM/yy kk:mm')
-          : undefined,
+          : null,
         updatedAt: plan.payment
           ? format(plan.payment.updatedAt, 'dd/MM/yy kk:mm')
-          : undefined,
+          : null,
       },
     }));
     return {

@@ -1,7 +1,7 @@
 {
   "extends": ["typescript-airbnb-prettier", "next/core-web-vitals"],
   "rules": {
-    "quotes": ["error", "single"],
+    "quotes": "off",
     "no-console": ["error", { "allow": ["warn", "error"] }],
     "react-hooks/exhaustive-deps": "off"
   }

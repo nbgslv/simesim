@@ -1,5 +1,4 @@
 import { Html, Head, Main, NextScript } from 'next/document';
-import Script from 'next/script';
 
 export default function Document() {
   return (
@@ -19,7 +18,6 @@ export default function Document() {
       <body>
         <Main />
         <NextScript />
-        <Script src="https://cdn.enable.co.il/licenses/enable-L15802dmirvhc1a8-1122-37877/init.js"></Script>
       </body>
     </Html>
   );

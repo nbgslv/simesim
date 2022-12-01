@@ -106,6 +106,7 @@ const UserOrders = ({
         </Button>
       ),
     },
+    /*
     {
       field: 'refill',
       headerName: 'טעינה',
@@ -119,6 +120,7 @@ const UserOrders = ({
         </Button>
       ),
     },
+     */
   ];
 
   const handlePaymentModalHide = () => {

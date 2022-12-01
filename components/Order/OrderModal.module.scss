@@ -37,6 +37,15 @@
   font-weight: 200;
 }
 
+.bundleTextPrice {
+  margin-left: 1rem;
+  font-weight: 800;
+
+  :global * {
+    color: $text-color !important;
+  }
+}
+
 .countryText {
   font-weight: 200;
 }
@@ -69,6 +78,18 @@
 
 .submitButton {
   color: $background-color !important;
+}
+
+.couponButton {
+  color: map-get($theme-colors, 'success') !important;
+
+  &:hover {
+    color: map-get($theme-colors, 'light') !important;
+  }
+}
+
+.couponSuccess {
+    color: map-get($theme-colors, 'success') !important;
 }
 
 .errorMessage {

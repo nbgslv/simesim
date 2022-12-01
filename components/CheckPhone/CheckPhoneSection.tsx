@@ -70,17 +70,19 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
 
     return (
       <AnimatePresence>
-        <motion.div
-          layout
-          initial="initial"
-          animate="show"
-          exit="initial"
-          variants={variants}
-          role="listbox"
-          className={`${styles.listBox}`}
-        >
-          {children}
-        </motion.div>
+        <div className={styles.listBoxContainer}>
+          <motion.div
+            layout="position"
+            initial="initial"
+            animate="show"
+            exit="initial"
+            variants={variants}
+            role="listbox"
+            className={`${styles.listBox}`}
+          >
+            {children}
+          </motion.div>
+        </div>
       </AnimatePresence>
     );
   };
@@ -170,11 +172,6 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
             <div className={styles.resultsContainer}>
               מכשיר מדגם זה תומך ב-eSim!
             </div>
-            {selectedBrand.exceptions && (
-              <div className={styles.resultsContainer}>
-                {selectedBrand.exceptions}
-              </div>
-            )}
           </div>
           <div
             className={`${styles.iconSuccess} h-100 w-100 position-relative`}
@@ -226,35 +223,38 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
     >
       <Row className="h-100 w-100 d-flex align-items-center">
         <Col
-          className="d-flex flex-column justify-content-center position-relative"
-          style={{ height: '80%' }}
+          className={`d-flex flex-column h-100 ${
+            selectedBrand ? 'justify-content-start' : 'justify-content-center'
+          } position-relative`}
         >
-          <div className={styles.titleWrapper}>
-            <h2 className={styles.title}>הטלפון שלך</h2>
-          </div>
-          <motion.div layout="position" className={styles.brandSearch}>
-            <SearchAutocomplete
-              placeholder={'של איזו חברה?'}
-              onSelect={handleBrandSelect}
-              onCancel={handleBrandCancel}
-              ListBoxComponent={ListBox}
-              ItemComponent={ListBoxItem}
-              items={phonesBrands}
-            />
-          </motion.div>
-          {selectedBrand && (
-            <motion.div layout="position" className={styles.modelSearch}>
+          <motion.div layout="position">
+            <div className={styles.titleWrapper}>
+              <h2 className={styles.title}>הטלפון שלך</h2>
+            </div>
+            <div className={styles.brandSearch}>
               <SearchAutocomplete
-                placeholder={'איזה דגם?'}
-                onSelect={handlePhoneSelect}
-                onCancel={handlePhoneCancel}
-                items={filteredPhones}
-                ref={phoneSearchRef}
+                placeholder={'של איזו חברה?'}
+                onSelect={handleBrandSelect}
+                onCancel={handleBrandCancel}
                 ListBoxComponent={ListBox}
                 ItemComponent={ListBoxItem}
+                items={phonesBrands}
               />
-            </motion.div>
-          )}
+            </div>
+            {selectedBrand && (
+              <motion.div layout="position" className={styles.modelSearch}>
+                <SearchAutocomplete
+                  placeholder={'איזה דגם?'}
+                  onSelect={handlePhoneSelect}
+                  onCancel={handlePhoneCancel}
+                  items={filteredPhones}
+                  ref={phoneSearchRef}
+                  ListBoxComponent={ListBox}
+                  ItemComponent={ListBoxItem}
+                />
+              </motion.div>
+            )}
+          </motion.div>
           {selectedBrand && selectedPhone && (
             <motion.div
               layout
@@ -266,7 +266,14 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
             </motion.div>
           )}
           <div className={styles.disclaimer}>
-            <small>הערת אזהרה</small>
+            <small style={{ fontSize: '0.7rem' }}>
+              שימו לב: רשימת המכשירים התומכים בטכנולוגיית eSim מסופקת על ידי צד
+              ג&apos;. מומלץ לקרוא את{' '}
+              <a href="/terms" target="_blank">
+                תנאי השימוש באתר
+              </a>{' '}
+              בעת הסתמכות על רשימה זו.
+            </small>
           </div>
         </Col>
         <Col className="w-100 h-100 p-6">

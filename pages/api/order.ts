@@ -1,34 +1,40 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { unstable_getServerSession } from 'next-auth';
+import { Plan } from '@prisma/client';
 import prisma from '../../lib/prisma';
-
-export enum OrderStatus {
-  READY = 'READY',
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  FINISHED = 'FINISHED',
-  DRAFT = 'DRAFT',
-}
-
-export type Order = {
-  id: string;
-  externalId: string;
-  simId: string;
-  bundleId: string;
-  status: OrderStatus;
-  activatedAt: Date;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import { ApiResponse } from '../../lib/types/api';
+import Invoice4UClearing from '../../utils/api/services/i4u/api';
+import { authOptions } from './auth/[...nextauth]';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Partial<Order> | Error>
+  res: NextApiResponse<ApiResponse<Partial<Plan>>>
 ) {
   try {
+    const session = await unstable_getServerSession(
+      req as NextApiRequest,
+      res as NextApiResponse,
+      authOptions(req as NextApiRequest, res as NextApiResponse)
+    );
     const { method } = req;
     if (method === 'POST') {
       const newOrderData = JSON.parse(req.body);
 
+      const googleRecaptchaResponse = await fetch(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.GOOGLE_RECAPTCHA_SECRET}&response=${newOrderData.recaptchaToken}`,
+        {
+          method: 'POST',
+        }
+      );
+      const googleRecaptchaResponseData = await googleRecaptchaResponse.json();
+      if (
+        !googleRecaptchaResponseData.success ||
+        googleRecaptchaResponseData.score < 0.5
+      ) {
+        throw new Error('Google reCAPTCHA verification failed');
+      }
+
+      // Check if user exists; if not, create user
       const userExists = await prisma.user.findUnique({
         where: {
           email: newOrderData.phoneNumber,
@@ -49,6 +55,42 @@ export default async function handler(
         user = userExists.id;
       }
 
+      if (!user) {
+        throw new Error('No user for order');
+      }
+
+      // Get planModel data for plan connections
+      const planModel = await prisma.planModel.findUnique({
+        where: {
+          id: newOrderData.planModel,
+        },
+      });
+
+      if (!planModel) {
+        throw new Error('Invalid plan model');
+      }
+
+      let { price } = planModel;
+      if (newOrderData.coupon) {
+        const coupon = await prisma.coupon.findUnique({
+          where: {
+            id: newOrderData.coupon,
+          },
+        });
+        if (coupon) {
+          if (coupon.discountType === 'PERCENT') {
+            price -= (price * coupon.discount) / 100;
+          } else if (coupon.discountType === 'AMOUNT') {
+            price -= coupon.discount;
+          }
+        }
+      }
+
+      const couponData = newOrderData.coupon
+        ? { connect: { id: newOrderData.coupon } }
+        : undefined;
+
+      // Create order with pending payment(plan)
       const plan = await prisma.plan.create({
         data: {
           planModel: {
@@ -56,7 +98,7 @@ export default async function handler(
               id: newOrderData.planModel,
             },
           },
-          price: newOrderData.price,
+          price,
           user: {
             connect: {
               id: user,
@@ -64,11 +106,9 @@ export default async function handler(
           },
           payment: {
             create: {
-              externalId: Math.floor(
-                Math.random() * (999 - 100) + 100
-              ).toString(), // TODO: Get from payment gateway
-              amount: newOrderData.price,
+              amount: price,
               status: 'PENDING',
+              coupon: couponData,
               user: {
                 connect: {
                   id: user,
@@ -78,31 +118,117 @@ export default async function handler(
           },
           Bundle: {
             connect: {
-              id: newOrderData.bundle,
+              id: planModel.bundleId,
             },
           },
           Refill: {
             connect: {
-              id: newOrderData.refill,
+              id: planModel.refillId,
             },
           },
         },
       });
 
-      res.redirect(
-        302,
-        `http://localhost:3000/login?orderId=${plan.id}&phone=${newOrderData.phoneNumber}`
+      if (!plan) {
+        throw new Error('Error creating plan');
+      }
+
+      const i4uPaymentApi = new Invoice4UClearing(
+        process.env.INVOICE4U_API_KEY!,
+        process.env.INVOICE4U_USER!,
+        process.env.INVOICE4U_PASSWORD!,
+        process.env.INVOICE4U_TEST === 'true'
       );
 
-      // console.log({headers: check.headers, status: check.status, body: await check.json()})
+      const paymentData = await i4uPaymentApi.createPaymentClearing({
+        fullName: `${newOrderData.firstName} ${newOrderData.lastName}`,
+        phone: newOrderData.phoneNumber,
+        email: newOrderData.email,
+        sum: price,
+        planId: plan.id,
+        items: [
+          {
+            name: planModel.name,
+            quantity: 1,
+            price: price.toString(),
+            taxRate: '0',
+          },
+        ],
+      });
 
-      // TODO: Create order in payment gateway
+      const clearingTraceId = paymentData.d.OpenInfo.find(
+        (item) => item.Key === 'ClearingTraceId'
+      )?.Value;
+      const paymentId = paymentData.d.OpenInfo.find(
+        (item) => item.Key === 'PaymentId'
+      )?.Value;
+      const clearingLogId = paymentData.d.OpenInfo.find(
+        (item) => item.Key === 'I4UClearingLogId'
+      )?.Value;
+
+      if (
+        !paymentData ||
+        (paymentData.d.Errors && paymentData.d.Errors.length) ||
+        !paymentData.d.ClearingRedirectUrl ||
+        !clearingTraceId ||
+        !paymentId ||
+        !clearingLogId
+      ) {
+        await prisma.payment.update({
+          where: {
+            id: plan.paymentId || undefined,
+          },
+          data: {
+            status: 'FAILED',
+          },
+        });
+        throw new Error('Error creating payment');
+      }
+
+      await prisma.payment.update({
+        where: {
+          id: plan.paymentId || undefined,
+        },
+        data: {
+          clearingTraceId,
+          paymentId,
+          I4UClearingLogId: clearingLogId,
+        },
+      });
+
+      // Check if user logged in/redirect to login
+      if (!session) {
+        res.redirect(
+          302,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/login?phone=${
+            newOrderData.phoneNumber
+          }&paymentUrl=${encodeURI(paymentData.d.ClearingRedirectUrl)}`
+        );
+      } else {
+        res.redirect(
+          302,
+          `${
+            process.env.NEXT_PUBLIC_BASE_URL
+          }/order/payment?paymentUrl=${encodeURI(
+            paymentData.d.ClearingRedirectUrl
+          )}`
+        );
+      }
+
       // TODO: Add coupon registration
-
-      // res.status(200).json(plan)
+    } else {
+      res.status(405).json({
+        name: 'METHOD_NOT_ALLOWED',
+        success: false,
+        message: 'Method not allowed',
+      });
     }
   } catch (error: unknown) {
     console.error(error);
-    res.status(500).json(error as Error);
+    res.status(500).json({
+      name: 'ORDER_CREATION_ERR',
+      success: false,
+      message: (error as Error).message,
+    });
   }
 }

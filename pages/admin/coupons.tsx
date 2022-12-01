@@ -1,14 +1,17 @@
+import { NextPageContext } from 'next';
 import React, { useEffect } from 'react';
 import { format, parse } from 'date-fns';
 import { Coupon, PlanModel } from '@prisma/client';
 import { GridColumns, GridValidRowModel } from '@mui/x-data-grid';
 import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
+import { Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
 import FormModal from '../../components/AdminTable/FormModal';
 import CouponsForm from '../../components/Coupons/CouponsForm';
+import { verifyAdmin } from '../../utils/auth';
 
 type CouponsAsAdminTableData = (GridValidRowModel & Coupon)[];
 
@@ -33,6 +36,7 @@ const Coupons = ({
     {
       field: 'id',
       headerName: 'ID',
+      width: 250,
     },
     {
       field: 'code',
@@ -75,10 +79,12 @@ const Coupons = ({
           />
         );
       },
+      width: 150,
     },
     {
       field: 'validTo',
       headerName: 'Valid To',
+      width: 150,
     },
     {
       field: 'maxUsesPerUser',
@@ -91,6 +97,15 @@ const Coupons = ({
     {
       field: 'uses',
       headerName: 'Uses',
+    },
+    {
+      field: 'planModelId',
+      headerName: 'Plan Model',
+      renderCell: (params) => {
+        if (params.value) return <Button>Go To Plan Model</Button>;
+        return null;
+      },
+      width: 200,
     },
   ];
 
@@ -109,7 +124,13 @@ const Coupons = ({
       }
     );
     const newCouponJson = await newCoupon.json();
-    setCouponsRows([...couponsRows, newCouponJson]);
+    if (!newCouponJson.success) throw new Error('Coupon creation failed');
+    const serializedCoupon = {
+      ...newCouponJson.data,
+      validFrom: format(newCouponJson.validFrom, 'dd/MM/yyyy kk:mm'),
+      validTo: format(newCouponJson.validTo, 'dd/MM/yyyy kk:mm'),
+    };
+    setCouponsRows([...couponsRows, serializedCoupon]);
     setAddRowLoading(false);
     await modal.hide();
     return { id: newCouponJson.id, columnToFocus: undefined };
@@ -143,7 +164,8 @@ const Coupons = ({
   );
 };
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context: NextPageContext) {
+  await verifyAdmin(context);
   const coupons = await prisma.coupon.findMany({
     orderBy: {
       validTo: 'desc',

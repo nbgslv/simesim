@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Prisma } from '@prisma/client';
+import { Coupon } from '@prisma/client';
 import prisma from '../../lib/prisma';
+import { ApiResponse } from '../../lib/types/api';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Prisma.CountrySelect | unknown>
+  res: NextApiResponse<ApiResponse<Partial<Coupon>>>
 ) {
   try {
     const { method } = req;
@@ -31,10 +32,22 @@ export default async function handler(
           PlanModel,
         },
       });
-      res.status(200).json(newCoupon);
+      res.status(201).json({ success: true, data: { ...newCoupon } });
+    } else {
+      res
+        .status(405)
+        .json({
+          name: 'METHOD_NOT_ALLOWED',
+          success: false,
+          message: 'Method not allowed',
+        });
     }
   } catch (error: unknown) {
     console.error(error);
-    res.status(500).json(error);
+    res.status(500).json({
+      name: 'COUPON_CREATION_ERR',
+      success: false,
+      message: (error as Error).message,
+    });
   }
 }

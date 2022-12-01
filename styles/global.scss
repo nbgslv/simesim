@@ -78,3 +78,15 @@ body.trigger-position-left #enable-toolbar-trigger {
 #enable-toolbar-trigger {
   top: -15px !important;
 }
+
+li.enable-button-highcontrast,
+li.enable-button-blackyellow,
+li.enable-button-readerview,
+li.enable-button-website-ipv6,
+li.enable-button-user-ipv6 {
+  display: none !important;
+}
+
+div#enable-modal * {
+  color: $text-color !important;
+}

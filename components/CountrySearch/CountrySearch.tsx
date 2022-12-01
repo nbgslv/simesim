@@ -54,6 +54,8 @@ const CountrySearchItem = ({
           width="30px"
           height="30px"
           alt={item.displayValue}
+          loading="eager"
+          priority
         />
       ) : null}
     </div>
@@ -152,7 +154,7 @@ const CountrySearch = ({ countriesList, onSelect }: CountrySearchProps) => {
               layout
             >
               <Image
-                src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${itemSelected.iso2?.toUpperCase()}.svg`}
+                src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${itemSelected.iso2?.toUpperCase()}.svg`}
                 placeholder="blur"
                 blurDataURL={blurDataPlaceholder}
                 layout="fill"

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Alert, Button, Form, Nav, Spinner } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import OtpInput from 'react-otp-input';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
@@ -29,13 +30,14 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
     'phoneNumber',
     'simesim_callbackUrl',
   ]);
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const router = useRouter();
 
   useEffect(() => {
     const cookiePhoneNumber = cookies.phoneNumber;
     const cookieCallbackUrl = cookies.simesim_callbackUrl;
     setPhoneNumber(cookiePhoneNumber);
-    setCallbackUrl(cookieCallbackUrl || 'http://localhost:3000');
+    setCallbackUrl(cookieCallbackUrl || 'https://simesim.co.il');
     removeCookie('simesim_callbackUrl');
     if (cookiePhoneNumber) {
       removeCookie('phoneNumber');
@@ -53,6 +55,10 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
     try {
       if (otp.length === 6 && phoneNumber) {
         setLoading(true);
+        if (!executeRecaptcha) {
+          throw new Error('Recaptcha not loaded');
+        }
+        const token = await executeRecaptcha('verify');
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/verify`,
           {
@@ -64,6 +70,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
               phoneNumber,
               token: otp,
               callbackUrl,
+              recaptchaToken: token,
             }),
             redirect: 'follow',
           }
@@ -89,7 +96,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
       email: phoneNumber,
       method: method || 'whatsapp',
       csrfToken,
-      callbackUrl: 'http://localhost:3000/login',
+      callbackUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
       json: 'true',
     };
 

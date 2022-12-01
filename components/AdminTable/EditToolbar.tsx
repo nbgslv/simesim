@@ -41,7 +41,7 @@ const EditToolbar = ({
       setLoading(true);
       if (addRow) {
         const newRowData = await addRow();
-        if (!(newRowData instanceof Error)) {
+        if (!(newRowData instanceof Error) && newRowData) {
           setRowModesModel((oldModel) => ({
             ...oldModel,
             [newRowData.id]: {

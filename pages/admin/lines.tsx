@@ -1,3 +1,4 @@
+import { NextPageContext } from 'next';
 import React from 'react';
 import { Prisma } from '@prisma/client';
 import { GridColumns, GridValidRowModel } from '@mui/x-data-grid';
@@ -6,6 +7,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
+import { verifyAdmin } from '../../utils/auth';
 
 type LineAsAdminTableData = (GridValidRowModel &
   Prisma.LineMaxAggregateOutputType)[];
@@ -93,7 +95,8 @@ const Lines = ({ lines }: LinesProps) => {
       }
     );
     const newLineJson = await newLine.json();
-    setLineRows([...lineRows, newLineJson]);
+    if (!newLineJson.success) throw new Error('Line creation failed');
+    setLineRows([...lineRows, newLineJson.data]);
     return { id: newLineJson.id, columnToFocus: undefined };
   };
 
@@ -122,7 +125,8 @@ const Lines = ({ lines }: LinesProps) => {
   );
 };
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context: NextPageContext) {
+  await verifyAdmin(context);
   const lines = await prisma.line.findMany({
     orderBy: {
       updatedAt: 'desc',

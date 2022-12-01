@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { CouponUser, Coupon } from '@prisma/client';
 import prisma from '../../../../lib/prisma';
+import { ApiResponse } from '../../../../lib/types/api';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Partial<Coupon | { message: string }>>
+  res: NextApiResponse<Partial<ApiResponse<Partial<Coupon>>>>
 ) {
   const {
     query: { id, phoneNumber },
@@ -39,21 +40,32 @@ export default async function handler(
         (coupon.maxUsesPerUser < userUsages.length + 1 ||
           (coupon.maxUsesTotal > 0 && coupon.maxUsesTotal <= coupon.uses + 1))
       ) {
-        res.status(400).json({ message: 'הקופון אזל' });
+        res.status(400).json({ success: false, message: 'הקופון אזל' });
       } else {
-        res.status(200).json(coupon);
+        res.status(200).json({
+          success: true,
+          data: {
+            id: coupon.id,
+            discountType: coupon.discountType,
+            discount: coupon.discount,
+          },
+        });
       }
     } else if (
       coupon &&
       (coupon.validFrom > new Date() || coupon.validTo < new Date())
     ) {
-      res.status(400).json({ message: 'פג תוקף' });
+      res.status(400).json({ success: false, message: 'פג תוקף' });
     } else {
-      res.status(404).json({ message: 'הקופון לא קיים' });
+      res.status(404).json({ success: false, message: 'הקופון לא קיים' });
     }
-  } else if (method === 'PUT') {
-    // Update Draft Order
-  } else if (method === 'DELETE') {
-    // Delete Draft Order
+  } else {
+    res
+      .status(405)
+      .json({
+        name: 'METHOD_NOT_ALLOWED',
+        success: false,
+        message: 'Method not allowed',
+      });
   }
 }

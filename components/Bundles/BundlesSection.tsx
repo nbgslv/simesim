@@ -1,5 +1,4 @@
-import { GridRowId } from '@mui/x-data-grid';
-import { Country, Bundle, Refill, Prisma } from '@prisma/client';
+import { Country, PlanModel, Prisma } from '@prisma/client';
 import React, { useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import Lottie from 'react-lottie';
@@ -13,8 +12,8 @@ import OrderModal from '../Order/OrderModal';
 
 type BundlesSectionProps = {
   countriesList: Country[];
-  bundlesList: (Bundle &
-    Prisma.BundleGetPayload<{ select: { refills: true } }>)[];
+  bundlesList: (PlanModel &
+    Prisma.PlanModelGetPayload<{ select: { bundle: true } }>)[];
 };
 
 const BundlesSection = ({
@@ -25,8 +24,8 @@ const BundlesSection = ({
     selectedCountry,
     setSelectedCountry,
   ] = useState<ExtendedCountry | null>(null);
-  const [selectedBundle, setSelectedBundle] = useState<GridRowId | null>(null);
-  const [selectedRefill, setSelectedRefill] = useState<Refill | null>(null);
+  const [selectedBundle, setSelectedBundle] = useState<string | null>(null);
+  const [filteredBundles, setFilteredBundles] = useState<PlanModel[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
 
@@ -36,31 +35,30 @@ const BundlesSection = ({
       setCurrentStep(1);
       if (country !== selectedCountry) {
         setSelectedBundle(null);
-        setSelectedRefill(null);
+        setFilteredBundles(
+          bundlesList.filter((bundle) =>
+            bundle.bundle.coverage.includes(country.name as string)
+          )
+        );
       }
     } else {
       setCurrentStep(0);
       setSelectedBundle(null);
-      setSelectedRefill(null);
+      setFilteredBundles([]);
     }
   };
 
-  const handleRefillSelect = (
-    refill: Refill | null,
-    bundleId: GridRowId | null
-  ) => {
+  const handleBundleSelect = (bundleId: string | null) => {
     setSelectedBundle(bundleId);
-    setSelectedRefill(refill);
-    if (refill && bundleId) {
+    if (bundleId) {
       setCurrentStep(2);
     } else {
       setCurrentStep(1);
     }
   };
 
-  const handleRefillReset = () => {
+  const handleBundleReset = () => {
     setSelectedBundle(null);
-    setSelectedRefill(null);
     setCurrentStep(1);
   };
 
@@ -93,9 +91,9 @@ const BundlesSection = ({
                 </div>
                 <div className="h-100">
                   <BundlesScroll
-                    bundlesList={bundlesList}
-                    setRefill={handleRefillSelect}
-                    resetRefill={handleRefillReset}
+                    bundlesList={filteredBundles}
+                    setBundle={handleBundleSelect}
+                    resetBundle={handleBundleReset}
                   />
                 </div>
               </div>
@@ -117,7 +115,6 @@ const BundlesSection = ({
                   bundle={bundlesList.find(
                     (bundle) => bundle.id === selectedBundle
                   )}
-                  refill={selectedRefill}
                 />
               </>
             ) : null}

@@ -33,7 +33,10 @@ const AdminHeader = () => (
         <Nav.Link eventKey="/users" href="/admin/users">
           משתמשים
         </Nav.Link>
-        <Nav.Link eventKey="/settings" href="/admin/main">
+        <Nav.Link eventKey="/inquiries" href="/admin/users">
+          פניות
+        </Nav.Link>
+        <Nav.Link disabled eventKey="/settings" href="/admin/main">
           הגדרות
         </Nav.Link>
       </Nav>

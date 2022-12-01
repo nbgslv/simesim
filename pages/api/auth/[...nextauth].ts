@@ -4,7 +4,7 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import otpGenerator from 'otp-generator';
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '../../../lib/prisma';
-import TwilioApi, { Channel } from '../../../utils/api/sevices/twilio/twilio';
+import TwilioApi, { Channel } from '../../../utils/api/services/twilio/twilio';
 
 const twilioApi = new TwilioApi(
   process.env.TWILIO_ACCOUNT_SID!,
@@ -25,6 +25,22 @@ export const authOptions = (
       sendVerificationRequest: async ({ identifier: phone, token }) => {
         const { body } = req;
         let { method } = body;
+        const { recaptchaToken } = body;
+
+        const googleRecaptchaResponse = await fetch(
+          `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.GOOGLE_RECAPTCHA_SECRET}&response=${recaptchaToken}`,
+          {
+            method: 'POST',
+          }
+        );
+        const googleRecaptchaResponseData = await googleRecaptchaResponse.json();
+        if (
+          !googleRecaptchaResponseData.success ||
+          googleRecaptchaResponseData.score < 0.5
+        ) {
+          throw new Error('Google reCAPTCHA verification failed');
+        }
+
         if (method) {
           if (method === 'sms') {
             method = Channel.SMS;

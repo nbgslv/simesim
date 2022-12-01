@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Alert, Container } from 'react-bootstrap';
+import { Alert, Button, Container } from 'react-bootstrap';
 import { useRouter } from 'next/router';
 import MainLayout from '../components/Layouts/MainLayout';
 import styles from '../styles/error.module.scss';
@@ -20,6 +20,9 @@ const Error = () => {
       } else if (router.query.error === 'Verification') {
         setAlertVariant('danger');
         setAlertMessage('קוד האימות שהזנת שגוי, נסה שנית');
+      } else if (router.query.error === 'Order') {
+        setAlertVariant('danger');
+        setAlertMessage('משהו השתבש עם קליטת ההזמנה. מציעים לבדוק עם התמיכה.');
       } else {
         setAlertVariant('danger');
         setAlertMessage('אירעה שגיאה, נסה שנית');
@@ -31,6 +34,9 @@ const Error = () => {
     <MainLayout hideJumbotron>
       <Container className={styles.container}>
         <Alert variant={alertVariant}>{alertMessage}</Alert>
+        <Button variant="primary" href="/">
+          חזרה לדף הבית
+        </Button>
       </Container>
     </MainLayout>
   );

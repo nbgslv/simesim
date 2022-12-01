@@ -14,9 +14,11 @@ import {
   Row,
   Spinner,
 } from 'react-bootstrap';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { AnimatePresence, motion } from 'framer-motion';
 import text from '../lib/content/text.json';
 import styles from '../styles/contact.module.scss';
 import MainLayout from '../components/Layouts/MainLayout';
@@ -24,16 +26,28 @@ import Input from '../components/Input/Input';
 
 const schema = yup.object().shape({
   name: yup.string(),
-  phone: yup.string().length(10),
-  email: yup.string().email().required(),
-  message: yup.string().required(),
+  phone: yup.string().test('phone-optional', 'שדה חובה', (phone) => {
+    console.log(phone);
+    if (phone) {
+      return phone.length === 10;
+    }
+    return true;
+  }),
+  email: yup.string().email('דוא"ל לא תקין').required('שדה חובה'),
+  message: yup.string().required('שדה חובה'),
 });
 
 const Contact = () => {
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
   const [error, setError] = React.useState(false);
-  const { register, control, handleSubmit } = useForm({
+  const { executeRecaptcha } = useGoogleReCaptcha();
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     mode: 'onBlur',
     reValidateMode: 'onChange',
     resolver: yupResolver(schema),
@@ -48,17 +62,25 @@ const Contact = () => {
   const submitForm = async (data: any) => {
     try {
       setLoading(true);
-      const inquiryId = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/inquiry`,
+      if (!executeRecaptcha) {
+        throw new Error('Recaptcha not loaded');
+      }
+      const token = await executeRecaptcha('contact');
+      const newInquiry = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/contact`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify({
+            ...data,
+            recaptchaToken: token,
+          }),
         }
       );
-      if (inquiryId) {
+      const newInquiryJson = await newInquiry.json();
+      if (newInquiryJson.success) {
         setSuccess(true);
       }
     } catch (e) {
@@ -109,20 +131,26 @@ const Contact = () => {
                   </Col>
                 </Row>
               </Col>
-              <Col className="h-100 d-flex align-items-center">
-                {success && (
-                  <Alert variant="success" className="w-100 text-center">
-                    {text.contact.success}
-                  </Alert>
-                )}
-                {error && (
-                  <Alert variant="danger" className="w-100 text-center">
-                    {text.contact.error}
-                  </Alert>
-                )}
+              <Col className="h-100 w-100 d-flex align-items-center justify-content-center flex-column">
+                <AnimatePresence>
+                  {success && (
+                    <motion.div layout>
+                      <Alert variant="success" className="w-100 text-center">
+                        {text.contact.success}
+                      </Alert>
+                    </motion.div>
+                  )}
+                  {error && (
+                    <motion.div>
+                      <Alert variant="danger" className="w-100 text-center">
+                        {text.contact.error}
+                      </Alert>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 {!error && !success && (
                   <>
-                    <Row>
+                    <Row className="d-flex flex-column">
                       <Form as={Col}>
                         <Form.Group>
                           <Form.Label>{text.contact.name}</Form.Label>
@@ -181,7 +209,11 @@ const Contact = () => {
                             {...register('message')}
                             as="textarea"
                             className={styles.textArea}
+                            isInvalid={!!errors.message}
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {errors.message?.message}
+                          </Form.Control.Feedback>
                         </Form.Group>
                       </Form>
                     </Row>

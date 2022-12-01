@@ -1,10 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Prisma, Country } from '@prisma/client';
 import prisma from '../../lib/prisma';
+import { ApiResponse } from '../../lib/types/api';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Prisma.CountrySelect | unknown>
+  res: NextApiResponse<
+    ApiResponse<
+      { countries: Partial<Country>[] } | Partial<Country> | Prisma.BatchPayload
+    >
+  >
 ) {
   try {
     const { method } = req;
@@ -18,7 +23,7 @@ export default async function handler(
           translation: true,
         },
       });
-      res.status(200).json(countries);
+      res.status(200).json({ success: true, data: { countries } });
     } else if (method === 'PUT') {
       const {
         body: { id, translation, lockTranslation, show },
@@ -33,7 +38,7 @@ export default async function handler(
           show,
         },
       });
-      res.status(200).json(update);
+      res.status(200).json({ success: true, data: update });
     } else if (method === 'DELETE') {
       const {
         body: { id },
@@ -48,10 +53,22 @@ export default async function handler(
           },
         },
       });
-      res.status(200).json(deleted);
+      res.status(200).json({ success: true, data: deleted });
+    } else {
+      res
+        .status(405)
+        .json({
+          name: 'METHOD_NOT_ALLOWED',
+          success: false,
+          message: 'Method not allowed',
+        });
     }
   } catch (error: unknown) {
     console.error(error);
-    res.status(500).json(error);
+    res.status(500).json({
+      name: 'COUNTRY_API_ERR',
+      success: false,
+      message: (error as Error).message,
+    });
   }
 }

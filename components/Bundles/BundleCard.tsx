@@ -1,52 +1,78 @@
-import { GridRowId } from '@mui/x-data-grid';
-import React from 'react';
-import { Card, ListGroup } from 'react-bootstrap';
-import { Bundle, Refill, Prisma } from '@prisma/client';
+import React, { useEffect } from 'react';
+import { Card } from 'react-bootstrap';
+import { PlanModel } from '@prisma/client';
+import { motion, useAnimationControls } from 'framer-motion';
 import styles from './BundleCard.module.scss';
 
 const BundleCard = ({
   bundle,
-  setRefill,
+  setBundle,
 }: {
-  bundle: Bundle & Prisma.BundleGetPayload<{ select: { refills: true } }>;
-  setRefill: (refill: Refill | null, bundleId: GridRowId | null) => void;
+  bundle: PlanModel | undefined;
+  setBundle: (planModelId: string | null) => void;
 }) => {
-  const [chosenRefill, setChosenRefill] = React.useState<number>(-1);
+  const [chosenPlanModel, setChosenPlanModel] = React.useState<string>('');
+  const controls = useAnimationControls();
 
-  const handleRefillSelect = (index: number) => {
-    if (chosenRefill === index) {
-      setChosenRefill(-1);
-      setRefill(null, null);
+  const variants = {
+    start: {
+      scale: [1, 1.1, 1],
+      transition: {
+        type: 'spring',
+        duration: 3,
+        repeat: Infinity,
+      },
+    },
+  };
+
+  useEffect(() => {
+    if (bundle) {
+      controls.start('start');
+    }
+  }, []);
+
+  const handlePlanModelSelect = (id: string) => {
+    if (chosenPlanModel === id) {
+      setChosenPlanModel('');
+      setBundle(null);
+      controls.start('start');
     } else {
-      setChosenRefill(index);
-      setRefill(bundle.refills[index], bundle.id);
+      setChosenPlanModel(id);
+      setBundle(id);
+      controls.stop();
     }
   };
 
+  if (!bundle) return null;
+
   return (
-    <Card className={styles.bundleCardMain}>
-      <Card.Body>
-        <Card.Title className={styles.bundleCardTitle}>
-          {bundle.name}
-        </Card.Title>
-        <Card.Text className={styles.bundleCardText}>
-          {bundle.description}
-        </Card.Text>
-        <ListGroup>
-          {bundle.refills.map((refill, index) => (
-            <ListGroup.Item
-              key={`${bundle.id}-${refill.title}`}
-              className={`${styles.bundleCardListItem} ${
-                chosenRefill === index ? styles.bundleCardListItemActive : ''
-              }`}
-              onClick={() => handleRefillSelect(index)}
-            >
-              {refill.title} - {refill.price_usd + 1.2}$
-            </ListGroup.Item>
-          ))}
-        </ListGroup>
-      </Card.Body>
-    </Card>
+    <motion.div
+      whileHover={{
+        scale: 1.1,
+        boxShadow: '0px 3px 15px 5px rgba(0,0,0,0.25)',
+      }}
+      className={styles.bundleCardContainer}
+    >
+      <motion.div animate={controls} variants={variants}>
+        <Card
+          className={styles.bundleCardMain}
+          onClick={() => handlePlanModelSelect(bundle.id)}
+        >
+          <Card.Body className={styles.cardBody}>
+            <Card.Title className={styles.bundleCardTitle}>
+              {bundle.name}
+            </Card.Title>
+            <Card.Text className={styles.bundleCardText}>
+              {bundle.description}
+            </Card.Text>
+            <Card.Text className={styles.bundleCardText}>
+              {bundle.price}
+              {'\u20AA'}
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      </motion.div>
+    </motion.div>
   );
 };
 

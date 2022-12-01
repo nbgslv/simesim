@@ -1,10 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Prisma } from '@prisma/client';
+import { PlanModel } from '@prisma/client';
 import prisma from '../../lib/prisma';
+import { ApiResponse } from '../../lib/types/api';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Prisma.CountrySelect | unknown>
+  res: NextApiResponse<ApiResponse<Partial<PlanModel>>>
 ) {
   try {
     const { method } = req;
@@ -39,21 +40,31 @@ export default async function handler(
           coupons: couponsRecord,
         },
       });
-      res.status(200).json(planModel);
-    } else if (method === 'GET') {
-      // Return Order by ID
+      res.status(201).json({ success: true, data: { ...planModel } });
     } else if (method === 'PUT') {
       const { id, ...planModel } = req.body;
       const updatedPlansModel = await prisma.planModel.update({
         where: { id },
         data: planModel,
       });
-      res.status(200).json(updatedPlansModel);
+      res.status(200).json({ success: true, data: { ...updatedPlansModel } });
     } else {
-      res.status(405).json({ message: 'Method not allowed' });
+      res
+        .status(405)
+        .json({
+          name: 'METHOD_NOT_ALLOWED',
+          success: false,
+          message: 'Method not allowed',
+        });
     }
   } catch (error: unknown) {
     console.error(error);
-    res.status(500).json(error);
+    res
+      .status(500)
+      .json({
+        name: 'PLANMODEL_API_ERR',
+        success: false,
+        message: (error as Error).message,
+      });
   }
 }

@@ -1,0 +1,9 @@
+@import 'styles/variables';
+
+.closeButton {
+  color: map-get($theme-colors, 'light');
+}
+
+.submitButton {
+  color: map-get($theme-colors, 'light');
+}

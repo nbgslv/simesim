@@ -1,8 +1,37 @@
 @import 'styles/variables';
 
+.bundleCardContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $background-color;
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  transform: translateX(50%) translateY(-50%) !important;
+  width: 17rem;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
 .bundleCardMain {
-  background-color: map-get($theme-colors, 'light');
+  background-color: map-get($theme-colors, 'orange');
+  border-radius: 25rem;
+  width: 17rem;
+  height: 17rem;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
   width: 100%;
+
+  :global * {
+    color: $background-color !important;
+  }
 }
 
 .bundleCardTitle {

@@ -146,7 +146,7 @@ function CustomNavbar({
               alt="Logo image"
               layout="fixed"
               width={65}
-              height={35}
+              height={32}
             />
           </Navbar.Brand>
         </Link>

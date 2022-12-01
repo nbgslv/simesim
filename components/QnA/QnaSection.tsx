@@ -73,6 +73,7 @@ const QnaSection = () => (
         layout="responsive"
         width={500}
         height={300}
+        priority
       />
     </motion.div>
   </Section>

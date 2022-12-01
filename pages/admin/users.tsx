@@ -1,3 +1,4 @@
+import { NextPageContext } from 'next';
 import React from 'react';
 import { Prisma } from '@prisma/client';
 import { GridColumns, GridRowId, GridValidRowModel } from '@mui/x-data-grid';
@@ -6,6 +7,7 @@ import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
+import { verifyAdmin } from '../../utils/auth';
 
 type UserAsAdminTableData = (GridValidRowModel &
   Prisma.UserMaxAggregateOutputType)[];
@@ -22,14 +24,22 @@ const Users = ({ users }: UsersProps) => {
     {
       field: 'id',
       headerName: 'ID',
+      width: 250,
     },
     {
       field: 'email',
-      headerName: 'Email',
+      headerName: 'Phone',
+      editable: true,
     },
     {
-      field: 'name',
-      headerName: 'Name',
+      field: 'emailEmail',
+      headerName: 'Email',
+      width: 200,
+      editable: true,
+    },
+    {
+      field: 'firstName',
+      headerName: 'First Name',
       editable: true,
     },
     {
@@ -42,25 +52,34 @@ const Users = ({ users }: UsersProps) => {
       headerName: 'Plans',
     },
     {
-      field: 'phone',
-      headerName: 'Phone',
-      editable: true,
+      field: 'payments',
+      headerName: 'Payments History',
     },
     {
-      field: 'Payment',
-      headerName: 'Payment',
+      field: 'role',
+      headerName: 'Role',
+      editable: true,
+      type: 'singleSelect',
+      valueOptions: ['ADMIN', 'USER'],
+    },
+    {
+      field: 'emailVerified',
+      headerName: 'Verified',
     },
     {
       field: 'createdAt',
       headerName: 'Created At',
+      width: 150,
     },
     {
       field: 'updatedAt',
       headerName: 'Updated At',
+      width: 150,
     },
     {
       field: 'lastLogin',
       headerName: 'Last Login',
+      width: 150,
     },
   ];
 
@@ -76,7 +95,8 @@ const Users = ({ users }: UsersProps) => {
       }
     );
     const newUserJson = await newUser.json();
-    setUserRows([...userRows, newUserJson]);
+    if (!newUserJson.success) throw new Error('User creation failed');
+    setUserRows([...userRows, newUserJson.data]);
     return { id: newUserJson.id, columnToFocus: 'firstName' };
   };
 
@@ -91,7 +111,8 @@ const Users = ({ users }: UsersProps) => {
         body: JSON.stringify({ ids }),
       }
     );
-    await deleteCount.json();
+    const deleteJson = await deleteCount.json();
+    if (!deleteJson.success) throw new Error('User deletion failed');
     setUserRows(userRows.filter((user) => !ids.includes(user.id!)));
   };
 
@@ -121,10 +142,11 @@ const Users = ({ users }: UsersProps) => {
   );
 };
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context: NextPageContext) {
+  await verifyAdmin(context);
   const users = await prisma.user.findMany({
     include: {
-      Payment: true,
+      payments: true,
     },
     orderBy: {
       updatedAt: 'desc',
@@ -136,6 +158,7 @@ export async function getServerSideProps() {
     createdAt: format(user.createdAt, 'dd/MM/yy kk:mm'),
     updatedAt: format(user.updatedAt, 'dd/MM/yy kk:mm'),
     lastLogin: user.lastLogin ? format(user.lastLogin, 'dd/MM/yy kk:mm') : null,
+    emailVerified: user.emailVerified ? 'Yes' : 'No',
   }));
 
   return {

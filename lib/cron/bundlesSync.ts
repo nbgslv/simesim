@@ -1,6 +1,6 @@
-import KeepGoApi from '../../utils/api/sevices/keepGo/api';
+import KeepGoApi from '../../utils/api/services/keepGo/api';
 import prisma from '../prisma';
-import { Bundle, Refill } from '../../utils/api/sevices/keepGo/types';
+import { Bundle, Refill } from '../../utils/api/services/keepGo/types';
 
 const getBundles = async () => {
   const keepGoApi = new KeepGoApi(

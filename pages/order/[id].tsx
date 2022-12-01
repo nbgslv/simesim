@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { Spinner } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import styles from './Checkout.module.scss';
+import styles from '../../styles/Checkout.module.scss';
 import MainLayout from '../../components/Layouts/MainLayout';
 
 const Checkout = () => {
@@ -14,35 +14,40 @@ const Checkout = () => {
   useEffect(() => {
     if (id) {
       (async () => {
-        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/order/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            payment: {
-              status: 'PAID',
-              invoice: '123456789', // TODO: generate invoice number/link
-              paymentMethod: {
-                token: '123456789', // TODO: get from payment gateway, if credit card saved
-                cardType: 'VISA', // TODO: get from payment gateway
-                expMonth: '12', // TODO: get from payment gateway
-                expYear: '2022', // TODO: get from payment gateway
-                last4: '1234', // TODO: get from payment gateway
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/order/${id}`,
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
               },
-            },
-          }),
-        });
+              body: JSON.stringify({
+                payment: {
+                  status: 'PAID',
+                },
+              }),
+            }
+          );
+          const responseJson = await response.json();
+          if (!responseJson.success) {
+            await router.push('/error?error=Order');
+          }
+        } catch (error) {
+          console.error(error);
+          await router.push('/error?error=Order');
+        } finally {
+          setPageLoading(false);
+        }
       })();
-      setPageLoading(false);
     }
   }, [id]);
 
   return (
     <MainLayout hideJumbotron>
       {pageLoading ? (
-        <div>
-          <Spinner animation="border" role="status" />
+        <div className={styles.main}>
+          <Spinner animation="border" role="status" style={{ color: '#000' }} />
         </div>
       ) : (
         <div className={styles.main}>

@@ -56,6 +56,7 @@ const Header = ({ hideJumbotron = false }: { hideJumbotron?: boolean }) => {
                     layout="fixed"
                     width={300}
                     height={55}
+                    priority
                   />
                 </div>
                 <p className="mt-4">{text.home.coverText}</p>

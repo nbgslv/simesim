@@ -1,0 +1,45 @@
+@import "styles/variables";
+
+.main {
+  :global * {
+    color: $text-color;
+  }
+}
+
+.active {
+  fill: map-get($theme-colors, 'danger');
+  width: 150%;
+  stroke: black;
+  stroke-width: .5px;
+  cursor: pointer;
+}
+
+.container {
+  height: 100%;
+}
+
+.mapContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+
+  :global * {
+    color: #fff;
+  }
+}
+
+.tooltipContainer {
+  text-align: center;
+  color: #fff !important;
+  border-radius: 5rem;
+  background-color: map-get($theme-colors, 'info');
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.countryNames {
+  text-align: center;
+}

@@ -21,15 +21,23 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
   const router = useRouter();
 
   const handleLogin = async () => {
-    if (phoneNumber.length === 10) {
-      setLoading(true);
-      setCookie('phoneNumber', phoneNumber);
-      setCookie('simesim_callbackUrl', callbackUrl || 'http://localhost:3000');
-      await signIn('email', {
-        email: phoneNumber,
-        callbackUrl: callbackUrl || 'http://localhost:3000',
-      });
-      setLoading(false);
+    try {
+      if (phoneNumber.length === 10) {
+        setLoading(true);
+        setCookie('phoneNumber', phoneNumber);
+        setCookie(
+          'simesim_callbackUrl',
+          callbackUrl || 'https://simesim.co.il'
+        );
+        await signIn('email', {
+          email: phoneNumber,
+          callbackUrl: callbackUrl || 'https://simesim.co.il',
+        });
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+      await router.push('/login?error=Default');
     }
   };
 
@@ -47,9 +55,14 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
       } else if (router.query.error === 'Default') {
         setAlertVariant('danger');
         setAlertMessage('אירעה שגיאה, נסה שנית');
+      } else {
+        setAlertVariant('danger');
+        setAlertMessage('אירעה שגיאה, נסה שנית');
       }
-    } else if (router.query.orderId && router.query.phone) {
-      setCallbackUrl(`http://localhost:3000/order/${router.query.orderId}`);
+    } else if (router.query.phone && router.query.paymentUrl) {
+      setCallbackUrl(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/order/payment?paymentUrl=${router.query.paymentUrl}`
+      );
       setPhoneNumber(router.query.phone as string);
     }
   }, []);
@@ -101,6 +114,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
               disabled={loading}
               className={styles.button}
               variant="primary"
+              type="submit"
               onClick={() => handleLogin()}
             >
               {loading ? (
