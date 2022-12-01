@@ -15,7 +15,9 @@ export default async function handler(
         price,
         user,
         allowRefill,
+        // eslint-disable-next-line
         createLine,
+        // eslint-disable-next-line
         sendPayment,
         payment: paymentData,
       } = req.body;
@@ -66,22 +68,18 @@ export default async function handler(
       });
       res.status(200).json({ success: true, data: { ...deleteCount } });
     } else {
-      res
-        .status(405)
-        .json({
-          name: 'METHOD_NOT_ALLOWED',
-          success: false,
-          message: 'Method not allowed',
-        });
+      res.status(405).json({
+        name: 'METHOD_NOT_ALLOWED',
+        success: false,
+        message: 'Method not allowed',
+      });
     }
   } catch (error: unknown) {
     console.error(error);
-    res
-      .status(500)
-      .json({
-        name: 'PLAN_API_ERR',
-        success: false,
-        message: (error as Error).message,
-      });
+    res.status(500).json({
+      name: 'PLAN_API_ERR',
+      success: false,
+      message: (error as Error).message,
+    });
   }
 }

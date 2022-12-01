@@ -27,7 +27,6 @@ import Input from '../components/Input/Input';
 const schema = yup.object().shape({
   name: yup.string(),
   phone: yup.string().test('phone-optional', 'שדה חובה', (phone) => {
-    console.log(phone);
     if (phone) {
       return phone.length === 10;
     }

@@ -36,7 +36,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
         setLoading(false);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       await router.push('/login?error=Default');
     }
   };

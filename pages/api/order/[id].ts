@@ -40,6 +40,7 @@ export default async function handler(
       const clearingLog = await i4uApi.getClearingLog(
         plan.payment.I4UClearingLogId as string
       );
+      // eslint-disable-next-line no-console
       console.log({ clearingLog });
       if (!clearingLog) {
         throw new Error('No clearing log found');

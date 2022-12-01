@@ -14,7 +14,6 @@ const RefillsAdminModal = ({
   refills,
   show,
 }: RefillsAdminModalProps) => {
-  console.log({ refills });
   if (!refills || refills.length === 0) return null;
   return (
     <Modal
