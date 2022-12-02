@@ -97,7 +97,7 @@ const Users = ({ users }: UsersProps) => {
     const newUserJson = await newUser.json();
     if (!newUserJson.success) throw new Error('User creation failed');
     setUserRows([...userRows, newUserJson.data]);
-    return { id: newUserJson.id, columnToFocus: 'firstName' };
+    return { id: newUserJson.data.id, columnToFocus: 'firstName' };
   };
 
   const handleDeleteRows = async (ids: GridRowId[]) => {

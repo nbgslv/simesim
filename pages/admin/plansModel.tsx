@@ -213,7 +213,7 @@ const PlansModel = ({
         if (!newPlanModelJson.success)
           throw new Error('Plan Model creation failed');
         setPlansRows([...plansRows, newPlanModelJson.data]);
-        return { id: newPlanModelJson.id, columnToFocus: undefined };
+        return { id: newPlanModelJson.data.id, columnToFocus: undefined };
       }
       throw new Error('No data');
     } catch (e) {

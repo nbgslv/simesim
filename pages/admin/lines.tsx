@@ -97,7 +97,7 @@ const Lines = ({ lines }: LinesProps) => {
     const newLineJson = await newLine.json();
     if (!newLineJson.success) throw new Error('Line creation failed');
     setLineRows([...lineRows, newLineJson.data]);
-    return { id: newLineJson.id, columnToFocus: undefined };
+    return { id: newLineJson.data.id, columnToFocus: undefined };
   };
 
   const showModal = async () => {

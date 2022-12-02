@@ -133,7 +133,7 @@ const Coupons = ({
     setCouponsRows([...couponsRows, serializedCoupon]);
     setAddRowLoading(false);
     await modal.hide();
-    return { id: newCouponJson.id, columnToFocus: undefined };
+    return { id: newCouponJson.data.id, columnToFocus: undefined };
   };
 
   const showModal = async (): Promise<

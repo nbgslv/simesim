@@ -107,7 +107,7 @@ const Plans = ({ plans, plansModel, payments, users }: PlansProps) => {
     setPlansRows([...plansRows, newPlanJson.data]);
     setAddRowLoading(false);
     await modal.hide();
-    return { id: newPlanJson.id, columnToFocus: undefined };
+    return { id: newPlanJson.data.id, columnToFocus: undefined };
   };
 
   const showModal = async (): Promise<

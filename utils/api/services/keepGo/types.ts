@@ -1,15 +1,19 @@
-type Line = {
+export type Line = {
   iccid: string;
   productId: string;
-  deactivationDate: string;
-  expiredAt: string;
-  allowedUsageKb: number;
-  remainingUsageKb: number;
-  remainingDays: number;
+  deactivation_date: string;
+  expired_at: string;
+  allowed_usage_kb: number;
+  remaining_usage_kb: number;
+  remaining_days: number;
+  auto_refill_turned_on: boolean;
+  auto_refill_amount_mb: number;
+  auto_refill_price: number;
+  auto_refill_currency: string;
   status: number;
   bundle: string;
   notes: string;
-  dataBundles?: [DataBundle];
+  dataBundles?: DataBundle[];
 };
 
 type Pagination = {
@@ -55,13 +59,13 @@ type FilterData = {
   autoRefillsStatusId: [string];
 };
 
-type CreateLine = {
+export type CreateLine = {
   iccid: string;
-  qrCode: string;
-  lpaCode: string;
+  qr_code: string;
+  lpa_code: string;
 };
 
-type LineDetails = Omit<Line, 'expiredAt'> & {
+export type LineDetails = Omit<Line, 'expiredAt'> & {
   msisdn: string;
   autoRefillTurnedOn: number;
   autoRefillAmountMb: string;
@@ -100,7 +104,7 @@ export type KeepGoResponseParams = {
   ack: string;
   sim_cards?: [Line];
   filters?: [FilterData];
-  sim_card?: [LineDetails] | CreateLine;
+  sim_card?: LineDetails[] | Line | CreateLine;
   available_refills?: [Refill];
   transactions?: Transactions;
   products_types?: [string];

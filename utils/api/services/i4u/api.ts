@@ -3,6 +3,7 @@ import {
   CompanyClearing,
   CreateCreditClearingRequestResponse,
   CreatePaymentClearingParams,
+  GetClearingLogParamsResponse,
   GetClearingLogResponse,
 } from './types';
 
@@ -196,7 +197,7 @@ export default class Invoice4UClearing {
 
   public async getClearingLogByParams(
     paymentId: string
-  ): Promise<GetClearingLogResponse> {
+  ): Promise<GetClearingLogParamsResponse> {
     try {
       if (!this.token) {
         throw new Error('You must verify your login first');

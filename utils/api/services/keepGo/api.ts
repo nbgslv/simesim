@@ -46,6 +46,7 @@ export default class KeepGoApi {
       );
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -59,6 +60,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -72,6 +74,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -90,6 +93,7 @@ export default class KeepGoApi {
       );
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -103,13 +107,14 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
 
   public async createLine(data: {
     refillMb: number;
-    refillDays: number;
+    refillDays: number | null;
     bundleId: number;
   }): Promise<KeepGoResponse | Error> {
     try {
@@ -127,6 +132,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -149,6 +155,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -170,6 +177,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -196,6 +204,7 @@ export default class KeepGoApi {
       );
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -209,6 +218,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -222,6 +232,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -235,6 +246,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -255,6 +267,7 @@ export default class KeepGoApi {
       );
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -268,6 +281,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -281,6 +295,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -294,6 +309,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }
@@ -307,6 +323,7 @@ export default class KeepGoApi {
       });
       return await response.json();
     } catch (error) {
+      console.error(error);
       return getErrorMessage(error);
     }
   }

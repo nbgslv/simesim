@@ -60,6 +60,8 @@ export async function getServerSideProps(context: NextPageContext) {
     });
     const serializedPlans = plans.map((plan) => ({
       ...plan,
+      startDate: format(plan.startDate, 'dd/MM/yy kk:mm'),
+      endDate: format(plan.endDate, 'dd/MM/yy kk:mm'),
       createdAt: format(plan.createdAt, 'dd/MM/yy kk:mm'),
       updatedAt: format(plan.updatedAt, 'dd/MM/yy kk:mm'),
       planModel: {

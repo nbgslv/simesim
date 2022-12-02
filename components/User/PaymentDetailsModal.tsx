@@ -75,7 +75,7 @@ const PaymentDetailsModal = ({
             {payment.paymentMethod ? (
               <Col>
                 <Row>
-                  <Col colspan={2}>
+                  <Col colspan={2} dir="ltr">
                     ****-****-****-{payment.paymentMethod.last4}
                   </Col>
                 </Row>

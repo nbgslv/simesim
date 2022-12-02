@@ -58,7 +58,7 @@ model PlanModel {
   coupons     Coupon[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  Plan        Plan[]
+  plan        Plan[]
 }
 
 model Plan {
@@ -78,30 +78,37 @@ model Plan {
   updatedAt   DateTime  @updatedAt
   line        Line?     @relation(fields: [lineId], references: [id])
   lineId      String?
-  Bundle      Bundle    @relation(fields: [bundleId], references: [id])
+  bundle      Bundle    @relation(fields: [bundleId], references: [id])
   bundleId    String
-  Refill      Refill    @relation(fields: [refillId], references: [id])
+  refill      Refill    @relation(fields: [refillId], references: [id])
   refillId    String
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+  FAILED
 }
 
 model Payment {
   id                         String         @id @default(cuid())
   clearingTraceId            String?        @unique
   paymentId                  String?        @unique
-  I4UClearingLogId           String?        @unique
-  ClearingConfirmationNumber String?        @unique
+  i4UClearingLogId           String?        @unique
+  clearingConfirmationNumber String?        @unique
   paymentDate                DateTime?
-  DocId                      String?        @unique
-  IsDocumentCreated          Boolean?       @default(false)
+  docId                      String?        @unique
+  isDocumentCreated          Boolean?       @default(false)
   amount                     Float
   paymentMethod              PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
   paymentMethodId            String?        @unique
-  status                     String
+  status                     PaymentStatus
   user                       User           @relation(fields: [userId], references: [id])
   userId                     String
   createdAt                  DateTime       @default(now())
   updatedAt                  DateTime       @updatedAt
-  Plan                       Plan?
+  plan                       Plan?
   planId                     String?        @unique
   coupon                     Coupon?        @relation(fields: [couponId], references: [id])
   couponId                   String?
@@ -117,21 +124,19 @@ model PaymentMethod {
   userId       String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  Payment      Payment?
+  payment      Payment?
   paymentId    String?  @unique
 }
 
 model Line {
   id                 String               @id @default(cuid())
-  externalId         String               @unique
   iccid              String
-  productId          String
-  deactivationDate   DateTime
-  expiredAt          DateTime
-  allowedUsageKb     Int
-  remainingUsageKb   Int
-  remainingDays      Int
-  status             Int
+  deactivationDate   DateTime?
+  expiredAt          DateTime?
+  allowedUsageKb     Int?
+  remainingUsageKb   Int?
+  remainingDays      Int?
+  status             Int?
   bundle             Bundle               @relation(fields: [bundleId], references: [id])
   bundleId           String
   notes              String
@@ -140,14 +145,14 @@ model Line {
   qrCode             String
   lpaCode            String
   msisdn             String?
-  autoRefillTurnedOn Int?
+  autoRefillTurnedOn Boolean?
   autoRefillAmountMb String?
   autoRefillPrice    Int?
   autoRefillCurrency String?
   autoRefillList     AutoRefillsLists[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
-  Plan               Plan[]
+  plan               Plan[]
 }
 
 model AutoRefillsLists {
@@ -182,9 +187,9 @@ model Bundle {
   refills     Refill[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  Plan        Plan[]
+  plan        Plan[]
   line        Line[]
-  PlanModel   PlanModel[]
+  planModel   PlanModel[]
 }
 
 model DataBundle {
@@ -220,11 +225,11 @@ model Refill {
   price_eur        Float
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
-  Plan             Plan[]
-  AutoRefillsLists AutoRefillsLists[]
+  plan             Plan[]
+  autoRefillsLists AutoRefillsLists[]
   bundle           Bundle             @relation(fields: [bundleId], references: [id])
   bundleId         String
-  PlanModel        PlanModel[]
+  planModel        PlanModel[]
 }
 
 model Transaction {
@@ -267,10 +272,10 @@ model Coupon {
   uses           Int          @default(0)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  PlanModel      PlanModel?   @relation(fields: [planModelId], references: [id])
+  planModel      PlanModel?   @relation(fields: [planModelId], references: [id])
   planModelId    String?
   users          CouponUser[]
-  Payment        Payment[]
+  payment        Payment[]
 }
 
 model CouponUser {

@@ -9,10 +9,11 @@ import MainLayout from '../../components/Layouts/MainLayout';
 const Checkout = () => {
   const [pageLoading, setPageLoading] = React.useState<boolean>(true);
   const router = useRouter();
-  const { id } = router.query;
+  const id = router.query.queryData?.[0];
+  const isSuccess = router.query.queryData?.[1].includes('success');
 
   useEffect(() => {
-    if (id) {
+    if (id && isSuccess) {
       (async () => {
         try {
           const response = await fetch(
@@ -40,8 +41,10 @@ const Checkout = () => {
           setPageLoading(false);
         }
       })();
+    } else {
+      router.push('/error?error=Order');
     }
-  }, [id]);
+  }, [id, isSuccess]);
 
   return (
     <MainLayout hideJumbotron>

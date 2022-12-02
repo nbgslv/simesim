@@ -118,12 +118,12 @@ export default async function handler(
               },
             },
           },
-          Bundle: {
+          bundle: {
             connect: {
               id: planModel.bundleId,
             },
           },
-          Refill: {
+          refill: {
             connect: {
               id: planModel.refillId,
             },
@@ -194,7 +194,7 @@ export default async function handler(
         data: {
           clearingTraceId,
           paymentId,
-          I4UClearingLogId: clearingLogId,
+          i4UClearingLogId: clearingLogId,
         },
       });
 

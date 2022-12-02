@@ -120,3 +120,7 @@ export type GetClearingLogResponse = {
     DocCreated?: boolean;
   };
 };
+
+export type GetClearingLogParamsResponse = {
+  d: GetClearingLogResponse['d'][];
+};
