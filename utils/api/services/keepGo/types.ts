@@ -10,7 +10,7 @@ export type Line = {
   auto_refill_amount_mb: number;
   auto_refill_price: number;
   auto_refill_currency: string;
-  status: number;
+  status: string;
   bundle: string;
   notes: string;
   dataBundles?: DataBundle[];
