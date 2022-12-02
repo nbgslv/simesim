@@ -142,7 +142,7 @@ export default async function handler(
           }
 
           const qrCode = await QRCode.toDataURL(
-            (newLineDetails.sim_card as CreateLine)?.qr_code
+            (newLineDetails.sim_card as CreateLine)?.lpa_code
           );
 
           const newLineRecord = await prisma.line.create({
