@@ -147,13 +147,14 @@ export default async function handler(
 
           const newLineRecord = await prisma.line.create({
             data: {
-              deactivationDate: (newLineDetails.sim_card as Line)
-                ?.deactivation_date,
+              deactivationDate:
+                (newLineDetails.sim_card as Line)?.deactivation_date || null,
               allowedUsageKb: (newLineDetails.sim_card as Line)
                 ?.allowed_usage_kb,
               remainingUsageKb: (newLineDetails.sim_card as Line)
                 ?.remaining_usage_kb,
-              remainingDays: (newLineDetails.sim_card as Line)?.remaining_days,
+              remainingDays:
+                (newLineDetails.sim_card as Line)?.remaining_days || null,
               status: (newLineDetails.sim_card as Line)?.status,
               autoRefillTurnedOn: (newLineDetails.sim_card as Line)
                 ?.auto_refill_turned_on,

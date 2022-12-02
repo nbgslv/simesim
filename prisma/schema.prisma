@@ -136,7 +136,7 @@ model Line {
   allowedUsageKb     Int?
   remainingUsageKb   Int?
   remainingDays      Int?
-  status             Int?
+  status             String?
   bundle             Bundle               @relation(fields: [bundleId], references: [id])
   bundleId           String
   notes              String
