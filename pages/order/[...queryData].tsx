@@ -10,10 +10,9 @@ const Checkout = () => {
   const [pageLoading, setPageLoading] = React.useState<boolean>(true);
   const router = useRouter();
   const id = router.query.queryData?.[0];
-  const isSuccess = router.query.queryData?.[1].includes('success');
 
   useEffect(() => {
-    if (id && isSuccess) {
+    if (id) {
       (async () => {
         try {
           const response = await fetch(
@@ -44,7 +43,7 @@ const Checkout = () => {
     } else {
       router.push('/error?error=Order');
     }
-  }, [id, isSuccess]);
+  }, [id]);
 
   return (
     <MainLayout hideJumbotron>
