@@ -12,7 +12,7 @@ export default async function handler(
     if (method === 'POST') {
       const newCouponData = req.body;
 
-      const PlanModel = newCouponData.planModel
+      const planModel = newCouponData.planModel
         ? {
             connect: {
               id: newCouponData.planModel,
@@ -29,18 +29,16 @@ export default async function handler(
           validTo: newCouponData.validTo,
           maxUsesPerUser: newCouponData.maxUsesPerUser,
           maxUsesTotal: newCouponData.maxUsesTotal,
-          PlanModel,
+          planModel,
         },
       });
       res.status(201).json({ success: true, data: { ...newCoupon } });
     } else {
-      res
-        .status(405)
-        .json({
-          name: 'METHOD_NOT_ALLOWED',
-          success: false,
-          message: 'Method not allowed',
-        });
+      res.status(405).json({
+        name: 'METHOD_NOT_ALLOWED',
+        success: false,
+        message: 'Method not allowed',
+      });
     }
   } catch (error: unknown) {
     console.error(error);

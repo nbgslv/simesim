@@ -47,12 +47,12 @@ export default async function handler(
           },
           allowRefill,
           payment,
-          Bundle: {
+          bundle: {
             connect: {
               id: existingPlanModel.bundleId,
             },
           },
-          Refill: {
+          refill: {
             connect: {
               id: existingPlanModel.refillId,
             },

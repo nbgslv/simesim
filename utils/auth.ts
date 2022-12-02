@@ -4,6 +4,7 @@ import { redirect } from 'next/dist/server/api-utils';
 import prisma from '../lib/prisma';
 import { authOptions } from '../pages/api/auth/[...nextauth]';
 
+// eslint-disable-next-line import/prefer-default-export
 export async function verifyAdmin(context: NextPageContext) {
   const session = await unstable_getServerSession(
     context.req as NextApiRequest,
@@ -14,13 +15,11 @@ export async function verifyAdmin(context: NextPageContext) {
     redirect(context.res as NextApiResponse, '/');
   }
   if (session && session.user) {
-    console.log({ session });
     const user = await prisma.user.findUnique({
       where: {
         id: session.user.id,
       },
     });
-    console.log({ user });
     if (user && user.role !== 'ADMIN') {
       redirect(context.res as NextApiResponse, '/');
     }

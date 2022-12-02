@@ -90,9 +90,9 @@ const PaymentDetailsModal = ({
                 className="w-100 mt-2"
                 variant="primary"
                 href={`https://newview.invoice4u.co.il/Views/PDF.aspx?docid=${
-                  payment.DocId as string
+                  payment.docId as string
                 }`}
-                disabled={!payment.IsDocumentCreated}
+                disabled={!payment.isDocumentCreated}
               >
                 קבלה
               </Button>
