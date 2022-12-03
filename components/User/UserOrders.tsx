@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DataGrid, GridCellParams, GridRowModel } from '@mui/x-data-grid';
 import { Plan, Prisma } from '@prisma/client';
 import { Button } from 'react-bootstrap';
+import QrModal from '../QrModal/QrModal';
 import styles from './UserOrders.module.scss';
 import gridTranslation from '../../lib/content/mui-datagrid-translation.json';
 import PaymentDetailsModal, { ExtendedPayment } from './PaymentDetailsModal';
@@ -12,12 +13,13 @@ const UserOrders = ({
   plans: (Plan &
     Prisma.PlanGetPayload<{ select: { planModel: true; line: true } }>)[];
 }) => {
-  const [plansRows, setPlansRows] = React.useState<GridRowModel[]>([]);
-  const [chosenRowPayment, setChosenRowPayment] = React.useState<
+  const [plansRows, setPlansRows] = useState<GridRowModel[]>([]);
+  const [chosenRowPayment, setChosenRowPayment] = useState<
     | (ExtendedPayment &
         Prisma.PaymentGetPayload<{ select: { paymentMethod: true } }>)
     | null
   >(null);
+  const [chosenRowQr, setChosenRowQr] = useState<string | null>(null);
 
   useEffect(() => {
     setPlansRows(
@@ -34,9 +36,7 @@ const UserOrders = ({
   }, [plans]);
 
   const handleShowQr = (qrCode: string | null) => {
-    // TODO add QR code modal
-    // eslint-disable-next-line no-console
-    console.log(qrCode);
+    setChosenRowQr(qrCode);
   };
 
   const handleShowPaymentModal = (
@@ -68,10 +68,15 @@ const UserOrders = ({
     {
       field: 'allowedUsageKb',
       headerName: 'נפח החבילה',
+      valueFormatter: ({ value }: { value: string }) =>
+        `${Math.floor(parseInt(value, 10) / 1000000)}GB`,
     },
     {
       field: 'remainingUsageKb',
       headerName: 'נפח שנותר',
+      valueFormatter: ({ value }: { value: string }) =>
+        `${Math.floor(parseInt(value, 10) / 1000000)}GB`,
+      // TODO show progress bar
     },
     {
       field: 'remainingDays',
@@ -84,8 +89,8 @@ const UserOrders = ({
         <Button
           variant="outline-primary"
           className={styles.button}
-          disabled={!params.row.qrCode}
-          onClick={() => handleShowQr(params.row.qrCode)}
+          disabled={!params.row.line.qrCode}
+          onClick={() => handleShowQr(params.row.line.qrCode)}
         >
           לצפייה
         </Button>
@@ -127,6 +132,10 @@ const UserOrders = ({
     setChosenRowPayment(null);
   };
 
+  const handleQrModalHide = () => {
+    setChosenRowQr(null);
+  };
+
   return (
     <div className={styles.main}>
       <DataGrid
@@ -148,6 +157,11 @@ const UserOrders = ({
         show={!!chosenRowPayment}
         payment={chosenRowPayment}
         handleModalHide={handlePaymentModalHide}
+      />
+      <QrModal
+        show={!!chosenRowQr}
+        handleModalHide={handleQrModalHide}
+        qrCode={chosenRowQr}
       />
     </div>
   );

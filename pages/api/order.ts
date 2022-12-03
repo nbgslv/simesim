@@ -16,6 +16,8 @@ export default async function handler(
       res as NextApiResponse,
       authOptions(req as NextApiRequest, res as NextApiResponse)
     );
+    // eslint-disable-next-line no-console
+    console.log({ session });
     const { method } = req;
     if (method === 'POST') {
       const newOrderData = JSON.parse(req.body);
@@ -93,8 +95,7 @@ export default async function handler(
       // Create order with pending payment(plan)
       const plan = await prisma.plan.create({
         data: {
-          startDate: newOrderData.startDate,
-          endDate: newOrderData.endDate,
+          status: 'ACTIVE',
           planModel: {
             connect: {
               id: newOrderData.planModel,
@@ -204,7 +205,9 @@ export default async function handler(
           302,
           `${process.env.NEXT_PUBLIC_BASE_URL}/login?phone=${
             newOrderData.phoneNumber
-          }&paymentUrl=${encodeURI(paymentData.d.ClearingRedirectUrl)}`
+          }&paymentUrl=${encodeURI(
+            paymentData.d.ClearingRedirectUrl
+          )}&total=${price}`
         );
       } else {
         res.redirect(
@@ -213,11 +216,9 @@ export default async function handler(
             process.env.NEXT_PUBLIC_BASE_URL
           }/order/payment?paymentUrl=${encodeURI(
             paymentData.d.ClearingRedirectUrl
-          )}`
+          )}&total=${price}`
         );
       }
-
-      // TODO: Add coupon registration
     } else {
       res.status(405).json({
         name: 'METHOD_NOT_ALLOWED',

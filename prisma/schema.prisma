@@ -61,26 +61,32 @@ model PlanModel {
   plan        Plan[]
 }
 
+enum PlanStatus {
+  ACTIVE
+  CANCELLED
+  PENDING
+  EXPIRED
+}
+
 model Plan {
-  id          String    @id @default(cuid())
-  friendlyId  Int       @unique @default(autoincrement())
-  planModel   PlanModel @relation(fields: [planModelId], references: [id])
+  id          String     @id @default(cuid())
+  friendlyId  Int        @unique @default(autoincrement())
+  planModel   PlanModel  @relation(fields: [planModelId], references: [id])
+  status      PlanStatus @default(ACTIVE)
   planModelId String
   price       Float
-  user        User      @relation(fields: [userId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
   userId      String
-  payment     Payment?  @relation(fields: [paymentId], references: [id])
-  paymentId   String?   @unique
-  allowRefill Boolean   @default(false)
-  startDate   DateTime
-  endDate     DateTime
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  line        Line?     @relation(fields: [lineId], references: [id])
+  payment     Payment?   @relation(fields: [paymentId], references: [id])
+  paymentId   String?    @unique
+  allowRefill Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  line        Line?      @relation(fields: [lineId], references: [id])
   lineId      String?
-  bundle      Bundle    @relation(fields: [bundleId], references: [id])
+  bundle      Bundle     @relation(fields: [bundleId], references: [id])
   bundleId    String
-  refill      Refill    @relation(fields: [refillId], references: [id])
+  refill      Refill     @relation(fields: [refillId], references: [id])
   refillId    String
 }
 

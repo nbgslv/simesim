@@ -8,6 +8,10 @@ import MainLayout from '../../components/Layouts/MainLayout';
 
 const Checkout = () => {
   const [pageLoading, setPageLoading] = React.useState<boolean>(true);
+  const [orderFriendlyId, setOrderFriendlyId] = React.useState<string | null>(
+    null
+  );
+  const [orderSuccess, setOrderSuccess] = React.useState<boolean | null>(null);
   const router = useRouter();
   const id = router.query.queryData?.[0];
 
@@ -31,7 +35,15 @@ const Checkout = () => {
           );
           const responseJson = await response.json();
           if (!responseJson.success) {
-            await router.push('/error?error=Order');
+            if (
+              responseJson.nane &&
+              responseJson.name === 'ORDER_CREATED_WITHOUT_LINE'
+            ) {
+              setOrderFriendlyId(responseJson.message);
+              setOrderSuccess(false);
+            } else {
+              await router.push('/error?error=Order');
+            }
           }
         } catch (error) {
           console.error(error);
@@ -53,9 +65,19 @@ const Checkout = () => {
         </div>
       ) : (
         <div className={styles.main}>
-          <h1>הזמנתך נקלטה בהצלחה</h1>
-          <p>פרטים מלאים על החבילה שלך ממתינים לך בדוא&quot;ל.</p>
-          <p>שתהיה לך נסיעה טובה!</p>
+          {orderSuccess ? (
+            <>
+              <h1>הזמנתך {orderFriendlyId} נקלטה בהצלחה</h1>
+              <p>פרטים מלאים על החבילה שלך ממתינים לך בדוא&quot;ל.</p>
+              <p>שתהיה לך נסיעה טובה!</p>
+            </>
+          ) : (
+            <>
+              <h1>הזמנתך {orderFriendlyId} נמצאת בתהליך קליטה</h1>
+              <p>בסיום התהליך, פרטי החבילה המלאים ישלחו בדוא&quot;ל</p>
+              <p>שתהיה לך נסיעה טובה!</p>
+            </>
+          )}
           <motion.div
             className={styles.qnaImage}
             animate={{ rotate: [0, 45, -45, 0] }}

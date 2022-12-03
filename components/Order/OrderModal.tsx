@@ -1,38 +1,25 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Col, Modal, Row, Form, Spinner } from 'react-bootstrap';
-import DatePicker, { registerLocale } from 'react-datepicker';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useForm, Controller } from 'react-hook-form';
 import 'react-datepicker/dist/react-datepicker.css';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { AnimatePresence, motion } from 'framer-motion';
-import he from 'date-fns/locale/he';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { regular, solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { useRouter } from 'next/router';
-import { Coupon, PlanModel } from '@prisma/client';
+import { Coupon, PlanModel, Prisma } from '@prisma/client';
 import styles from './OrderModal.module.scss';
 import Input from '../Input/Input';
 
 type BundlesSectionProps = {
   show: boolean;
   onHide: () => void;
-  bundle?: PlanModel;
+  bundle?: PlanModel & Prisma.PlanModelGetPayload<{ select: { refill: true } }>;
   country?: string;
 };
 
 const schema = yup.object().shape({
-  startDate: yup
-    .date()
-    .min(new Date(), 'תאריך לא תקין')
-    .required('שדה חובה')
-    .nullable(true),
-  endDate: yup
-    .date()
-    .min(yup.ref('startDate'), 'תאריך לא תקין')
-    .required('שדה חובה')
-    .nullable(true),
   firstName: yup.string().required('שדה חובה'),
   lastName: yup.string().required('שדה חובה'),
   email: yup.string().email('דוא"ל לא תקין').required('שדה חובה'),
@@ -41,17 +28,17 @@ const schema = yup.object().shape({
 });
 
 const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
-  const [price, setPrice] = React.useState<number>(0);
-  const [coupon, setCoupon] = React.useState<string>('');
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [couponSet, setCouponSet] = React.useState<string>('');
-  const [
-    couponDetails,
-    setCouponDetails,
-  ] = React.useState<Partial<Coupon> | null>(null);
-  const [couponError, setCouponError] = React.useState<string>('');
-  const [loadingCoupon, setLoadingCoupon] = React.useState<boolean>(false);
-  const [couponStatus, setCouponStatus] = React.useState<
+  const [price, setPrice] = useState<number>(0);
+  const [amountDays, setAmountDays] = useState<number>(0);
+  const [coupon, setCoupon] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [couponSet, setCouponSet] = useState<string>('');
+  const [couponDetails, setCouponDetails] = useState<Partial<Coupon> | null>(
+    null
+  );
+  const [couponError, setCouponError] = useState<string>('');
+  const [loadingCoupon, setLoadingCoupon] = useState<boolean>(false);
+  const [couponStatus, setCouponStatus] = useState<
     'valid' | 'invalid' | 'none'
   >('none');
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -60,6 +47,7 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
   useEffect(() => {
     if (bundle) {
       setPrice(bundle.price);
+      setAmountDays(bundle.refill.amount_days || 0);
     }
   }, [bundle]);
 
@@ -75,20 +63,11 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
     }
   }, [couponDetails]);
 
-  registerLocale('he', he);
-  const {
-    getValues,
-    watch,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const { watch, control, handleSubmit } = useForm({
     mode: 'onBlur',
     reValidateMode: 'onChange',
     resolver: yupResolver(schema),
     defaultValues: {
-      startDate: null,
-      endDate: null,
       firstName: '',
       lastName: '',
       email: '',
@@ -96,7 +75,6 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
       terms: false,
     },
   });
-  const startDate = watch('startDate');
   const phoneNumber = watch('phoneNumber');
 
   const handleCoupon = async () => {
@@ -249,72 +227,13 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
           </Row>
           <Row className={styles.orderModalRow}>
             <Col className={styles.omFieldTitle} lg={3}>
-              תאריכי נסיעה
+              תוקף החבילה
             </Col>
             <Col className={styles.dateInput}>
-              <Controller
-                name="startDate"
-                control={control}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <DatePicker
-                    selected={field.value}
-                    onChange={field.onChange}
-                    dateFormat="dd/MM/yyyy"
-                    placeholderText="מתאריך"
-                    minDate={new Date()}
-                    openToDate={new Date()}
-                    isClearable
-                    locale="he"
-                  />
-                )}
-              />
-              {errors.startDate && (
-                <AnimatePresence>
-                  <motion.div
-                    key={1}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className={styles.errorMessage}
-                  >
-                    {errors.startDate.message as string}
-                  </motion.div>
-                </AnimatePresence>
-              )}
-            </Col>
-            <Col className={styles.dateInput}>
-              <Controller
-                name="endDate"
-                control={control}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <DatePicker
-                    selected={field.value}
-                    onChange={field.onChange}
-                    dateFormat="dd/MM/yyyy"
-                    placeholderText="עד תאריך"
-                    minDate={getValues('startDate')}
-                    openToDate={getValues('startDate') || undefined}
-                    isClearable
-                    disabled={!startDate}
-                    locale="he"
-                  />
-                )}
-              />
-              {errors.endDate && (
-                <AnimatePresence>
-                  <motion.div
-                    key={1}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className={styles.errorMessage}
-                  >
-                    {errors.endDate.message as string}
-                  </motion.div>
-                </AnimatePresence>
-              )}
+              <FontAwesomeIcon icon={regular('circle-question')} />
+              {amountDays !== 0
+                ? `החבילה תהיה תקפה מרגע הפעלה ולמשך ${amountDays} ימים`
+                : `החבילה תהיה תקפה מרגע הפעלתה ועד שנה לאחר מכן`}
             </Col>
           </Row>
           <Row className={styles.orderModalRow}>
@@ -322,7 +241,6 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
               <Controller
                 name="firstName"
                 control={control}
-                rules={{ required: 'הזן שם פרטי' }}
                 render={({ field, fieldState }) => (
                   <Input
                     {...field}
@@ -343,7 +261,6 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
               <Controller
                 name="lastName"
                 control={control}
-                rules={{ required: 'הזן שם משפחה' }}
                 render={({ field, fieldState }) => (
                   <Input
                     {...field}
@@ -364,7 +281,6 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
               <Controller
                 name="phoneNumber"
                 control={control}
-                rules={{ required: 'הזו טלפון נייד' }}
                 render={({ field, fieldState }) => (
                   <Input
                     {...field}
@@ -386,7 +302,6 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
               <Controller
                 name="email"
                 control={control}
-                rules={{ required: 'הזן דוא"ל' }}
                 render={({ field, fieldState }) => (
                   <Input
                     {...field}

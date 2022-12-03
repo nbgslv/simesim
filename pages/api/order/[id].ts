@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { Plan } from '@prisma/client';
 import { unstable_getServerSession } from 'next-auth';
 import QRCode from 'qrcode';
+// @ts-ignore
+import MailerSend from 'mailersend';
 import prisma from '../../../lib/prisma';
 import { ApiResponse } from '../../../lib/types/api';
 import Invoice4UClearing from '../../../utils/api/services/i4u/api';
@@ -9,6 +11,7 @@ import KeepGoApi from '../../../utils/api/services/keepGo/api';
 import { CreateLine, Line } from '../../../utils/api/services/keepGo/types';
 import { authOptions } from '../auth/[...nextauth]';
 
+// eslint-disable-next-line consistent-return
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse<Partial<Plan>>>
@@ -22,6 +25,8 @@ export default async function handler(
     const { method } = req;
     if (method === 'PUT') {
       const { id } = req.query;
+
+      // Get plan, payment, refill, bundle, and user
       const plan = await prisma.plan.findUnique({
         where: {
           id: id as string,
@@ -30,11 +35,22 @@ export default async function handler(
           payment: true,
           refill: true,
           bundle: true,
+          user: true,
         },
       });
-      if (!plan || !plan.payment || !plan.refill || !plan.bundle) {
+
+      // Check if plan exists
+      if (
+        !plan ||
+        !plan.payment ||
+        !plan.refill ||
+        !plan.bundle ||
+        !plan.user
+      ) {
         throw new Error('No plan found');
       }
+
+      // *** Payment ***
       const i4uApi = new Invoice4UClearing(
         process.env.INVOICE4U_API_KEY!,
         process.env.INVOICE4U_USER!,
@@ -49,16 +65,22 @@ export default async function handler(
       );
       // eslint-disable-next-line no-console
       console.log({ clearingLog: clearingLog.d[0] });
-      if (!clearingLog || !clearingLog.d || clearingLog.d.length === 0) {
+      if (
+        !clearingLog ||
+        !clearingLog.d ||
+        !clearingLog.d[0] ||
+        clearingLog.d.length === 0
+      ) {
         throw new Error('No clearing log found');
       } else if (
-        clearingLog.d[0].Errors &&
-        clearingLog.d[0].Errors.length > 0
+        clearingLog.d[0]?.Errors &&
+        clearingLog.d[0]?.Errors.length > 0
       ) {
         console.error(clearingLog.d[0].Errors);
         throw new Error(clearingLog.d[0].Errors.toString());
       }
 
+      // Update payment and payment method
       if (plan && plan.userId === session?.user?.id) {
         if (plan.payment?.status !== 'PAID') {
           const updatedPayment = await prisma.payment.update({
@@ -87,6 +109,11 @@ export default async function handler(
             },
           });
 
+          if (!updatedPayment) {
+            throw new Error('Payment not updated');
+          }
+
+          // Handle coupon, if exists
           if (plan.payment.couponId) {
             await prisma.coupon.update({
               where: {
@@ -108,98 +135,192 @@ export default async function handler(
             });
           }
 
-          const keepGoApi = new KeepGoApi(
-            process.env.KEEPGO_BASE_URL || '',
-            process.env.KEEPGO_API_KEY || '',
-            process.env.KEEPGO_ACCESS_TOKEN || ''
-          );
-          const newLine = await keepGoApi.createLine({
-            refillMb: plan.refill.amount_mb,
-            refillDays: plan.refill.amount_days,
-            bundleId: parseInt(plan.bundle.externalId, 10),
-          });
+          // *** Line ***
+          if (!plan.lineId) {
+            const keepGoApi = new KeepGoApi(
+              process.env.KEEPGO_BASE_URL || '',
+              process.env.KEEPGO_API_KEY || '',
+              process.env.KEEPGO_ACCESS_TOKEN || ''
+            );
 
-          // eslint-disable-next-line no-console
-          console.log({ newLine });
+            // Create line
+            const newLine = await keepGoApi.createLine({
+              refillMb: plan.refill.amount_mb,
+              refillDays: plan.refill.amount_days,
+              bundleId: parseInt(plan.bundle.externalId, 10),
+            });
 
-          if (
-            !newLine ||
-            newLine instanceof Error ||
-            newLine.ack !== 'success'
-          ) {
-            throw new Error('No line created');
-          }
+            // eslint-disable-next-line no-console
+            console.log({ newLine });
 
-          const newLineDetails = await keepGoApi.getLineDetails(
-            (newLine.sim_card as CreateLine)?.iccid
-          );
+            // Instantiate email client
+            const { Recipient, EmailParams } = MailerSend;
 
-          // eslint-disable-next-line no-console
-          console.log({ newLineDetails });
+            const mailerSend = new MailerSend({
+              api_key: process.env.MAILER_SNED_API_KEY || '',
+            });
 
-          if (newLineDetails instanceof Error) {
-            throw new Error('No line details');
-          }
+            const recipients = [
+              new Recipient(
+                plan.user.emailEmail,
+                `${plan.user.firstName} ${plan.user.lastName}`
+              ),
+            ];
 
-          const qrCode = await QRCode.toDataURL(
-            (newLineDetails.sim_card as CreateLine)?.lpa_code
-          );
+            // If line wasn't created - send pending email and update plan status
+            if (
+              !newLine ||
+              newLine instanceof Error ||
+              newLine.ack !== 'success'
+            ) {
+              await prisma.plan.update({
+                where: {
+                  id: plan.id,
+                },
+                data: {
+                  status: 'PENDING',
+                },
+              });
 
-          const newLineRecord = await prisma.line.create({
-            data: {
-              deactivationDate:
-                (newLineDetails.sim_card as Line)?.deactivation_date || null,
-              allowedUsageKb: (newLineDetails.sim_card as Line)
-                ?.allowed_usage_kb,
-              remainingUsageKb: (newLineDetails.sim_card as Line)
-                ?.remaining_usage_kb,
-              remainingDays:
-                (newLineDetails.sim_card as Line)?.remaining_days || null,
-              status: (newLineDetails.sim_card as Line)?.status,
-              autoRefillTurnedOn: (newLineDetails.sim_card as Line)
-                ?.auto_refill_turned_on,
-              autoRefillAmountMb: (newLineDetails.sim_card as Line)?.auto_refill_amount_mb.toString(),
-              autoRefillPrice: (newLineDetails.sim_card as Line)
-                ?.auto_refill_price,
-              autoRefillCurrency: (newLineDetails.sim_card as Line)
-                ?.auto_refill_currency,
-              notes: (newLineDetails.sim_card as Line)?.notes,
-              iccid: (newLine.sim_card as CreateLine)?.iccid,
-              lpaCode: (newLine.sim_card as CreateLine)?.lpa_code,
-              bundle: {
-                connect: {
-                  id: plan.bundle.id,
+              const bcc = [
+                new Recipient('nbgslv@gmail.com', 'נחמן בוגוסלבסקי'),
+              ];
+              const emailParams = new EmailParams()
+                .setFrom('order@simesim.co.il')
+                .setFromName('simEsim')
+                .setRecipients(recipients)
+                .setBcc(bcc)
+                .setTemplateId(
+                  process.env.EMAIL_TEMPLATE_USER_PENDING_LINE || ''
+                )
+                .setSubject('הזמנתך מאתר שים eSim')
+                .setVariables([
+                  {
+                    email: plan.user.emailEmail,
+                    substitutions: [
+                      {
+                        var: 'fullName',
+                        value: `${plan.user.firstName} ${plan.user.lastName}`,
+                      },
+                      {
+                        var: 'orderId',
+                        value: plan.friendlyId,
+                      },
+                    ],
+                  },
+                ]);
+              await mailerSend.send(emailParams);
+
+              return res.status(200).json({
+                name: 'ORDER_CREATED_WITHOUT_LINE',
+                success: false,
+                message: plan.id,
+              });
+            }
+
+            // Get full line details and create line record
+            const newLineDetails = await keepGoApi.getLineDetails(
+              (newLine.sim_card as CreateLine)?.iccid
+            );
+
+            // eslint-disable-next-line no-console
+            console.log({ newLineDetails });
+
+            if (newLineDetails instanceof Error) {
+              throw new Error('No line details');
+            }
+
+            const qrCode = await QRCode.toDataURL(
+              (newLineDetails.sim_card as CreateLine)?.lpa_code
+            );
+
+            const newLineRecord = await prisma.line.create({
+              data: {
+                deactivationDate:
+                  (newLineDetails.sim_card as Line)?.deactivation_date || null,
+                allowedUsageKb: (newLineDetails.sim_card as Line)
+                  ?.allowed_usage_kb,
+                remainingUsageKb: (newLineDetails.sim_card as Line)
+                  ?.remaining_usage_kb,
+                remainingDays:
+                  (newLineDetails.sim_card as Line)?.remaining_days || null,
+                status: (newLineDetails.sim_card as Line)?.status,
+                autoRefillTurnedOn: (newLineDetails.sim_card as Line)
+                  ?.auto_refill_turned_on,
+                autoRefillAmountMb: (newLineDetails.sim_card as Line)?.auto_refill_amount_mb.toString(),
+                autoRefillPrice: (newLineDetails.sim_card as Line)
+                  ?.auto_refill_price,
+                autoRefillCurrency: (newLineDetails.sim_card as Line)
+                  ?.auto_refill_currency,
+                notes: (newLineDetails.sim_card as Line)?.notes,
+                iccid: (newLine.sim_card as CreateLine)?.iccid,
+                lpaCode: (newLine.sim_card as CreateLine)?.lpa_code,
+                bundle: {
+                  connect: {
+                    id: plan.bundle.id,
+                  },
+                },
+                qrCode,
+              },
+            });
+
+            await prisma.plan.update({
+              where: {
+                id: plan.id,
+              },
+              data: {
+                line: {
+                  connect: {
+                    id: newLineRecord.id,
+                  },
                 },
               },
-              qrCode,
-            },
-          });
+            });
 
-          await prisma.plan.update({
-            where: {
-              id: plan.id,
-            },
-            data: {
-              line: {
-                connect: {
-                  id: newLineRecord.id,
+            // TODO add transactions and rollbacks
+
+            // TODO: add data bundles and refills to line
+
+            // Send new order email to user
+            const emailParams = new EmailParams()
+              .setFrom('order@simesim.co.il')
+              .setFromName('simEsim')
+              .setRecipients(recipients)
+              .setTemplateId(process.env.EMAIL_TEMPLATE_USER_NEW_LINE || '')
+              .setSubject('הזמנתך מאתר שים eSim')
+              .setAttachments([
+                {
+                  content: qrCode.replace(/^data:image\/png;base64,/, ''),
+                  filename: 'qrCode.png',
+                  disposition: 'inline',
+                  id: 'qrCode',
                 },
-              },
-            },
-          });
+              ])
+              .setVariables([
+                {
+                  email: plan.user.emailEmail,
+                  substitutions: [
+                    {
+                      var: 'fullName',
+                      value: `${plan.user.firstName} ${plan.user.lastName}`,
+                    },
+                    {
+                      var: 'orderId',
+                      value: plan.friendlyId,
+                    },
+                    {
+                      var: 'amountDays',
+                      value: plan.refill.amount_days,
+                    },
+                  ],
+                },
+              ]);
 
-          // TODO add transactions and rollbacks
+            await mailerSend.send(emailParams);
 
-          // TODO: add data bundles and refills to line
-
-          // TODO - send email to user with line details
-
-          if (updatedPayment) {
             res
               .status(200)
               .json({ success: true, data: { friendlyId: plan.friendlyId } });
-          } else {
-            throw new Error('Payment failed');
           }
         } else {
           res.status(403).json({

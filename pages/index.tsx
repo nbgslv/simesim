@@ -60,6 +60,12 @@ export async function getStaticProps() {
           coverage: true,
         },
       },
+      refill: {
+        select: {
+          id: true,
+          amount_days: true,
+        },
+      },
       description: true,
       price: true,
       vat: true,

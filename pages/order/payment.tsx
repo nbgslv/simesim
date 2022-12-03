@@ -4,7 +4,10 @@ import PaymentModal from '../../components/PaymentModal/PaymentModal';
 
 const Payment = () => {
   const router = useRouter();
-  const { paymentUrl }: { paymentUrl?: string } = router.query;
+  const {
+    paymentUrl,
+    total,
+  }: { paymentUrl?: string; total?: string } = router.query;
   const [showPaymentModal, setShowPaymentModal] = React.useState<boolean>(
     false
   );
@@ -16,7 +19,11 @@ const Payment = () => {
   }, [paymentUrl]);
 
   return (
-    <PaymentModal show={showPaymentModal} paymentUrl={paymentUrl as string} />
+    <PaymentModal
+      show={showPaymentModal}
+      paymentUrl={paymentUrl as string}
+      total={total as string}
+    />
   );
 };
 

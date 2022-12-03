@@ -35,11 +35,11 @@ export default async function handler(
       }
 
       const newPlan = await prisma.plan.create({
-        // TODO add startDate and endDate
         // @ts-ignore
         data: {
           planModel,
           price,
+          status: 'ACTIVE',
           user: {
             connect: {
               id: user,

@@ -66,11 +66,16 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
         setAlertVariant('danger');
         setAlertMessage('אירעה שגיאה, נסה שנית');
       }
-    } else if (router.query.phone && router.query.paymentUrl) {
+    } else if (
+      router.query.phone &&
+      router.query.paymentUrl &&
+      router.query.total
+    ) {
       setCallbackUrl(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/order/payment?paymentUrl=${router.query.paymentUrl}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/order/payment?paymentUrl=${router.query.paymentUrl}&total=${router.query.total}`
       );
       setPhoneNumber(router.query.phone as string);
+      handleLogin();
     }
   }, [router.query]);
 

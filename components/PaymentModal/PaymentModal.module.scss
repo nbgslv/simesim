@@ -16,3 +16,10 @@
   border: none;
   overflow: auto;
 }
+
+.paymentLogo {
+  position: absolute;
+  top: 62%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
