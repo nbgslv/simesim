@@ -14,6 +14,11 @@
     font-weight: 100;
     font-size: 0.7rem;
   }
+
+  :global strong {
+    color: $text-color !important;
+    font-weight: 800 !important;
+  }
 }
 
 .orderModalRow {
@@ -35,6 +40,7 @@
 .bundleText {
   margin-left: 1rem;
   font-weight: 200;
+  font-size: 0.81rem;
 }
 
 .bundleTextPrice {
@@ -48,32 +54,21 @@
 
 .countryText {
   font-weight: 200;
+  font-size: 0.81rem;
 }
 
 .dateInput {
   width: 45%;
-  :global .react-datepicker__input-container input {
-    width: 100%;
-    background-color: $background-color;
-    color: $text-color;
-    position: relative;
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-    padding: 0.5rem;
-    border: 3px solid $secondary-color;
-    border-radius: 0.5rem;
-    height: 3rem;
-  }
 
-  :global .react-datepicker__close-icon {
-    right: 82% !important;
-
-    &::after {
-      background-color: transparent;
-      color: $text-color;
-      font-size: 22px;
-    }
+  :global path {
+    color: $text-color !important;
   }
+}
+
+.amountDaysText {
+  display: inline;
+  font-weight: 200;
+  font-size: 0.81rem;
 }
 
 .submitButton {

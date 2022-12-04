@@ -6,9 +6,11 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { regular, solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { useRouter } from 'next/router';
 import { Coupon, PlanModel, Prisma } from '@prisma/client';
+import { Context, useUserStore } from '../../lib/context/UserStore';
+import { Action } from '../../lib/reducer/reducer';
 import styles from './OrderModal.module.scss';
 import Input from '../Input/Input';
 
@@ -43,6 +45,7 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
     'valid' | 'invalid' | 'none'
   >('none');
   const { executeRecaptcha } = useGoogleReCaptcha();
+  const { state } = useUserStore() as Context<Action>;
   const router = useRouter();
 
   useEffect(() => {
@@ -64,7 +67,7 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
     }
   }, [couponDetails]);
 
-  const { watch, control, handleSubmit } = useForm({
+  const { watch, control, handleSubmit, reset } = useForm({
     mode: 'onBlur',
     reValidateMode: 'onChange',
     resolver: yupResolver(schema),
@@ -77,6 +80,17 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
     },
   });
   const phoneNumber = watch('phoneNumber');
+
+  useEffect(() => {
+    if (state.user.id) {
+      reset({
+        firstName: state.user.name.split(' ')[0],
+        lastName: state.user.name.split(' ')[1],
+        phoneNumber: state.user.email,
+        email: state.user.emailEmail,
+      });
+    }
+  }, [state]);
 
   const handleCoupon = async () => {
     try {
@@ -231,12 +245,20 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
               תוקף החבילה
             </Col>
             <Col className={styles.dateInput}>
-              <FontAwesomeIcon icon={regular('circle-question')} />
-              {amountDays !== 0
-                ? `החבילה תהיה תקפה מרגע הפעלה ולמשך ${amountDays} ימים`
-                : `החבילה תהיה תקפה מרגע הפעלתה ועד שנה לאחר מכן`}
+              <div className={styles.amountDaysText}>
+                {amountDays !== 0
+                  ? `החבילה תהיה תקפה מרגע הפעלתה ולמשך ${amountDays} ימים`
+                  : `החבילה תהיה תקפה מרגע הפעלתה ועד שנה לאחר מכן`}
+              </div>
             </Col>
           </Row>
+          {state.user.id && (
+            <Row className={styles.orderModalRow}>
+              <small>
+                <strong>נא לוודא שפרטיך נכונים. לעדכון הפרטים האישיים</strong>
+              </small>
+            </Row>
+          )}
           <Row className={styles.orderModalRow}>
             <Col>
               <Controller
@@ -251,6 +273,7 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
                     ref={field.ref}
                     value={field.value}
                     onChange={field.onChange}
+                    readonly={!!state.user.id}
                     error={fieldState.error}
                   />
                 )}
@@ -270,6 +293,7 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
                     focusedBorderColor="#FFC107"
                     ref={field.ref}
                     value={field.value}
+                    readonly={!!state.user.id}
                     onChange={field.onChange}
                     error={fieldState.error}
                   />
@@ -290,12 +314,15 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
                     focusedBorderColor="#FFC107"
                     ref={field.ref}
                     value={field.value}
+                    readonly={!!state.user.id}
                     onChange={field.onChange}
                     error={fieldState.error}
                   />
                 )}
               />
-              <small>מספר זה ישמש בעת התחברות לחשבונך</small>
+              {!state.user.id && (
+                <small>מספר זה ישמש בעת התחברות לחשבונך</small>
+              )}
             </Col>
           </Row>
           <Row className={styles.orderModalRow}>
@@ -311,12 +338,15 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
                     focusedBorderColor="#FFC107"
                     ref={field.ref}
                     value={field.value}
+                    readonly={!!state.user.id}
                     onChange={field.onChange}
                     error={fieldState.error}
                   />
                 )}
               />
-              <small>לכתובת דוא&quot;ל זו ישלח קוד QR להפעלת הכרטיס</small>
+              {!state.user.id && (
+                <small>לכתובת דוא&quot;ל זו ישלח קוד QR להפעלת הכרטיס</small>
+              )}
             </Col>
           </Row>
           <Row className={styles.orderModalRow}>

@@ -100,6 +100,7 @@ export const authOptions = (
         token.name = `${user.firstName} ${user.lastName}`;
         token.role = user.role;
         token.id = user.id;
+        token.emailEmail = user.emailEmail;
       }
       return token;
     },
@@ -107,6 +108,7 @@ export const authOptions = (
       if (session && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.emailEmail = token.emailEmail as string;
         return session;
       }
       return session;
