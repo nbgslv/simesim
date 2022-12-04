@@ -52,6 +52,9 @@ const Checkout = () => {
             } else {
               await router.push('/error?error=Order');
             }
+          } else {
+            setOrderFriendlyId(responseJson.data.friendlyId);
+            setOrderSuccess(true);
           }
         } catch (error) {
           console.error(error);
