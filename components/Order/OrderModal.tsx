@@ -15,7 +15,8 @@ import Input from '../Input/Input';
 type BundlesSectionProps = {
   show: boolean;
   onHide: () => void;
-  bundle?: PlanModel & Prisma.PlanModelGetPayload<{ select: { refill: true } }>;
+  bundle?: PlanModel &
+    Prisma.PlanModelGetPayload<{ select: { bundle: true; refill: true } }>;
   country?: string;
 };
 

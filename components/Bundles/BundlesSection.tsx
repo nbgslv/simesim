@@ -13,7 +13,7 @@ import OrderModal from '../Order/OrderModal';
 type BundlesSectionProps = {
   countriesList: Country[];
   bundlesList: (PlanModel &
-    Prisma.PlanModelGetPayload<{ select: { bundle: true } }>)[];
+    Prisma.PlanModelGetPayload<{ select: { bundle: true; refill: true } }>)[];
 };
 
 const BundlesSection = ({

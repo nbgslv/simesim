@@ -14,7 +14,7 @@ import MainLayout from '../components/Layouts/MainLayout';
 type HomeProps = {
   countriesList: Country[];
   bundlesList: (PlanModel &
-    Prisma.PlanModelGetPayload<{ select: { bundle: true } }>)[];
+    Prisma.PlanModelGetPayload<{ select: { bundle: true; refill: true } }>)[];
   phonesList: PhonesList[];
 };
 
