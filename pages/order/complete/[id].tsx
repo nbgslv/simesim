@@ -8,10 +8,8 @@ import MainLayout from '../../../components/Layouts/MainLayout';
 
 const Checkout = () => {
   const [pageLoading, setPageLoading] = React.useState<boolean>(true);
-  const [orderFriendlyId, setOrderFriendlyId] = React.useState<string | null>(
-    null
-  );
-  const [orderSuccess, setOrderSuccess] = React.useState<boolean | null>(null);
+  const [orderFriendlyId, setOrderFriendlyId] = React.useState<string>('');
+  const [orderSuccess, setOrderSuccess] = React.useState<boolean>(false);
   const router = useRouter();
   const { id } = router.query;
 

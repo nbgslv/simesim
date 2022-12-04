@@ -308,11 +308,11 @@ export default async function handler(
                     },
                     {
                       var: 'orderId',
-                      value: plan.friendlyId,
+                      value: plan.friendlyId.toString(),
                     },
                     {
                       var: 'amountDays',
-                      value: plan.refill.amount_days,
+                      value: `${plan.refill.amount_days}`,
                     },
                   ],
                 },
