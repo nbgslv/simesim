@@ -54,15 +54,12 @@ const Checkout = () => {
             setOrderFriendlyId(responseJson.data.friendlyId);
             setOrderSuccess(true);
           }
+          setPageLoading(false);
         } catch (error) {
           console.error(error);
           await router.push('/error?error=Order');
-        } finally {
-          setPageLoading(false);
         }
       })();
-    } else {
-      router.push('/error?error=Order');
     }
   }, [id]);
 
