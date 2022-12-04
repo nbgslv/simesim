@@ -318,9 +318,7 @@ export default async function handler(
                 },
               ]);
 
-            const emailOrder = await mailerSend.send(emailParams);
-            // eslint-disable-next-line no-console
-            console.log({ emailOrder, emailBody: await emailOrder.json() });
+            await mailerSend.send(emailParams);
 
             res
               .status(200)

@@ -107,6 +107,12 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
         <Form
           className={`${styles.signIn} d-flex flex-column align-items-center justify-content-center`}
         >
+          {router.query.paymentUrl && (
+            <Alert className="text-center" variant="info">
+              לפני שנמשיך, וכדי לוודא שאתם לא רובוטים,
+              <br /> נשלח לטלפון שתזינו הודעה עם קוד, אותו תתבקשו להזין במסך הבא
+            </Alert>
+          )}
           {alertVariant && <Alert variant={alertVariant}>{alertMessage}</Alert>}
           <Form.Control type="hidden" name="csrfToken" value={csrfToken} />
           <Form.Group className={styles.formGroup}>
