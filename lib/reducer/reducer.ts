@@ -14,6 +14,7 @@ export const initialState: State = {
     name: '',
     id: '',
     role: '',
+    emailEmail: '',
     image: null,
   },
 };
