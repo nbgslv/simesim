@@ -36,11 +36,17 @@ const Checkout = () => {
           const responseJson = await response.json();
           if (!responseJson.success) {
             if (
-              responseJson.nane &&
+              responseJson.name &&
               responseJson.name === 'ORDER_CREATED_WITHOUT_LINE'
             ) {
               setOrderFriendlyId(responseJson.message);
               setOrderSuccess(false);
+            } else if (
+              responseJson.name &&
+              responseJson.name === 'PAYMENT_ALREADY_PROCESSED'
+            ) {
+              setOrderFriendlyId(responseJson.message);
+              setOrderSuccess(true);
             } else {
               await router.push('/error?error=Order');
             }

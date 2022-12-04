@@ -209,7 +209,9 @@ export default async function handler(
                     ],
                   },
                 ]);
-              await mailerSend.send(emailParams);
+              const emailPending = await mailerSend.send(emailParams);
+              // eslint-disable-next-line no-console
+              console.log({ emailPending });
 
               return res.status(200).json({
                 name: 'ORDER_CREATED_WITHOUT_LINE',
@@ -316,17 +318,19 @@ export default async function handler(
                 },
               ]);
 
-            await mailerSend.send(emailParams);
+            const emailOrder = await mailerSend.send(emailParams);
+            // eslint-disable-next-line no-console
+            console.log({ emailOrder });
 
             res
               .status(200)
               .json({ success: true, data: { friendlyId: plan.friendlyId } });
           }
         } else {
-          res.status(403).json({
+          res.status(200).json({
             name: 'PAYMENT_ALREADY_PROCESSED',
             success: false,
-            message: 'Payment already processed',
+            message: plan.friendlyId.toString(),
           });
         }
       } else {
