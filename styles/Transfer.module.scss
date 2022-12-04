@@ -9,14 +9,4 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  :global * {
-    color: $text-color;
-  }
-}
-
-.qnaImage {
-  width: 27%;
-  margin-right: auto;
-  margin-left: auto;
 }
