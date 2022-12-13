@@ -20,20 +20,24 @@ export type ExtendedCountry = {
 type CountrySearchProps = {
   countriesList: Country[];
   onSelect: (country: ExtendedCountry | null) => void;
+  ariaLabeledby?: string;
 };
 
 const CountrySearchItem = ({
   item,
   selectItem,
   selectedItem,
+  index,
 }: {
   item: ExtendedCountry;
   selectItem: (item: ExtendedCountry) => void;
   selectedItem: ExtendedCountry | null;
+  index: number;
 }) => (
   <div
     onClick={() => selectItem(item)}
     role="option"
+    aria-posinset={index}
     aria-selected={selectedItem?.id === item.id}
     key={item.id}
     className={`${styles.item} d-flex`}
@@ -63,7 +67,11 @@ const CountrySearchItem = ({
   </div>
 );
 
-const CountrySearch = ({ countriesList, onSelect }: CountrySearchProps) => {
+const CountrySearch = ({
+  countriesList,
+  onSelect,
+  ariaLabeledby,
+}: CountrySearchProps) => {
   const [itemSelected, setItemSelected] = useState<ExtendedCountry | null>(
     null
   );
@@ -114,6 +122,7 @@ const CountrySearch = ({ countriesList, onSelect }: CountrySearchProps) => {
         ItemComponent={CountrySearchItem}
         placeholder="לאן טסים?"
         searchFields={['name', 'translation']}
+        ariaLabeledby={ariaLabeledby}
       />
       {itemSelected ? (
         <div

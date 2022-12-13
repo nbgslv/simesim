@@ -1,5 +1,9 @@
 .main {
   height: 88%;
+
+  :global .btn path {
+    color: #ffffff;
+  }
 }
 
 .table {

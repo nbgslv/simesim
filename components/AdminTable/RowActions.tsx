@@ -1,3 +1,4 @@
+import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import React, { ReactElement, useEffect } from 'react';
 import {
   GridActionsCellItem,
@@ -19,6 +20,7 @@ type RowActionsProps<T extends GridValidRowModel> = {
   setRowModesModel: React.Dispatch<React.SetStateAction<GridRowModesModel>>;
   setRows: React.Dispatch<React.SetStateAction<GridRowModel<T>[]>>;
   rows: GridRowModel<T>[];
+  onDelete?: (id: GridRowId) => Promise<boolean>;
 };
 
 const RowActions = <T extends GridValidRowModel>({
@@ -28,6 +30,7 @@ const RowActions = <T extends GridValidRowModel>({
   setRowModesModel,
   setRows,
   rows,
+  onDelete,
 }: RowActionsProps<T>): ReactElement<GridActionsCellItemProps>[] => {
   const [id] = React.useState<GridRowId>(row.id);
   const [inEditMode, setInEditMode] = React.useState<boolean>(false);
@@ -55,8 +58,11 @@ const RowActions = <T extends GridValidRowModel>({
     });
   };
 
-  const handleDeleteClick = (rowId: string | number) => () => {
-    setRows(rows.filter((rowToDelete) => rowToDelete.id !== rowId));
+  const handleDeleteClick = (rowId: GridRowId) => async () => {
+    const deleteRow = await onDelete?.(rowId);
+    if (deleteRow) {
+      setRows(rows.filter((rowToDelete) => rowToDelete.id !== rowId));
+    }
   };
 
   const handleCancelClick = (rowId: GridRowParams<T>) => () => {

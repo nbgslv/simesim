@@ -152,8 +152,11 @@ const Contact = () => {
                     <Row className="d-flex flex-column">
                       <Form as={Col}>
                         <Form.Group>
-                          <Form.Label>{text.contact.name}</Form.Label>
+                          <Form.Label id="name-label">
+                            {text.contact.name}
+                          </Form.Label>
                           <Controller
+                            arial-labeledby="name-label"
                             name="name"
                             control={control}
                             render={({ field, fieldState }) => (
@@ -169,9 +172,12 @@ const Contact = () => {
                           />
                         </Form.Group>
                         <Form.Group>
-                          <Form.Label>{text.contact.phone}</Form.Label>
+                          <Form.Label id="phone-label">
+                            {text.contact.phone}
+                          </Form.Label>
                           <Controller
                             name="phone"
+                            aria-labeledby="phone-label"
                             control={control}
                             render={({ field, fieldState }) => (
                               <Input
@@ -186,8 +192,11 @@ const Contact = () => {
                           />
                         </Form.Group>
                         <Form.Group>
-                          <Form.Label>{text.contact.email}</Form.Label>
+                          <Form.Label id="email-label">
+                            {text.contact.email}
+                          </Form.Label>
                           <Controller
+                            aria-labeledby="email-label"
                             name="email"
                             control={control}
                             render={({ field, fieldState }) => (
@@ -203,8 +212,11 @@ const Contact = () => {
                           />
                         </Form.Group>
                         <Form.Group>
-                          <Form.Label>{text.contact.message}</Form.Label>
+                          <Form.Label id="message-label">
+                            {text.contact.message}
+                          </Form.Label>
                           <Form.Control
+                            aria-labeledby="message-label"
                             {...register('message')}
                             as="textarea"
                             className={styles.textArea}

@@ -17,14 +17,14 @@ const Section = ({
   className,
   sectionRef,
 }: SectionProps) => (
-  <div className={className} ref={sectionRef} id="section">
+  <section className={className} ref={sectionRef} id={id || title}>
     <Container as="section" className={styles.section} id={id}>
       {title && (
         <h1 className={`${styles.sectionTitle} text-center mb-4`}>{title}</h1>
       )}
       {children}
     </Container>
-  </div>
+  </section>
 );
 
 export default Section;

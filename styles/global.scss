@@ -15,6 +15,10 @@ html {
   --bs-nav-link-font-size: 0.875rem;
 }
 
+a {
+  color: #0B6CE4;
+}
+
 h1,
 h2,
 h3,
@@ -77,6 +81,10 @@ body.trigger-position-left #enable-toolbar-trigger {
 
 #enable-toolbar-trigger {
   top: -15px !important;
+}
+
+.keyboard-shorcut {
+  color: #3A7CAD !important;
 }
 
 li.enable-button-highcontrast,

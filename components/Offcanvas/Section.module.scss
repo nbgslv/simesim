@@ -1,0 +1,41 @@
+@import "styles/variables";
+
+.main {
+  :global * {
+    color: $text-color;
+  }
+
+  :global .data-container {
+    padding: 0.3rem 0.5rem;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  :global .data-container:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.2);
+
+  }
+}
+
+.leftData {
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+}
+
+.sectionButtons {
+  :global .btn-primary path {
+    color: #ffffff;
+  }
+
+  :global .btn-danger path {
+    color: #ffffff;
+  }
+
+  :global .btn-success path {
+    color: #ffffff;
+  }
+
+  :global .btn-primary path:hover {
+    color: #ffffff !important;
+  }
+}

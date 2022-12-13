@@ -1,6 +1,8 @@
+import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tooltip } from '@mui/material';
 import { NextPageContext } from 'next';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Prisma, PlanModel, Bundle, Refill, Coupon } from '@prisma/client';
 import {
   GridCellParams,
@@ -11,18 +13,26 @@ import {
 import { format, parseISO } from 'date-fns';
 import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import { Button } from 'react-bootstrap';
-import BundlesAdminModal from '../../components/Bundles/BundlesAdminModal';
+import AdminSelect from '../../components/AdminSelect/AdminSelect';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
+import AdminOffcanvas from '../../components/Offcanvas/AdminOffcanvas';
+import BundleData from '../../components/Offcanvas/BundleData/BundleData';
 import RefillsAdminModal from '../../components/Refills/RefillsAdminModal';
 import prisma from '../../lib/prisma';
 import AdminTableSwitch from '../../components/AdminTable/AdminTableSwitch';
 import FormModal from '../../components/AdminTable/FormModal';
 import PlansModelForm from '../../components/PlansModel/PlansModelForm';
 import styles from '../../styles/bundles.module.scss';
+import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
 import { verifyAdmin } from '../../utils/auth';
 
-type PlansModelAsAdminTableData = (GridValidRowModel & PlanModel)[];
+type PlanModelData = PlanModel &
+  Prisma.PlanModelGetPayload<{
+    select: { bundle: { include: { refills: true } }; refill: true };
+  }>;
+
+type PlansModelAsAdminTableData = (GridValidRowModel & PlanModelData)[];
 
 type PlansModelProps = {
   plansModel: PlansModelAsAdminTableData;
@@ -46,8 +56,9 @@ const PlansModel = ({
     (Bundle & Prisma.BundleGetPayload<{ select: { refills: true } }>) | null
   >(null);
   const [refills, setRefills] = React.useState<Refill[]>(existingRefills);
-  const [bundleToShow, setBundleToShow] = React.useState<Bundle | null>(null);
-  const [refillToShow, setRefillToShow] = React.useState<Refill | null>(null);
+  const [bundleData, setBundleData] = React.useState<Bundle | null>(null);
+  const [refillData, setRefillData] = React.useState<Refill | null>(null);
+  const [adminApi] = useState<AdminApi>(new AdminApi());
   const modal = useModal('add-plansmodel');
 
   useEffect(() => {
@@ -109,44 +120,67 @@ const PlansModel = ({
     }
   };
 
-  const handleShowBundle = (bundle: Bundle) => {
-    setBundleToShow(bundle);
-  };
-
-  const handleShowRefill = (refill: Refill) => {
-    setRefillToShow(refill);
-  };
-
   const columns: GridColumns = [
     {
       field: 'id',
       headerName: 'ID',
-      width: 200,
+      width: 220,
     },
     {
       field: 'bundle',
       headerName: 'Bundle',
       renderCell: (params) => (
-        <Button onClick={() => handleShowBundle(params.value)}>
-          Show Bundle
+        <Button onClick={() => setBundleData(params.row.bundle)}>
+          <FontAwesomeIcon icon={solid('up-right-from-square')} />
         </Button>
       ),
-      width: 150,
+      renderEditCell: (params) => (
+        <AdminSelect
+          ariaLabel="select bundle"
+          options={existingBundles.map((bundle) => ({
+            value: bundle.id,
+            label: bundle.name,
+            id: bundle.id,
+          }))}
+          onSelect={(option) => {
+            params.api.setEditCellValue({ ...params, value: option.value });
+          }}
+        />
+      ),
+      width: 70,
+      editable: true,
     },
     {
       field: 'refill',
       headerName: 'Refill',
       renderCell: (params) => (
-        <Button onClick={() => handleShowRefill(params.value)}>
-          Show Refill
+        <Button onClick={() => setRefillData(params.row.refill)}>
+          <FontAwesomeIcon icon={solid('up-right-from-square')} />
         </Button>
       ),
-      width: 130,
+      renderEditCell: (params) => (
+        <AdminSelect
+          ariaLabel="select refill"
+          options={existingRefills
+            .filter((refill) => refill.bundleId === params.row.bundleId)
+            .map((refill) => ({
+              value: refill.id,
+              label: refill.title,
+              id: refill.id,
+            }))}
+          onSelect={(option) => {
+            params.api.setEditCellValue({ ...params, value: option.value });
+          }}
+        />
+      ),
+      width: 70,
+      editable: true,
     },
     {
       field: 'name',
       headerName: 'Name',
-      width: 130,
+      width: 200,
+      editable: true,
     },
     {
       field: 'description',
@@ -156,12 +190,15 @@ const PlansModel = ({
           <span className={styles.tooltip}>{params.value}</span>
         </Tooltip>
       ),
+      editable: true,
+      width: 200,
     },
     {
       field: 'price',
       headerName: 'Price',
       editable: true,
       width: 70,
+      type: 'number',
     },
     {
       field: 'vat',
@@ -181,6 +218,11 @@ const PlansModel = ({
       field: 'coupons',
       headerName: 'Coupons',
       editable: true,
+      renderCell: () => (
+        <Button>
+          <FontAwesomeIcon icon={solid('arrow-up')} />
+        </Button>
+      ),
     },
     {
       field: 'createdAt',
@@ -223,18 +265,31 @@ const PlansModel = ({
   };
 
   const handleDeleteRows = async (ids: GridRowId[]) => {
-    const deleteCount = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/plansmodel`,
+    await adminApi.callApi<
+      PlanModelData,
+      'deleteMany',
       {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ids }),
+        select: {
+          bundle: {
+            include: {
+              refills: true;
+            };
+          };
+          refill: true;
+        };
       }
-    );
-    const deleteJson = await deleteCount.json();
-    if (!deleteJson.success) throw new Error('Plan Model deletion failed');
+    >({
+      method: 'DELETE',
+      action: AdminApiAction.deleteMany,
+      model: 'PlanModel',
+      input: {
+        where: {
+          id: {
+            in: ids as string[],
+          },
+        },
+      },
+    });
     setPlansRows(plansRows.filter((plan) => !ids.includes(plan.id!)));
   };
 
@@ -252,6 +307,56 @@ const PlansModel = ({
     }
   };
 
+  const handleRowUpdate = async (
+    rowId: GridRowId,
+    updatedData: Partial<PlanModel>
+  ): Promise<PlanModel | Error> => {
+    try {
+      const updatedPlanModel = await adminApi.callApi<
+        PlanModelData,
+        'update',
+        {
+          select: {
+            bundle: {
+              include: {
+                refills: true;
+              };
+            };
+            refill: true;
+          };
+        }
+      >({
+        method: 'PUT',
+        model: 'PlanModel',
+        input: {
+          where: { id: rowId as string },
+          data: updatedData,
+          include: {
+            bundle: {
+              include: {
+                refills: true,
+              },
+            },
+            refill: true,
+          },
+        },
+      });
+      if (updatedPlanModel) return updatedPlanModel;
+      throw new Error('PlanModel update failed');
+    } catch (error) {
+      console.error(error);
+      return error as Error;
+    }
+  };
+
+  const handleDeleteRow = async (id: GridRowId) => {
+    try {
+      await handleDeleteRows([id as string]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <AdminLayout>
       <AdminTable
@@ -259,6 +364,8 @@ const PlansModel = ({
         columns={columns}
         addRow={showModal}
         deleteRows={handleDeleteRows}
+        processRowUpdate={handleRowUpdate}
+        deleteRow={handleDeleteRow}
       />
       <FormModal
         id="add-plansmodel"
@@ -272,15 +379,17 @@ const PlansModel = ({
           setBundle={handleBundleSet}
         />
       </FormModal>
-      <BundlesAdminModal
-        bundle={bundleToShow as Bundle}
-        show={bundleToShow !== null}
-        onHide={() => setBundleToShow(null)}
-      />
+      <AdminOffcanvas
+        show={!!bundleData}
+        title="Bundle"
+        onHide={() => setBundleData(null)}
+      >
+        <BundleData bundle={bundleData as Bundle & { refills: Refill[] }} />
+      </AdminOffcanvas>
       <RefillsAdminModal
-        onHide={() => setRefillToShow(null)}
-        refills={refillToShow ? [refillToShow as Refill] : []}
-        show={refillToShow !== null}
+        onHide={() => setRefillData(null)}
+        refills={[refillData as Refill]}
+        show={!!refillData}
       />
     </AdminLayout>
   );
@@ -290,7 +399,9 @@ export async function getServerSideProps(context: NextPageContext) {
   await verifyAdmin(context);
   const plansModel = await prisma.planModel.findMany({
     include: {
-      bundle: true,
+      bundle: {
+        include: { refills: true },
+      },
       refill: true,
     },
     orderBy: {
@@ -320,6 +431,11 @@ export async function getServerSideProps(context: NextPageContext) {
     ...planModel,
     bundle: {
       ...planModel.bundle,
+      refills: planModel.bundle.refills.map((refill) => ({
+        ...refill,
+        createdAt: format(refill.createdAt, 'dd/MM/yy kk:mm'),
+        updatedAt: format(refill.updatedAt, 'dd/MM/yy kk:mm'),
+      })),
       createdAt: format(planModel.bundle.createdAt, 'dd/MM/yy kk:mm'),
       updatedAt: format(planModel.bundle.updatedAt, 'dd/MM/yy kk:mm'),
     },

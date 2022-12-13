@@ -60,6 +60,74 @@ export default async function handler(
         },
       });
       res.status(201).json({ success: true, data: { ...newPlan } });
+    } else if (method === 'PUT') {
+      const { id, ...data } = req.body;
+      console.log({ data });
+      const payment = Object.keys(data).includes('payment') && {
+        connect: {
+          id: data.payment,
+        },
+      };
+      if (payment) {
+        data.payment = payment;
+      }
+      const user = Object.keys(data).includes('user') && {
+        connect: {
+          id: data.user,
+        },
+      };
+      if (user) {
+        data.user = user;
+      }
+      const line = Object.keys(data).includes('line') && {
+        connect: {
+          id: data.line,
+        },
+      };
+      if (line) {
+        data.line = line;
+      }
+      const bundle = Object.keys(data).includes('bundle') && {
+        connect: {
+          id: data.bundle,
+        },
+      };
+      if (bundle) {
+        data.bundle = bundle;
+      }
+
+      const updatedPlan = await prisma.plan.update({
+        where: {
+          id,
+        },
+        data: {
+          ...data,
+        },
+        include: {
+          planModel: {
+            include: {
+              bundle: true,
+              refill: true,
+            },
+          },
+          user: true,
+          payment: {
+            include: {
+              paymentMethod: true,
+            },
+          },
+          line: true,
+          bundle: {
+            include: {
+              refills: true,
+            },
+          },
+        },
+      });
+      if (!updatedPlan) {
+        throw new Error('Error updating plan');
+      }
+      res.status(200).json({ success: true, data: { ...updatedPlan } });
     } else if (method === 'DELETE') {
       const { ids } = req.body;
       const deleteCount = await prisma.plan.deleteMany({

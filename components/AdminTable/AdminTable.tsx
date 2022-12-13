@@ -1,3 +1,4 @@
+import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import React, { RefObject, useEffect, useMemo, useRef } from 'react';
 import {
   DataGrid,
@@ -12,7 +13,15 @@ import {
   MuiEvent,
 } from '@mui/x-data-grid';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
+import {
+  differenceWith,
+  toPairs,
+  fromPairs,
+  isEqual,
+  Dictionary,
+} from 'lodash';
 import styles from './AdminTable.module.scss';
+import AsyncConfirmationModal from './AsyncConfirmationModal';
 import EditToolbar from './EditToolbar';
 import useAddActions from './useAddActions';
 
@@ -20,7 +29,10 @@ type AdminTableProps<T extends GridValidRowModel> = {
   data: GridRowModel<T>[];
   title?: string;
   handleRowsSelection?: (ids: GridSelectionModel) => boolean;
-  processRowUpdate?: (newRow: T, oldRow: T) => Promise<any>;
+  processRowUpdate?: (
+    rowId: GridRowId,
+    updatedValues: Dictionary<T>
+  ) => Promise<T>;
   columns: GridColumns;
   multiActions?: string[];
   rowActions?: string[];
@@ -31,6 +43,7 @@ type AdminTableProps<T extends GridValidRowModel> = {
   >;
   onDelete?: (ids: GridSelectionModel) => Promise<{ ids: GridSelectionModel }>;
   deleteRows?: (ids: GridRowId[]) => Promise<void>;
+  deleteRow?: (id: GridRowId) => Promise<void>;
 };
 
 function useApiRef({ columns }: { columns: any }) {
@@ -66,6 +79,7 @@ const AdminTable = <T extends GridValidRowModel>({
   editMode = 'cell',
   addRow,
   deleteRows,
+  deleteRow,
 }: AdminTableProps<T>) => {
   const [dataRows, setDataRows] = React.useState<GridRowModel<T>[]>(data);
   const [
@@ -80,6 +94,25 @@ const AdminTable = <T extends GridValidRowModel>({
   }: { apiRef: RefObject<GridApiCommunity>; columns: GridColumns } = useApiRef({
     columns,
   });
+  const modal = useModal('delete-modal-admin-table');
+
+  const processRowDelete = async (id: GridRowId) => {
+    try {
+      const deleteModal = await NiceModal.show('delete-modal-admin-table');
+      if (deleteModal) {
+        await deleteRow?.(id);
+        setDataRows(dataRows.filter((row) => row.id !== id));
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error(e);
+      return false;
+    } finally {
+      await modal.hide();
+    }
+  };
+
   const {
     columns: columnsWithActions,
   }: { columns: GridColumns } = useAddActions({
@@ -89,6 +122,7 @@ const AdminTable = <T extends GridValidRowModel>({
     setRowModesModel,
     setRows: setDataRows,
     rows: dataRows,
+    onDelete: (id: GridRowId) => processRowDelete(id),
   });
 
   useEffect(() => {
@@ -124,6 +158,12 @@ const AdminTable = <T extends GridValidRowModel>({
     event.defaultMuiPrevented = true;
   };
 
+  const handleProcessRowUpdate = async (newRow: T, oldRow: T) =>
+    processRowUpdate?.(
+      newRow.id,
+      fromPairs(differenceWith(toPairs(newRow), toPairs(oldRow), isEqual))
+    ) ?? oldRow;
+
   return (
     <div className={styles.main}>
       {title && <h2>{title}</h2>}
@@ -133,7 +173,7 @@ const AdminTable = <T extends GridValidRowModel>({
           pagination
           columns={rowActions.length ? columnsWithActions : columnsWithApi}
           rows={dataRows}
-          processRowUpdate={processRowUpdate}
+          processRowUpdate={handleProcessRowUpdate}
           checkboxSelection
           disableSelectionOnClick
           selectionModel={selectionModel}
@@ -161,6 +201,30 @@ const AdminTable = <T extends GridValidRowModel>({
           experimentalFeatures={{ newEditingApi: true }}
         />
       </div>
+      <AsyncConfirmationModal
+        id="delete-modal-admin-table"
+        title={'Delete'}
+        body={
+          'Are you sure you want to delete this? All the related data will be deleted.'
+        }
+        confirmAction={() => deleteRows?.(selectionModel as GridRowId[])}
+        confirmButtonText={'Delete'}
+        cancelButtonText={'Cancel'}
+        {...bootstrapDialog(modal)}
+      />
+      <AsyncConfirmationModal
+        id="delete-modal-admin-table"
+        title={'Delete'}
+        body={
+          'Are you sure you want to delete this? All the related data will be deleted.'
+        }
+        cancelAction={() => {
+          modal.hide();
+        }}
+        confirmButtonText={'Delete'}
+        cancelButtonText={'Cancel'}
+        {...bootstrapDialog(modal)}
+      />
     </div>
   );
 };

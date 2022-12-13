@@ -11,7 +11,7 @@ const MainLayout = ({
 }) => (
   <>
     <Header hideJumbotron={hideJumbotron} />
-    {children}
+    <main>{children}</main>
     <Footer />
   </>
 );

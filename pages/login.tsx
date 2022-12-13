@@ -125,6 +125,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
               name="email"
               id="email"
               size="lg"
+              autoFocus
             />
           </Form.Group>
           <motion.div layout>

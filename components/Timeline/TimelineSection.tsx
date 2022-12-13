@@ -32,7 +32,6 @@ const TimelineSection = () => {
       id="timeline-section"
       className={styles.timelineSection}
     >
-      <Nav.Link href="/guide">מדריך</Nav.Link>
       <Timeline>
         <TimelineItem
           tooltipText={text.home.stepOneContentText}

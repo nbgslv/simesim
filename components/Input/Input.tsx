@@ -20,6 +20,7 @@ type InputProps<T extends FieldValues> = {
   readonly?: boolean;
   cancelButton?: boolean;
   handleCancel?: () => void;
+  ariaLabeledby?: string;
 };
 
 const InputInner = <T extends FieldValues>(
@@ -32,6 +33,7 @@ const InputInner = <T extends FieldValues>(
     readonly,
     cancelButton,
     handleCancel,
+    ariaLabeledby,
     ...props
   }: InputProps<T>,
   ref?: ForwardedRef<any>
@@ -47,6 +49,11 @@ const InputInner = <T extends FieldValues>(
       type="text"
       value={value}
       onChange={onChange}
+      aria-labelledby={ariaLabeledby}
+      aria-autocomplete="list"
+      aria-controls="autocomplete-list"
+      aria-expanded="true"
+      role="combobox"
     />
     <div className={`d-flex position-absolute ${styles.inputEnd}`}>
       {cancelButton && (

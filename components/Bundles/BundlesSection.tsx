@@ -74,10 +74,11 @@ const BundlesSection = ({
             {currentStep >= 0 ? (
               <motion.div className={styles.firstStepContainer} layout>
                 <div className={`${styles.infoPlate} p-1 mb-2`}>
-                  <h3>1. מספרים לנו לאן אתם טסים</h3>
+                  <h3 id="flight-destination">1. מספרים לנו לאן אתם טסים</h3>
                 </div>
                 <div className="h-100 p-2">
                   <CountrySearch
+                    ariaLabeledby="flight-destination"
                     countriesList={countriesList}
                     onSelect={handleCountrySelect}
                   />
@@ -119,8 +120,9 @@ const BundlesSection = ({
               </>
             ) : null}
           </Col>
-          <Col>
+          <Col role="presentation">
             <Lottie
+              ariaLabel="Traveling animation"
               options={{
                 loop: true,
                 autoplay: true,

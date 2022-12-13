@@ -33,6 +33,7 @@ type SearchAutocompleteProps<T> = {
   clearSelectedItem?: boolean;
   ListBoxComponent?: ElementType;
   searchFields?: Partial<keyof Item<T>>[];
+  ariaLabeledby?: string;
 };
 
 type DefaultListBoxComponentProps = {
@@ -43,9 +44,10 @@ type DefaultCountrySearchItemProps<T> = {
   item: Item<T>;
   selectItem: (item: Item<T>) => void;
   selectedItem: T | null;
+  index: number;
 };
 
-const SearchAutocompleteInner = <T extends object>(
+const SearchAutocompleteInner = <T extends { id: string }>(
   {
     maxResults,
     onSelect,
@@ -56,6 +58,7 @@ const SearchAutocompleteInner = <T extends object>(
     onQueryChange,
     ListBoxComponent,
     searchFields = [],
+    ariaLabeledby,
   }: SearchAutocompleteProps<T>,
   ref: ForwardedRef<any>
 ) => {
@@ -104,14 +107,17 @@ const SearchAutocompleteInner = <T extends object>(
 
     return (
       <AnimatePresence>
-        <div className={styles.listBoxContainer}>
+        <div
+          className={styles.listBoxContainer}
+          role="listbox"
+          id="autocomplete-listbox"
+        >
           <motion.div
             layout="position"
             initial="initial"
             animate="show"
             exit="initial"
             variants={variants}
-            role="listbox"
             className={`${styles.listBox}`}
           >
             {children}
@@ -124,6 +130,8 @@ const SearchAutocompleteInner = <T extends object>(
   const DefaultItemComponent: FC<DefaultCountrySearchItemProps<T>> = ({
     item,
     selectItem,
+    selectedItem,
+    index,
   }) => {
     if (!item) return null;
 
@@ -131,6 +139,8 @@ const SearchAutocompleteInner = <T extends object>(
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
+        aria-posinset={index}
+        aria-selected={selectedItem?.id === item.id}
         role="option"
         onClick={() => selectItem(item)}
         key={item.id}
@@ -194,6 +204,7 @@ const SearchAutocompleteInner = <T extends object>(
           placeholder={placeholder}
           value={itemSelected ? itemSelected.displayValue : query}
           onChange={handleChange}
+          ariaLabeledby={ariaLabeledby}
         />
         <button
           type="button"
@@ -213,7 +224,7 @@ const SearchAutocompleteInner = <T extends object>(
               boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.25)',
             }}
           >
-            <CloseIcon />
+            <CloseIcon aria-label="Clear Field" />
           </motion.div>
         </button>
       </div>
@@ -226,6 +237,7 @@ const SearchAutocompleteInner = <T extends object>(
               return (
                 <ItemComponentToUse
                   key={i}
+                  index={i}
                   item={item}
                   selectItem={handleSelect}
                 />
@@ -262,7 +274,7 @@ const SearchAutocompleteInner = <T extends object>(
 };
 
 const SearchAutocomplete = forwardRef(SearchAutocompleteInner) as <
-  T extends object
+  T extends { id: string }
 >(
   props: SearchAutocompleteProps<T> & { ref?: MutableRefObject<any> }
 ) => JSX.Element;

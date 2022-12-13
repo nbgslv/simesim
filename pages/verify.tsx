@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { LegacyRef, useEffect, useRef } from 'react';
 import { Alert, Button, Form, Nav, Spinner } from 'react-bootstrap';
 import { useCookies } from 'react-cookie';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
@@ -14,7 +14,7 @@ import styles from '../styles/verify.module.scss';
 import MainLayout from '../components/Layouts/MainLayout';
 
 const Verify = ({ csrfToken }: { csrfToken: string }) => {
-  const TIMER = 60000; // 60 seconds
+  const TIMER = 120000; // 2 minutes
   const [phoneNumber, setPhoneNumber] = React.useState<string>('');
   const [callbackUrl, setCallbackUrl] = React.useState<string>('');
   const [otp, setOtp] = React.useState<string>('');
@@ -31,6 +31,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
     'simesim_callbackUrl',
   ]);
   const { executeRecaptcha } = useGoogleReCaptcha();
+  const countdownRef: LegacyRef<Countdown | undefined> = useRef();
   const router = useRouter();
 
   useEffect(() => {
@@ -54,6 +55,10 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
   const handleVerification = async () => {
     try {
       if (otp.length === 6 && phoneNumber) {
+        if (countdownRef.current) {
+          const { pause } = countdownRef.current.getApi();
+          pause();
+        }
         setLoading(true);
         if (!executeRecaptcha) {
           throw new Error('Recaptcha not loaded');
@@ -90,6 +95,12 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
       setAlertMessage('קוד האימות פג תוקף או שאינו נכון');
     }
   };
+
+  useEffect(() => {
+    if (otp.length === 6) {
+      handleVerification();
+    }
+  }, [otp]);
 
   const handleReLogin = async (method?: string) => {
     const params = {
@@ -152,6 +163,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
                 className={styles.button}
                 variant="primary"
                 onClick={() => handleVerification()}
+                type="submit"
               >
                 {loading ? (
                   <Spinner
@@ -201,6 +213,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
                 <>
                   לא קיבלת קוד? ניתן יהיה לנסות שוב בעוד&nbsp;
                   <Countdown
+                    ref={countdownRef as LegacyRef<Countdown>}
                     date={timer}
                     autoStart
                     renderer={({ minutes, seconds }) =>

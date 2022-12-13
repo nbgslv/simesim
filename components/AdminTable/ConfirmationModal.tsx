@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import styles from './ConfirmationModal.module.scss';
 
-type ConfirmationModalProps = {
+export type ConfirmationModalProps = {
   show: boolean;
   onHide?: () => void;
   title: string;
@@ -11,6 +11,7 @@ type ConfirmationModalProps = {
   cancelButtonText?: string;
   confirmAction?: (() => void) | (() => Promise<void>);
   cancelAction?: (() => void) | (() => Promise<void>);
+  id?: string;
 };
 
 const ConfirmationModal = ({
@@ -22,8 +23,16 @@ const ConfirmationModal = ({
   cancelButtonText,
   confirmAction,
   cancelAction,
+  id,
+  ...props
 }: ConfirmationModalProps) => (
-  <Modal show={show} onHide={cancelAction} className={styles.main}>
+  <Modal
+    id={id}
+    show={show}
+    onHide={cancelAction}
+    className={styles.main}
+    {...props}
+  >
     <Modal.Header closeButton>
       <Modal.Title>{title}</Modal.Title>
     </Modal.Header>

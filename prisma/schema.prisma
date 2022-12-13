@@ -58,7 +58,7 @@ model PlanModel {
   coupons     Coupon[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  plan        Plan[]
+  plans       Plan[]
 }
 
 enum PlanStatus {
@@ -83,7 +83,7 @@ model Plan {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   line        Line?      @relation(fields: [lineId], references: [id])
-  lineId      String?
+  lineId      String?    @unique
   bundle      Bundle     @relation(fields: [bundleId], references: [id])
   bundleId    String
   refill      Refill     @relation(fields: [refillId], references: [id])
@@ -158,7 +158,7 @@ model Line {
   autoRefillList     AutoRefillsLists[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
-  plan               Plan[]
+  plan               Plan?
 }
 
 model AutoRefillsLists {
@@ -193,8 +193,8 @@ model Bundle {
   refills     Refill[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  plan        Plan[]
-  line        Line[]
+  plans       Plan[]
+  lines       Line[]
   planModel   PlanModel[]
 }
 

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Button, Form, Spinner } from 'react-bootstrap';
+import React, { ChangeEvent, useEffect } from 'react';
+import { Button, Col, Form, InputGroup, Row, Spinner } from 'react-bootstrap';
 import { Prisma, Payment, PlanModel, User } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -41,11 +41,16 @@ const PlansForm = ({
   users,
   loading,
 }: {
-  plansModel: PlanModel[];
+  plansModel: (PlanModel &
+    Prisma.PlanModelGetPayload<{ select: { refill: true } }>)[];
   payments: (Payment & Prisma.PaymentGetPayload<{ select: { user: true } }>)[];
   users: User[];
   loading: boolean;
 }) => {
+  const [chosenPlanModel, setChosenPlanModel] = React.useState<
+    | (PlanModel & Prisma.PlanModelGetPayload<{ select: { refill: true } }>)
+    | null
+  >(null);
   const { resolve, hide } = useModal('add-plans');
   const {
     register,
@@ -73,8 +78,14 @@ const PlansForm = ({
   useEffect(() => {
     if (planModel === 'none') {
       setValue('price', 0);
+      setChosenPlanModel(null);
     } else {
       const plan = plansModel.find((p) => p.id === planModel);
+      if (plan) {
+        setChosenPlanModel(plan);
+      } else {
+        setChosenPlanModel(null);
+      }
       setValue('price', plan?.price || 0);
     }
   }, [planModel, plansModel]);
@@ -97,6 +108,13 @@ const PlansForm = ({
             <option value="none">No Plans</option>
           )}
         </Form.Select>
+        {chosenPlanModel && (
+          <Form.Text className="text-muted">
+            Price: {chosenPlanModel.price}
+            {'\u20AA'}; Days: {chosenPlanModel.refill.amount_days}; MB:{' '}
+            {chosenPlanModel.refill.amount_mb}
+          </Form.Text>
+        )}
         <Form.Control.Feedback type="invalid">
           {errors.planModel?.message}
         </Form.Control.Feedback>
@@ -133,43 +151,58 @@ const PlansForm = ({
       </Form.Group>
       <Form.Group>
         <Form.Label>Payment</Form.Label>
-        <Form.Check
-          type="checkbox"
-          label="Send Payment"
-          {...register('sendPayment')}
-        />
-        {!sendPayment && (
-          <Form.Select {...register('payment')} isInvalid={!!errors.payment}>
+        <InputGroup>
+          <InputGroup.Checkbox
+            label="Send Payment"
+            onClick={(e: ChangeEvent<HTMLInputElement>) =>
+              setValue('sendPayment', e.target.checked)
+            }
+            {...register('sendPayment')}
+          />
+          <InputGroup.Text>Send Payment</InputGroup.Text>
+          <Form.Select
+            {...register('payment')}
+            isInvalid={!!errors.payment}
+            disabled={sendPayment}
+          >
             <option value="none">None</option>
             {payments.length ? (
               payments.map((payment) => (
                 <option key={payment.id} value={payment.id}>
-                  {`${payment.user.firstName} ${payment.user.lastName} - ${payment.i4UClearingLogId}/${payment.paymentDate}`}
+                  {`${payment.user.firstName} ${payment.user.lastName} - ${payment.i4UClearingLogId}-${payment.paymentDate}`}
                 </option>
               ))
             ) : (
               <option value="none">No Payments</option>
             )}
           </Form.Select>
-        )}
+        </InputGroup>
         <Form.Control.Feedback type="invalid">
           {errors.payment?.message}
         </Form.Control.Feedback>
       </Form.Group>
-      <Form.Group>
-        <Form.Label>Allow Refill</Form.Label>
-        <Form.Check type="checkbox" {...register('allowRefill')} />
-        <Form.Control.Feedback type="invalid">
-          {errors.allowRefill?.message}
-        </Form.Control.Feedback>
-      </Form.Group>
-      <Form.Group>
-        <Form.Label>Create Line</Form.Label>
-        <Form.Check type="checkbox" {...register('createLine')} />
-        <Form.Control.Feedback type="invalid">
-          {errors.createLine?.message}
-        </Form.Control.Feedback>
-      </Form.Group>
+      <Row>
+        <Form.Group as={Col}>
+          <Form.Check
+            label="Allow Refill"
+            type="checkbox"
+            {...register('allowRefill')}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.allowRefill?.message}
+          </Form.Control.Feedback>
+        </Form.Group>
+        <Form.Group as={Col}>
+          <Form.Check
+            label="Create Line"
+            type="checkbox"
+            {...register('createLine')}
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.createLine?.message}
+          </Form.Control.Feedback>
+        </Form.Group>
+      </Row>
       <Button
         variant="secondary"
         onClick={() => hide()}
@@ -182,7 +215,7 @@ const PlansForm = ({
         onClick={handleSubmit((data) => resolve(data))}
         className={styles.submitButton}
       >
-        {loading ? <Spinner animation="border" size="sm" /> : 'Save Changes'}
+        {loading ? <Spinner animation="border" size="sm" /> : 'Create'}
       </Button>
     </Form>
   );

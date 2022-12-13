@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import {
   GridColumns,
+  GridRowId,
   GridRowModel,
   GridRowModesModel,
   GridValidRowModel,
@@ -14,6 +15,7 @@ type RowActionsProps<T extends GridValidRowModel> = {
   setRowModesModel: React.Dispatch<React.SetStateAction<GridRowModesModel>>;
   setRows: React.Dispatch<React.SetStateAction<GridRowModel<T>[]>>;
   rows: GridRowModel<T>[];
+  onDelete?: (id: GridRowId) => Promise<boolean>;
 };
 
 const useAddActions = <T extends GridValidRowModel>({
@@ -23,6 +25,7 @@ const useAddActions = <T extends GridValidRowModel>({
   setRowModesModel,
   setRows,
   rows,
+  onDelete,
 }: RowActionsProps<T>) => {
   // eslint-disable-next-line @typescript-eslint/naming-convention,no-underscore-dangle
   const _columns = useMemo(
@@ -41,6 +44,7 @@ const useAddActions = <T extends GridValidRowModel>({
               setRowModesModel={setRowModesModel}
               setRows={setRows}
               rows={rows}
+              onDelete={onDelete}
             />
           </>,
         ],

@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { NextPageContext } from 'next';
 import React from 'react';
 import prisma from '../../lib/prisma';
@@ -21,9 +22,14 @@ export async function getServerSideProps(context: NextPageContext) {
       createdAt: 'desc',
     },
   });
+  const serializedLines = lines.map((line) => ({
+    ...line,
+    createdAt: format(line.createdAt, 'dd/MM/yy kk:mm'),
+    updatedAt: format(line.updatedAt, 'dd/MM/yy kk:mm'),
+  }));
   return {
     props: {
-      lastLines: lines || [],
+      lastLines: serializedLines,
     },
   };
 }
