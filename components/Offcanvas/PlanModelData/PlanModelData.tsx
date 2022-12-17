@@ -8,18 +8,31 @@ import AdminApi from '../../../utils/api/services/adminApi';
 import BundleData from '../BundleData/BundleData';
 import Section, { SectionType } from '../Section';
 
-export type PlanModelDataType = PlanModel &
-  Prisma.PlanModelGetPayload<{
-    select: {
-      bundle: {
-        include: {
-          refills: true;
+export type PlanModelDataType =
+  | (PlanModel &
+      Prisma.PlanModelGetPayload<{
+        select: {
+          bundle: {
+            include: {
+              refills: true;
+            };
+          };
+          plans: true;
+          coupons: true;
         };
-      };
-      plans: true;
-      coupons: true;
-    };
-  }>;
+      }>)
+  | (PlanModel &
+      Prisma.PlanModelGetPayload<{
+        select: {
+          bundle: {
+            include: {
+              refills: true;
+            };
+          };
+          plans: true;
+          coupons: false;
+        };
+      }>);
 
 const PlanModelData = ({
   planModel,
@@ -87,33 +100,21 @@ const PlanModelData = ({
           title: 'Plans',
           value: planModel.plans,
           type: 'text',
-          RenderData: (): ReactNode => {
-            const [
-              showPaymentsModal,
-              setShowPaymentsModal,
-            ] = React.useState<boolean>(false);
-            return (
-              <Button onClick={() => setShowPaymentsModal(true)}>
-                <FontAwesomeIcon icon={solid('up-right-from-square')} />
-              </Button>
-            );
-          },
+          RenderData: (): ReactNode => (
+            <Button>
+              <FontAwesomeIcon icon={solid('up-right-from-square')} />
+            </Button>
+          ),
         },
         {
           title: 'Coupons',
           value: planModel.coupons,
           type: 'text',
-          RenderData: (): ReactNode => {
-            const [
-              showPaymentsModal,
-              setShowPaymentsModal,
-            ] = React.useState<boolean>(false);
-            return (
-              <Button onClick={() => setShowPaymentsModal(true)}>
-                <FontAwesomeIcon icon={solid('up-right-from-square')} />
-              </Button>
-            );
-          },
+          RenderData: (): ReactNode => (
+            <Button>
+              <FontAwesomeIcon icon={solid('up-right-from-square')} />
+            </Button>
+          ),
         },
       ],
     },

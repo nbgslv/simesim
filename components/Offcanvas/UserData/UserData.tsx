@@ -101,48 +101,31 @@ const UserData = ({
           title: 'Plans',
           value: user.plans,
           type: 'text',
-          RenderData: (): ReactNode => {
-            const [showPlansModal, setShowPlansModal] = React.useState<boolean>(
-              false
-            );
-            return (
-              <Button onClick={() => setShowPlansModal(true)}>
-                <FontAwesomeIcon icon={solid('up-right-from-square')} />
-              </Button>
-            );
-          },
+          RenderData: (): ReactNode => (
+            <Button>
+              <FontAwesomeIcon icon={solid('up-right-from-square')} />
+            </Button>
+          ),
         },
         {
           title: 'Payments',
           value: user.payments,
           type: 'text',
-          RenderData: (): ReactNode => {
-            const [
-              showPaymentsModal,
-              setShowPaymentsModal,
-            ] = React.useState<boolean>(false);
-            return (
-              <Button onClick={() => setShowPaymentsModal(true)}>
-                <FontAwesomeIcon icon={solid('up-right-from-square')} />
-              </Button>
-            );
-          },
+          RenderData: (): ReactNode => (
+            <Button>
+              <FontAwesomeIcon icon={solid('up-right-from-square')} />
+            </Button>
+          ),
         },
         {
           title: 'Coupons',
           value: user.coupons,
           type: 'text',
-          RenderData: (): ReactNode => {
-            const [
-              showCouponsModal,
-              setShowCouponsModal,
-            ] = React.useState<boolean>(false);
-            return (
-              <Button onClick={() => setShowCouponsModal(true)}>
-                <FontAwesomeIcon icon={solid('up-right-from-square')} />
-              </Button>
-            );
-          },
+          RenderData: (): ReactNode => (
+            <Button>
+              <FontAwesomeIcon icon={solid('up-right-from-square')} />
+            </Button>
+          ),
         },
       ],
     },

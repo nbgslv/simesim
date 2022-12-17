@@ -1,6 +1,6 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useEffect } from 'react';
 import { Button, Form, InputGroup, Spinner } from 'react-bootstrap';
-import { PlanModel } from '@prisma/client';
+import { PlanModel, Prisma } from '@prisma/client';
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -15,7 +15,10 @@ const schema = yup.object().shape({
     .number()
     .required('Discount is required')
     .min(0, 'Discount must be greater than 0'),
-  type: yup.mixed().oneOf(['PERCENT', 'AMOUNT']).required('Type is required'),
+  discountType: yup
+    .mixed()
+    .oneOf(['PERCENT', 'AMOUNT'])
+    .required('Type is required'),
   validFrom: yup.date().required('Valid from is required').nullable(true),
   validTo: yup.date().required('Valid from is required').nullable(true),
   maxUsesPerUser: yup
@@ -33,9 +36,14 @@ const CouponsForm = ({
   plansModel,
   loading,
 }: {
-  plansModel: PlanModel[];
+  plansModel: (PlanModel &
+    Prisma.PlanModelGetPayload<{ select: { refill: true } }>)[];
   loading: boolean;
 }) => {
+  const [chosenPlanModel, setChosenPlanModel] = React.useState<
+    | (PlanModel & Prisma.PlanModelGetPayload<{ select: { refill: true } }>)
+    | null
+  >(null);
   const { resolve, hide } = useModal('add-coupons');
   const {
     register,
@@ -51,7 +59,7 @@ const CouponsForm = ({
     defaultValues: {
       code: '',
       discount: 0,
-      type: 'PERCENT',
+      discountType: 'PERCENT',
       validFrom: null,
       validTo: null,
       maxUsesPerUser: 1,
@@ -60,6 +68,17 @@ const CouponsForm = ({
     },
   });
   const maxUsesTotal = watch('maxUsesTotal');
+  const planModel = watch('planModel');
+
+  useEffect(() => {
+    if (planModel) {
+      setChosenPlanModel(
+        plansModel.find(
+          (planModelOfPlansModel) => planModelOfPlansModel.id === planModel
+        ) || null
+      );
+    }
+  }, [planModel]);
 
   return (
     <Form>
@@ -89,12 +108,15 @@ const CouponsForm = ({
       </Form.Group>
       <Form.Group>
         <Form.Label>Type</Form.Label>
-        <Form.Select {...register('type')} isInvalid={!!errors.type}>
+        <Form.Select
+          {...register('discountType')}
+          isInvalid={!!errors.discountType}
+        >
           <option value={'PERCENT'}>%</option>
           <option value={'AMOUNT'}>{'\u20AA'}</option>
         </Form.Select>
         <Form.Control.Feedback type="invalid">
-          {errors.type?.message}
+          {errors.discountType?.message}
         </Form.Control.Feedback>
       </Form.Group>
       <Form.Group>
@@ -145,7 +167,7 @@ const CouponsForm = ({
         </Form.Control.Feedback>
       </Form.Group>
       <Form.Group>
-        <Form.Label>Max Uses Per User</Form.Label>
+        <Form.Label>Max Uses Total</Form.Label>
         <InputGroup>
           <InputGroup.Checkbox
             onClick={(e: ChangeEvent<HTMLInputElement>) =>
@@ -170,15 +192,26 @@ const CouponsForm = ({
         <Form.Select {...register('planModel')} isInvalid={!!errors.planModel}>
           <option value={''}>None</option>
           {plansModel.length ? (
-            plansModel.map((planModel) => (
-              <option key={planModel.id} value={planModel.id as string}>
-                {planModel.name}
+            plansModel.map((planModelOfPlansModel) => (
+              <option
+                key={planModelOfPlansModel.id}
+                value={planModelOfPlansModel.id as string}
+              >
+                {planModelOfPlansModel.name}
               </option>
             ))
           ) : (
             <option value="none">No Plans</option>
           )}
         </Form.Select>
+        {chosenPlanModel && (
+          <Form.Text>
+            Name: {chosenPlanModel.name}; Description:{' '}
+            {chosenPlanModel.description}; MB:{' '}
+            {chosenPlanModel.refill.amount_mb}; Days:{' '}
+            {chosenPlanModel.refill.amount_days}
+          </Form.Text>
+        )}
         <Form.Control.Feedback type="invalid">
           {errors.planModel?.message}
         </Form.Control.Feedback>

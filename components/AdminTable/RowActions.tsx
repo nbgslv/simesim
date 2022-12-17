@@ -1,4 +1,3 @@
-import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import React, { ReactElement, useEffect } from 'react';
 import {
   GridActionsCellItem,

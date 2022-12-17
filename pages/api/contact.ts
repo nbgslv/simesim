@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Inquiry } from '@prisma/client';
+import { Inquiry, Prisma } from '@prisma/client';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<Partial<Inquiry>>>
+  res: NextApiResponse<ApiResponse<Partial<Inquiry> | Prisma.BatchPayload>>
 ) {
   try {
     const { method } = req;
@@ -37,6 +37,19 @@ export default async function handler(
       });
 
       res.status(201).json({ success: true, data: { id: newInquiry.id } });
+    } else if (method === 'DELETE') {
+      const { action, input } = req.body;
+      if (action === 'deleteMany') {
+        const deleteMany = await prisma.inquiry.deleteMany({
+          ...input,
+        });
+        res.status(200).json({ success: true, data: deleteMany });
+      } else if (action === 'delete') {
+        const deleteOne = await prisma.inquiry.delete({
+          ...input,
+        });
+        res.status(200).json({ success: true, data: deleteOne });
+      }
     } else {
       res.status(405).json({
         name: 'METHOD_NOT_ALLOWED',

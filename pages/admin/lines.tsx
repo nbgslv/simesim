@@ -1,7 +1,7 @@
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { NextPageContext } from 'next';
-import React from 'react';
+import React, { useState } from 'react';
 import { Bundle, Line, Prisma, Refill } from '@prisma/client';
 import {
   GridCellParams,
@@ -21,10 +21,11 @@ import PlanData, {
 import RefillsAdminModal from '../../components/Refills/RefillsAdminModal';
 import prisma from '../../lib/prisma';
 import { verifyAdmin } from '../../utils/auth';
+import AdminApi from '../../utils/api/services/adminApi';
 
-type LineAsAdminTableData = (GridValidRowModel &
-  Line &
-  Prisma.LineGetPayload<{ select: { plan: true } }>)[];
+type LineData = Line & Prisma.LineGetPayload<{ select: { plan: true } }>;
+
+type LineAsAdminTableData = (GridValidRowModel & LineData)[];
 
 type LinesProps = {
   lines: LineAsAdminTableData;
@@ -37,6 +38,7 @@ const Lines = ({ lines }: LinesProps) => {
     (Bundle & Prisma.BundleGetPayload<{ select: { refills: true } }>) | null
   >(null);
   const [refillData, setRefillData] = React.useState<Refill | null>(null);
+  const [adminApi] = useState<AdminApi>(new AdminApi());
   const modal = useModal('add-line');
 
   const columns: GridColumns = [
@@ -118,20 +120,26 @@ const Lines = ({ lines }: LinesProps) => {
   ];
 
   const addRow = async (data: Line) => {
-    const newLine = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/lines`,
+    const newLine = await adminApi.callApi<
+      LineData,
+      'create',
       {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        select: {
+          plan: true;
+        };
       }
-    );
-    const newLineJson = await newLine.json();
-    if (!newLineJson.success) throw new Error('Line creation failed');
-    setLineRows([...lineRows, newLineJson.data]);
-    return { id: newLineJson.data.id, columnToFocus: undefined };
+    >({
+      method: 'POST',
+      model: 'Line',
+      input: {
+        data,
+        include: {
+          plan: true,
+        },
+      },
+    });
+    setLineRows([...lineRows, newLine]);
+    return { id: newLine.id, columnToFocus: undefined };
   };
 
   const showModal = async () => {
@@ -140,9 +148,10 @@ const Lines = ({ lines }: LinesProps) => {
       return await addRow(addData as Line);
     } catch (e) {
       modal.reject(e);
+      return e as Error;
+    } finally {
       await modal.hide();
       modal.remove();
-      return e as Error;
     }
   };
 

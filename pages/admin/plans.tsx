@@ -39,7 +39,7 @@ import prisma from '../../lib/prisma';
 import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
 import { verifyAdmin } from '../../utils/auth';
 
-type PlansType = Plan &
+type PlanData = Plan &
   Prisma.PlanGetPayload<{
     select: {
       planModel: {
@@ -63,7 +63,7 @@ type PlansType = Plan &
     };
   }>;
 
-type PlansAsAdminTableData = (GridValidRowModel & PlansType)[];
+type PlansAsAdminTableData = (GridValidRowModel & PlanData)[];
 
 type PlansProps = {
   plans: PlansAsAdminTableData;
@@ -96,8 +96,8 @@ const Plans = ({
   const [refillData, setRefillData] = useState<GridRowModel | null>(null);
   const [userData, setUserData] = useState<GridRowModel | null>(null);
   const [paymentData, setPaymentData] = useState<GridRowModel | null>(null);
-  const modal = useModal('add-plans');
   const [adminApi] = useState(new AdminApi());
+  const modal = useModal('add-plans');
 
   const updatePlan = async (
     id: GridRowId,
@@ -105,7 +105,7 @@ const Plans = ({
   ): Promise<Plan | null> => {
     try {
       const updatedPlan = await adminApi.callApi<
-        PlansType,
+        PlanData,
         'update',
         {
           select: {
@@ -230,7 +230,7 @@ const Plans = ({
             value: line.id,
           }))}
           onSelect={(option) => {
-            params.api.setEditCellValue({ ...params, value: option.id });
+            params.api.setEditCellValue({ ...params, value: option?.value });
           }}
           defaultValue={params.row.lineId}
         />
@@ -257,7 +257,7 @@ const Plans = ({
             value: bundle.id,
           }))}
           onSelect={(option) => {
-            params.api.setEditCellValue({ ...params, value: option.id });
+            params.api.setEditCellValue({ ...params, value: option?.value });
           }}
           defaultValue={params.row.bundleId}
         />
@@ -283,7 +283,7 @@ const Plans = ({
               value: refill.id,
             }))}
           onSelect={(option) => {
-            params.api.setEditCellValue({ ...params, value: option.id });
+            params.api.setEditCellValue({ ...params, value: option?.value });
           }}
           defaultValue={params.row.refillId}
         />
@@ -314,7 +314,7 @@ const Plans = ({
             value: user.id,
           }))}
           onSelect={(option) => {
-            params.api.setEditCellValue({ ...params, value: option.id });
+            params.api.setEditCellValue({ ...params, value: option?.value });
           }}
           defaultValue={params.row.userId}
         />
@@ -338,7 +338,7 @@ const Plans = ({
             value: payment.id,
           }))}
           onSelect={(option) => {
-            params.api.setEditCellValue({ ...params, value: option.id });
+            params.api.setEditCellValue({ ...params, value: option?.value });
           }}
         />
       ),
@@ -354,78 +354,109 @@ const Plans = ({
   ];
 
   const handleDeleteRows = async (ids: GridRowId[]) => {
-    try {
-      await adminApi.callApi<
-        PlansType,
-        'deleteMany',
-        {
-          select: {
-            planModel: {
-              include: {
-                bundle: true;
-                refill: true;
-              };
-            };
-            user: true;
-            payment: {
-              include: {
-                paymentMethod: true;
-              };
-            };
-            line: true;
-            bundle: {
-              include: {
-                refills: true;
-              };
+    await adminApi.callApi<
+      PlanData,
+      'deleteMany',
+      {
+        select: {
+          planModel: {
+            include: {
+              bundle: true;
+              refill: true;
             };
           };
-        }
-      >({
-        method: 'DELETE',
-        action: AdminApiAction.deleteMany,
-        model: 'Plan',
-        input: {
-          where: {
-            id: {
-              in: ids as string[],
-            },
+          user: true;
+          payment: {
+            include: {
+              paymentMethod: true;
+            };
+          };
+          line: true;
+          bundle: {
+            include: {
+              refills: true;
+            };
+          };
+        };
+      }
+    >({
+      method: 'DELETE',
+      action: AdminApiAction.deleteMany,
+      model: 'Plan',
+      input: {
+        where: {
+          id: {
+            in: ids as string[],
           },
         },
-      });
-      setPlansRows(plansRows.filter((plan) => !ids.includes(plan.id!)));
-    } catch (error) {
-      console.error(error);
-    }
+      },
+    });
+    setPlansRows(plansRows.filter((plan) => !ids.includes(plan.id!)));
   };
 
   const handleDeleteRow = async (id: GridRowId) => {
-    try {
-      await handleDeleteRows([id]);
-    } catch (error) {
-      console.error(error);
-    }
+    await handleDeleteRows([id]);
   };
 
   const addRow = async (
     data: Plan
   ): Promise<{ id: string; columnToFocus: undefined }> => {
     setAddRowLoading(true);
-    const newPlan = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/plan`,
+    const newPlan = await adminApi.callApi<
+      PlanData,
+      'create',
       {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        select: {
+          planModel: {
+            include: {
+              bundle: true;
+              refill: true;
+            };
+          };
+          user: true;
+          payment: {
+            include: {
+              paymentMethod: true;
+            };
+          };
+          line: true;
+          bundle: {
+            include: {
+              refills: true;
+            };
+          };
+        };
       }
-    );
-    const newPlanJson = await newPlan.json();
-    if (!newPlanJson.success) throw new Error('Plan creation failed');
-    setPlansRows([...plansRows, newPlanJson.data]);
+    >({
+      method: 'POST',
+      model: 'Plan',
+      input: {
+        data,
+        include: {
+          planModel: {
+            include: {
+              bundle: true,
+              refill: true,
+            },
+          },
+          user: true,
+          payment: {
+            include: {
+              paymentMethod: true,
+            },
+          },
+          line: true,
+          bundle: {
+            include: {
+              refills: true,
+            },
+          },
+        },
+      },
+    });
+    setPlansRows([...plansRows, newPlan]);
     setAddRowLoading(false);
-    await modal.hide();
-    return { id: newPlanJson.data.id, columnToFocus: undefined };
+    return { id: newPlan.id, columnToFocus: undefined };
   };
 
   const showModal = async (): Promise<
@@ -436,25 +467,19 @@ const Plans = ({
       return await addRow(addData as Plan);
     } catch (e) {
       modal.reject(e);
+      return e as Error;
+    } finally {
       await modal.hide();
       modal.remove();
-      return e as Error;
     }
   };
 
   const handleRowUpdate = async (
     rowId: GridRowId,
     updatedData: Partial<Plan>
-  ): Promise<Plan | Error> => {
-    try {
-      const updatedPlan = await updatePlan(rowId, updatedData);
-      if (updatedPlan) return updatedPlan;
-      throw new Error('Plan update failed');
-    } catch (error) {
-      console.error(error);
-      return error as Error;
-    }
-  };
+  ): Promise<Plan> =>
+    (await updatePlan(rowId, updatedData)) ||
+    (plansRows.find((row) => row.id === rowId) as Plan);
 
   return (
     <AdminLayout>

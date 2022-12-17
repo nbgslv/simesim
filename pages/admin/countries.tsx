@@ -1,7 +1,7 @@
 import { NextPageContext } from 'next';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { format, parseISO } from 'date-fns';
-import { Prisma } from '@prisma/client';
+import { Country } from '@prisma/client';
 import {
   GridColumns,
   GridRowId,
@@ -9,27 +9,30 @@ import {
   GridSelectionModel,
   GridValidRowModel,
 } from '@mui/x-data-grid';
+import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
 import AdminTableSwitch from '../../components/AdminTable/AdminTableSwitch';
 import { verifyAdmin } from '../../utils/auth';
+import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
+import CountriesForm from '../../components/Countries/CountriesForm';
+import FormModal from '../../components/AdminTable/FormModal';
 
-type CountriesAsAdminTableData = (GridValidRowModel &
-  Prisma.CountryMaxAggregateOutputType)[];
+type CountriesAsAdminTableData = (GridValidRowModel & Country)[];
 
 const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
-  const [
-    countriesRows,
-    setCountriesRows,
-  ] = React.useState<CountriesAsAdminTableData>(countries);
-  const [changeShowLoading, setChangeShowLoading] = React.useState<GridRowId>(
-    ''
+  const [countriesRows, setCountriesRows] = useState<CountriesAsAdminTableData>(
+    countries
   );
+  const [addCountryLoading, setAddCountryLoading] = useState<boolean>(false);
+  const [changeShowLoading, setChangeShowLoading] = useState<GridRowId>('');
   const [
     changeLockTranslationLoading,
     setChangeLockTranslationLoading,
-  ] = React.useState<GridRowId>('');
+  ] = useState<GridRowId>('');
+  const [adminApi] = useState<AdminApi>(new AdminApi());
+  const modal = useModal('add-country');
 
   useEffect(() => {
     setCountriesRows(countries);
@@ -50,7 +53,7 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
   const handleLockTranslationToggle = async (
     checked: boolean,
     rowId: GridRowId,
-    row: GridRowModel<Prisma.CountryMaxAggregateOutputType>
+    row: GridRowModel<Country>
   ) => {
     try {
       setChangeLockTranslationLoading(rowId);
@@ -88,7 +91,7 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
   const handleShowToggle = async (
     checked: boolean,
     rowId: GridRowId,
-    row: GridRowModel<Prisma.CountryMaxAggregateOutputType>
+    row: GridRowModel<Country>
   ) => {
     try {
       setChangeShowLoading(rowId);
@@ -169,67 +172,101 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
   ];
 
   const handleRowUpdate = async (
-    newRow: GridRowModel<Prisma.CountryMaxAggregateOutputType>,
-    oldRow: GridRowModel<Prisma.CountryMaxAggregateOutputType>
-  ) => {
+    rowId: GridRowId,
+    updatedData: Partial<Country>
+  ): Promise<Country> => {
+    const update = await adminApi.callApi<Country, 'update'>({
+      method: 'PUT',
+      model: 'Country',
+      input: {
+        where: { id: rowId as string },
+        data: updatedData,
+      },
+    });
+    setCountriesRows((oldCountries) =>
+      oldCountries.map((country) => (country.id === rowId ? update : country))
+    );
+    return update;
+  };
+
+  const handleDeleteRows = async (rows: GridSelectionModel) => {
     try {
-      const update = await updateRow(
-        JSON.stringify({
-          ...newRow,
-          id: oldRow.id,
-        })
+      await adminApi.callApi<Country, 'deleteMany'>({
+        method: 'DELETE',
+        model: 'Country',
+        action: AdminApiAction.deleteMany,
+        input: {
+          where: { id: { in: rows as string[] } },
+        },
+      });
+      setCountriesRows((oldCountries) =>
+        oldCountries.filter((country) => !rows.includes(country.id))
       );
-      const updateJson = await update.json();
-      if (!updateJson.success)
-        throw new Error('Failed to update lockTranslation');
-      const serializedUpdate = { ...updateJson.data };
-      serializedUpdate.createdAt = format(
-        parseISO(serializedUpdate.createdAt),
-        'dd/MM/yy kk:mm'
-      );
-      serializedUpdate.updatedAt = format(
-        parseISO(serializedUpdate.updatedAt),
-        'dd/MM/yy kk:mm'
-      );
-      return serializedUpdate;
     } catch (e) {
       console.error(e);
-      return oldRow;
     }
   };
 
-  const handleRowsDelete = async (rows: GridSelectionModel) => {
+  const handleDeleteRow = async (id: GridRowId) => {
     try {
-      const deleteRes = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/country`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            id: Array.from(rows.keys()),
-          }),
-        }
-      );
-      const deleteJson = await deleteRes.json();
-      if (!deleteJson.success) throw new Error('Country deletion failed');
-      return deleteJson.data.count;
+      await handleDeleteRows([id]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const addRow = async (newRow: Country) => {
+    try {
+      setAddCountryLoading(true);
+      const newCountry = await adminApi.callApi<Country, 'create'>({
+        method: 'POST',
+        model: 'Country',
+        input: {
+          data: newRow,
+        },
+      });
+      setCountriesRows((oldCountries) => [...oldCountries, newCountry]);
+      return { id: newCountry.id, columnToFocus: undefined };
     } catch (e) {
       console.error(e);
-      return 0;
+      return { id: '', columnToFocus: undefined };
+    } finally {
+      setAddCountryLoading(false);
+    }
+  };
+
+  const showModal = async (): Promise<
+    Error | { id: GridRowId; columnToFocus: string | undefined }
+  > => {
+    try {
+      const addData = await NiceModal.show('add-country');
+      return await addRow(addData as Country);
+    } catch (e) {
+      modal.reject(e);
+      return e as Error;
+    } finally {
+      await modal.hide();
+      modal.remove();
     }
   };
 
   return (
     <AdminLayout>
-      <AdminTable
+      <AdminTable<Country>
         columns={columns}
         data={countriesRows}
         processRowUpdate={handleRowUpdate}
-        onDelete={handleRowsDelete}
-        rowActions={[]}
+        deleteRows={handleDeleteRows}
+        deleteRow={handleDeleteRow}
+        addRow={showModal}
       />
+      <FormModal
+        {...bootstrapDialog(modal)}
+        header="Add Country"
+        id="add-country"
+      >
+        <CountriesForm loading={addCountryLoading} />
+      </FormModal>
     </AdminLayout>
   );
 };

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
-import { Nav } from 'react-bootstrap';
 import Timeline from './Timeline';
 import TimelineItem from './TimelineItem';
 import text from '../../lib/content/text.json';

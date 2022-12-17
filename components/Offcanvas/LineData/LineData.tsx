@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Line, Prisma, User } from '@prisma/client';
+import { Line } from '@prisma/client';
 import { ProgressBar, Spinner } from 'react-bootstrap';
 import AdminApi from '../../../utils/api/services/adminApi';
 import Section, { SectionType } from '../Section';

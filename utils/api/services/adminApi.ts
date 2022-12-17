@@ -35,7 +35,9 @@ type MapPrismaTypes<
     }
   ],
   [
-    T extends undefined ? PlanModel : PlanModel & Prisma.PlanModelGetPayload<T>,
+    T extends Prisma.HasInclude | Prisma.HasSelect
+      ? PlanModel & Prisma.PlanModelGetPayload<T>
+      : PlanModel,
     {
       findFirst: Prisma.PlanModelFindFirstArgs;
       findMany: Prisma.PlanModelFindManyArgs;
@@ -48,7 +50,9 @@ type MapPrismaTypes<
     }
   ],
   [
-    T extends undefined ? Plan : Plan & Prisma.PlanGetPayload<T>,
+    T extends Prisma.HasInclude | Prisma.HasSelect
+      ? Plan & Prisma.PlanGetPayload<T>
+      : Plan,
     {
       findFirst: Prisma.PlanFindFirstArgs;
       findMany: Prisma.PlanFindManyArgs;
@@ -61,7 +65,9 @@ type MapPrismaTypes<
     }
   ],
   [
-    T extends undefined ? Payment : Payment & Prisma.PaymentGetPayload<T>,
+    T extends Prisma.HasInclude | Prisma.HasSelect
+      ? Payment & Prisma.PaymentGetPayload<T>
+      : Payment,
     {
       findFirst: Prisma.PaymentFindFirstArgs;
       findMany: Prisma.PaymentFindManyArgs;
@@ -74,9 +80,9 @@ type MapPrismaTypes<
     }
   ],
   [
-    T extends undefined
-      ? PaymentMethod
-      : PaymentMethod & Prisma.PaymentMethodGetPayload<T>,
+    T extends Prisma.HasInclude | Prisma.HasSelect
+      ? PaymentMethod & Prisma.PaymentMethodGetPayload<T>
+      : PaymentMethod,
     {
       findFirst: Prisma.PaymentMethodFindFirstArgs;
       findMany: Prisma.PaymentMethodFindManyArgs;
@@ -89,7 +95,9 @@ type MapPrismaTypes<
     }
   ],
   [
-    T extends undefined ? Line : Line & Prisma.LineGetPayload<T>,
+    T extends Prisma.HasInclude | Prisma.HasSelect
+      ? Line & Prisma.LineGetPayload<T>
+      : Line,
     {
       findFirst: Prisma.LineFindFirstArgs;
       findMany: Prisma.LineFindManyArgs;
@@ -102,7 +110,9 @@ type MapPrismaTypes<
     }
   ],
   [
-    T extends undefined ? Bundle : Bundle & Prisma.BundleGetPayload<T>,
+    T extends Prisma.HasInclude | Prisma.HasSelect
+      ? Bundle & Prisma.BundleGetPayload<T>
+      : Bundle,
     {
       findFirst: Prisma.BundleFindFirstArgs;
       findMany: Prisma.BundleFindManyArgs;
@@ -115,9 +125,9 @@ type MapPrismaTypes<
     }
   ],
   [
-    T extends undefined
-      ? DataBundle
-      : DataBundle & Prisma.DataBundleGetPayload<T>,
+    T extends Prisma.HasInclude | Prisma.HasSelect
+      ? DataBundle & Prisma.DataBundleGetPayload<T>
+      : DataBundle,
     {
       findFirst: Prisma.DataBundleFindFirstArgs;
       findMany: Prisma.DataBundleFindManyArgs;
@@ -130,7 +140,9 @@ type MapPrismaTypes<
     }
   ],
   [
-    T extends undefined ? Refill : Refill & Prisma.RefillGetPayload<T>,
+    T extends Prisma.HasInclude | Prisma.HasSelect
+      ? Refill & Prisma.RefillGetPayload<T>
+      : Refill,
     {
       findFirst: Prisma.RefillFindFirstArgs;
       findMany: Prisma.RefillFindManyArgs;
@@ -169,7 +181,9 @@ type MapPrismaTypes<
     }
   ],
   [
-    T extends undefined ? Coupon : Coupon & Prisma.CouponGetPayload<T>,
+    T extends Prisma.HasInclude | Prisma.HasSelect
+      ? Coupon & Prisma.CouponGetPayload<T>
+      : Coupon,
     {
       findFirst: Prisma.CouponFindFirstArgs;
       findMany: Prisma.CouponFindManyArgs;
@@ -242,7 +256,7 @@ export default class AdminApi {
   private readonly _apiPrefix = '/api';
 
   private readonly _endPoints: Record<string, string> = {
-    inquiries: '/contact',
+    inquiry: '/contact',
     country: '/country',
     coupon: '/coupon',
     order: '/order',
@@ -250,6 +264,7 @@ export default class AdminApi {
     planModel: '/planmodel',
     user: '/user',
     payment: '/payment',
+    line: '/line',
   };
 
   callApi = async <

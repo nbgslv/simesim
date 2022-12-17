@@ -3,14 +3,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tooltip } from '@mui/material';
 import { NextPageContext } from 'next';
 import React, { useEffect, useState } from 'react';
-import { Prisma, PlanModel, Bundle, Refill, Coupon } from '@prisma/client';
+import { Bundle, Coupon, PlanModel, Prisma, Refill } from '@prisma/client';
 import {
   GridCellParams,
   GridColumns,
   GridRowId,
   GridValidRowModel,
 } from '@mui/x-data-grid';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import { Button } from 'react-bootstrap';
 import AdminSelect from '../../components/AdminSelect/AdminSelect';
@@ -78,40 +78,36 @@ const PlansModel = ({
     setChosenBundle(bundle);
   };
 
-  const handleVatToggle = async (
-    checked: boolean,
-    rowId: GridRowId,
-    row: GridValidRowModel
-  ) => {
+  const handleVatToggle = async (checked: boolean, rowId: GridRowId) => {
     try {
       setVatToggleLoading(rowId);
-      const update = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/plansmodel`,
+      const update = await adminApi.callApi<
+        PlanModelData,
+        'update',
         {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...row,
-            vat: checked,
-            id: row.id,
-          }),
+          select: {
+            bundle: {
+              include: {
+                refills: true;
+              };
+            };
+            refill: true;
+          };
         }
-      );
-      const updateJson = await update.json();
-      if (!updateJson.success) throw new Error('Plan Model update failed');
-      const serializedUpdate = { ...updateJson };
-      serializedUpdate.createdAt = format(
-        parseISO(serializedUpdate.createdAt),
-        'dd/MM/yy kk:mm'
-      );
-      serializedUpdate.updatBatchPayloadedAt = format(
-        parseISO(serializedUpdate.updatedAt),
-        'dd/MM/yy kk:mm'
-      );
+      >({
+        method: 'PUT',
+        model: 'PlanModel',
+        input: {
+          where: {
+            id: rowId as string,
+          },
+          data: {
+            vat: checked,
+          },
+        },
+      });
       setPlansRows(
-        plansRows.map((plan) => (plan.id === rowId ? serializedUpdate : plan))
+        plansRows.map((plan) => (plan.id === rowId ? update : plan))
       );
     } catch (e) {
       console.error(e);
@@ -140,14 +136,14 @@ const PlansModel = ({
           options={existingBundles.map((bundle) => ({
             value: bundle.id,
             label: bundle.name,
-            id: bundle.id,
           }))}
           onSelect={(option) => {
-            params.api.setEditCellValue({ ...params, value: option.value });
+            params.api.setEditCellValue({ ...params, value: option?.value });
           }}
+          defaultValue={params.row.bundleId}
         />
       ),
-      width: 70,
+      width: 150,
       editable: true,
     },
     {
@@ -166,14 +162,14 @@ const PlansModel = ({
             .map((refill) => ({
               value: refill.id,
               label: refill.title,
-              id: refill.id,
             }))}
           onSelect={(option) => {
-            params.api.setEditCellValue({ ...params, value: option.value });
+            params.api.setEditCellValue({ ...params, value: option?.value });
           }}
+          defaultValue={params.row.refillId}
         />
       ),
-      width: 70,
+      width: 150,
       editable: true,
     },
     {
@@ -223,6 +219,21 @@ const PlansModel = ({
           <FontAwesomeIcon icon={solid('arrow-up')} />
         </Button>
       ),
+      renderEditCell: (params) => (
+        <AdminSelect<true>
+          ariaLabel="select coupons"
+          options={existingCoupons.map((coupon) => ({
+            value: coupon.id,
+            label: `${coupon.code} - ${coupon.discount}${
+              coupon.discountType === 'PERCENT' ? '%' : '\u20AA'
+            }`,
+          }))}
+          onSelect={(option) => {
+            params.api.setEditCellValue({ ...params, value: option });
+          }}
+          defaultValue={params.row.coupons}
+        />
+      ),
     },
     {
       field: 'createdAt',
@@ -237,31 +248,30 @@ const PlansModel = ({
   ];
 
   const addRow = async (
-    data: Prisma.PlanModelMaxAggregateOutputType
+    data: PlanModel
   ): Promise<{ id: GridRowId; columnToFocus: undefined } | Error> => {
-    try {
-      if (data) {
-        const newPlanModel = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/plansmodel`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-          }
-        );
-        const newPlanModelJson = await newPlanModel.json();
-        if (!newPlanModelJson.success)
-          throw new Error('Plan Model creation failed');
-        setPlansRows([...plansRows, newPlanModelJson.data]);
-        return { id: newPlanModelJson.data.id, columnToFocus: undefined };
+    const newPlanModel = await adminApi.callApi<
+      PlanModelData,
+      'create',
+      {
+        select: {
+          bundle: {
+            include: {
+              refills: true;
+            };
+          };
+          refill: true;
+        };
       }
-      throw new Error('No data');
-    } catch (e) {
-      console.error(e);
-      return e as Error;
-    }
+    >({
+      method: 'POST',
+      model: 'PlanModel',
+      input: {
+        data,
+      },
+    });
+    setPlansRows([...plansRows, newPlanModel]);
+    return { id: newPlanModel.id, columnToFocus: undefined };
   };
 
   const handleDeleteRows = async (ids: GridRowId[]) => {
@@ -298,63 +308,52 @@ const PlansModel = ({
   > => {
     try {
       const addData = await NiceModal.show('add-plansmodel');
-      return await addRow(addData as PlanModel);
+      return await addRow(addData as PlanModelData);
     } catch (e) {
       modal.reject(e);
+      return e as Error;
+    } finally {
       await modal.hide();
       modal.remove();
-      return e as Error;
     }
   };
 
   const handleRowUpdate = async (
     rowId: GridRowId,
     updatedData: Partial<PlanModel>
-  ): Promise<PlanModel | Error> => {
-    try {
-      const updatedPlanModel = await adminApi.callApi<
-        PlanModelData,
-        'update',
-        {
-          select: {
-            bundle: {
-              include: {
-                refills: true;
-              };
+  ): Promise<PlanModel> =>
+    adminApi.callApi<
+      PlanModelData,
+      'update',
+      {
+        select: {
+          bundle: {
+            include: {
+              refills: true;
             };
-            refill: true;
           };
-        }
-      >({
-        method: 'PUT',
-        model: 'PlanModel',
-        input: {
-          where: { id: rowId as string },
-          data: updatedData,
-          include: {
-            bundle: {
-              include: {
-                refills: true,
-              },
+          refill: true;
+        };
+      }
+    >({
+      method: 'PUT',
+      model: 'PlanModel',
+      input: {
+        where: { id: rowId as string },
+        data: updatedData,
+        include: {
+          bundle: {
+            include: {
+              refills: true,
             },
-            refill: true,
           },
+          refill: true,
         },
-      });
-      if (updatedPlanModel) return updatedPlanModel;
-      throw new Error('PlanModel update failed');
-    } catch (error) {
-      console.error(error);
-      return error as Error;
-    }
-  };
+      },
+    });
 
   const handleDeleteRow = async (id: GridRowId) => {
-    try {
-      await handleDeleteRows([id as string]);
-    } catch (error) {
-      console.error(error);
-    }
+    await handleDeleteRows([id as string]);
   };
 
   return (

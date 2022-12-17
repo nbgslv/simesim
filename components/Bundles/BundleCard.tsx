@@ -18,7 +18,7 @@ const BundleCard = ({
     start: {
       scale: [1, 1.1, 1],
       transition: {
-        type: 'spring',
+        discountType: 'spring',
         duration: 3,
         repeat: Infinity,
       },

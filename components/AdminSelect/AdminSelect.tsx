@@ -1,26 +1,40 @@
-import React, { ChangeEvent, useEffect } from 'react';
-import { Form } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import Select, {
+  Props,
+  MultiValue,
+  OptionsOrGroups,
+  GroupBase,
+} from 'react-select';
+import { OnChangeValue } from 'react-select/dist/declarations/src/types';
 
 export type AdminSelectOption = {
-  id: string;
   label: string;
   value: string;
 };
 
-type AdminSelectProps = {
+type AdminSelectProps<
+  IsMulti extends boolean = false,
+  Group extends GroupBase<AdminSelectOption> = GroupBase<AdminSelectOption>
+> = Props<AdminSelectOption, IsMulti, Group> & {
   ariaLabel: string;
-  options: AdminSelectOption[];
-  onSelect: (option: AdminSelectOption) => void;
-  defaultValue?: string;
+  options: OptionsOrGroups<AdminSelectOption, any>;
+  onSelect: (option: OnChangeValue<AdminSelectOption, IsMulti>) => void;
+  isMulti?: boolean;
 };
 
-const AdminSelect = ({
+const AdminSelect = <
+  IsMulti extends boolean = false,
+  Group extends GroupBase<AdminSelectOption> = GroupBase<AdminSelectOption>
+>({
   ariaLabel,
   options,
   onSelect,
   defaultValue,
-}: AdminSelectProps) => {
-  const [selected, setSelected] = React.useState<string>('');
+  isMulti,
+}: AdminSelectProps<IsMulti, Group>) => {
+  const [selected, setSelected] = React.useState<
+    AdminSelectOption | MultiValue<AdminSelectOption> | null
+  >(null);
 
   useEffect(() => {
     if (defaultValue) {
@@ -28,26 +42,38 @@ const AdminSelect = ({
     }
   }, [defaultValue]);
 
-  const handleSelect = (e: ChangeEvent<HTMLSelectElement>) => {
-    const selectedOption = options.find(
-      (option: AdminSelectOption) => option.value === e.target.value
-    );
-    setSelected(selectedOption?.value || '');
-    if (selectedOption) onSelect(selectedOption);
+  const handleSelect = (
+    newValue: OnChangeValue<AdminSelectOption, IsMulti>
+  ) => {
+    setSelected(newValue);
+    onSelect(newValue);
   };
 
   return (
-    <Form.Select
-      aria-label={ariaLabel}
+    <Select
       value={selected}
+      options={options as OptionsOrGroups<AdminSelectOption, any>}
       onChange={handleSelect}
-    >
-      {options.map((option: AdminSelectOption) => (
-        <option key={option.id} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </Form.Select>
+      aria-label={ariaLabel}
+      isSearchable
+      styles={{
+        container: (baseStyles) => ({
+          ...baseStyles,
+          width: '100%',
+        }),
+        menu: (baseStyles) => ({
+          ...baseStyles,
+          direction: 'ltr',
+        }),
+        option: (baseStyle) => ({
+          ...baseStyle,
+          color: '#000',
+        }),
+      }}
+      isMulti={isMulti}
+      menuPortalTarget={document.body}
+      menuPosition={'fixed'}
+    />
   );
 };
 

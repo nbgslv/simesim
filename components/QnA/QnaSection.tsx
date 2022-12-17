@@ -64,7 +64,7 @@ const QnaSection = () => (
         repeat: Infinity,
         duration: 5,
         repeatType: 'mirror',
-        type: 'spring',
+        discountType: 'spring',
       }}
     >
       <Image

@@ -4,7 +4,7 @@ import { Plan, Prisma } from '@prisma/client';
 import { Spinner } from 'react-bootstrap';
 import AdminApi from '../../../utils/api/services/adminApi';
 import PaymentData from '../PaymentData/PaymentData';
-import PlanModelData from '../PlanModel/PlanModel';
+import PlanModelData from '../PlanModelData/PlanModelData';
 import Section, { SectionType } from '../Section';
 import UserData from '../UserData/UserData';
 

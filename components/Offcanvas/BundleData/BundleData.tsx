@@ -1,8 +1,8 @@
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { ReactNode, useState } from 'react';
-import { Bundle, Prisma, User } from '@prisma/client';
-import { Button } from 'react-bootstrap';
+import { Bundle, Prisma } from '@prisma/client';
+import { Button, Spinner } from 'react-bootstrap';
 import AdminApi from '../../../utils/api/services/adminApi';
 import CountriesAdminModal from '../../Countries/CountriesAdminModal';
 import { Refills } from '../../Refills/RefillsAdminModal';
@@ -122,11 +122,15 @@ const BundleData = ({
 
   return (
     <div>
-      <Section
-        sections={data}
-        onDelete={handleBundleDelete}
-        setLoading={(value) => setLoading(value)}
-      />
+      {loading ? (
+        <Spinner animation="border" />
+      ) : (
+        <Section
+          sections={data}
+          onDelete={handleBundleDelete}
+          setLoading={(value) => setLoading(value)}
+        />
+      )}
     </div>
   );
 };

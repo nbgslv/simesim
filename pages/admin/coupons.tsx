@@ -1,31 +1,70 @@
 import { NextPageContext } from 'next';
-import React, { useEffect } from 'react';
-import { format, parse } from 'date-fns';
-import { Coupon, PlanModel } from '@prisma/client';
-import { GridColumns, GridValidRowModel } from '@mui/x-data-grid';
+import React, { useEffect, useState } from 'react';
+import { format, parse, parseISO } from 'date-fns';
+import { Coupon, PlanModel, Prisma } from '@prisma/client';
+import { GridColumns, GridRowId, GridValidRowModel } from '@mui/x-data-grid';
 import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import { Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
+import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
 import FormModal from '../../components/AdminTable/FormModal';
 import CouponsForm from '../../components/Coupons/CouponsForm';
 import { verifyAdmin } from '../../utils/auth';
+import AdminOffcanvas from '../../components/Offcanvas/AdminOffcanvas';
+import PlanModelData from '../../components/Offcanvas/PlanModelData/PlanModelData';
+import AdminSelect from '../../components/AdminSelect/AdminSelect';
+import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
 
-type CouponsAsAdminTableData = (GridValidRowModel & Coupon)[];
+type CouponData = Coupon &
+  Prisma.CouponGetPayload<{
+    select: {
+      planModel: {
+        include: {
+          bundle: {
+            include: {
+              refills: true;
+            };
+          };
+          plans: true;
+        };
+      };
+    };
+  }>;
+
+type PlanModelDataType = PlanModel &
+  Prisma.PlanModelGetPayload<{
+    select: {
+      bundle: {
+        include: {
+          refills: true;
+        };
+      };
+      plans: true;
+    };
+  }>;
+
+type CouponsAsAdminTableData = (GridValidRowModel & CouponData)[];
 
 const Coupons = ({
   coupons,
   plansModel,
 }: {
   coupons: CouponsAsAdminTableData;
-  plansModel: PlanModel[];
+  plansModel: (PlanModel &
+    Prisma.PlanModelGetPayload<{ select: { refill: true } }>)[];
 }) => {
-  const [couponsRows, setCouponsRows] = React.useState<CouponsAsAdminTableData>(
+  const [couponsRows, setCouponsRows] = useState<CouponsAsAdminTableData>(
     coupons
   );
-  const [addRowLoading, setAddRowLoading] = React.useState<boolean>(false);
+  const [addRowLoading, setAddRowLoading] = useState<boolean>(false);
+  const [planModelData, setPlanModelData] = useState<PlanModelDataType | null>(
+    null
+  );
+  const [adminApi] = useState<AdminApi>(new AdminApi());
   const modal = useModal('add-coupons');
 
   useEffect(() => {
@@ -46,10 +85,11 @@ const Coupons = ({
     {
       field: 'discount',
       headerName: 'Discount',
-      valueGetter: (params: any) =>
-        `${params.value}${
-          params.row.discountType === 'PERCENT' ? '%' : '\u20AA'
-        }`,
+      valueFormatter: ({ id, value, api }) => {
+        const discountType = api.getCellParams(id as GridRowId, 'discountType');
+        return `${value}${discountType.value === 'PERCENT' ? '%' : '\u20AA'}`;
+      },
+      type: 'number',
       editable: true,
     },
     {
@@ -84,15 +124,35 @@ const Coupons = ({
     {
       field: 'validTo',
       headerName: 'Valid To',
+      renderEditCell: (params) => {
+        const { id, field, value } = params;
+        return (
+          <DatePicker
+            selected={parse(value, 'dd/MM/yyyy kk:mm', new Date())}
+            dateFormat="dd/MM/yyyy"
+            onChange={(date) =>
+              params.api.setEditCellValue({
+                id,
+                field,
+                value: format(date as Date, 'dd/MM/yyyy kk:mm'),
+              })
+            }
+          />
+        );
+      },
       width: 150,
     },
     {
       field: 'maxUsesPerUser',
       headerName: 'Max Uses Per User',
+      type: 'number',
+      editable: true,
     },
     {
       field: 'maxUsesTotal',
       headerName: 'Max Uses Total',
+      type: 'number',
+      editable: true,
     },
     {
       field: 'uses',
@@ -101,39 +161,230 @@ const Coupons = ({
     {
       field: 'planModelId',
       headerName: 'Plan Model',
-      renderCell: (params) => {
-        if (params.value) return <Button>Go To Plan Model</Button>;
-        return null;
-      },
+      renderCell: (params) => (
+        <Button
+          disabled={!params.row.planModelId}
+          onClick={() => setPlanModelData(params.row.planModel)}
+        >
+          <FontAwesomeIcon icon={solid('up-right-from-square')} />
+        </Button>
+      ),
+      editable: true,
+      renderEditCell: (params) => (
+        <AdminSelect
+          ariaLabel="select bundle"
+          options={plansModel.map((planModel) => ({
+            value: planModel.id,
+            label: planModel.name,
+          }))}
+          onSelect={(option) => {
+            params.api.setEditCellValue({ ...params, value: option?.value });
+          }}
+          defaultValue={
+            params.row.planModelId &&
+            params.row.planModel && {
+              value: params.row.planModelId,
+              label: params.row.planModel.name,
+            }
+          }
+        />
+      ),
       width: 200,
     },
   ];
+
+  const handleDeleteRows = async (ids: GridRowId[]) => {
+    try {
+      await adminApi.callApi<
+        CouponData,
+        'deleteMany',
+        {
+          select: {
+            planModel: {
+              include: {
+                bundle: {
+                  include: {
+                    refills: true;
+                  };
+                };
+                plans: true;
+              };
+            };
+          };
+        }
+      >({
+        method: 'DELETE',
+        model: 'Coupon',
+        action: AdminApiAction.deleteMany,
+        input: {
+          where: {
+            id: {
+              in: ids as string[],
+            },
+          },
+        },
+      });
+      setCouponsRows((prev) =>
+        prev.filter((coupon) => !ids.includes(coupon.id))
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDeleteRow = async (id: GridRowId) => {
+    try {
+      await handleDeleteRows([id]);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRowUpdate = async (
+    rowId: GridRowId,
+    updatedData: Partial<Coupon>
+  ) => {
+    try {
+      let updatedRow = { ...updatedData };
+      if (updatedRow.validTo) {
+        updatedRow = {
+          ...updatedRow,
+          validTo: parse(
+            updatedRow.validTo.toString(),
+            'dd/MM/yyyy kk:mm',
+            new Date()
+          ),
+        };
+      }
+      if (updatedRow.validFrom) {
+        updatedRow = {
+          ...updatedRow,
+          validFrom: parse(
+            updatedRow.validFrom.toString(),
+            'dd/MM/yyyy kk:mm',
+            new Date()
+          ),
+        };
+      }
+      const updatedCoupon = await adminApi.callApi<
+        CouponData,
+        'update',
+        {
+          select: {
+            planModel: {
+              include: {
+                bundle: {
+                  include: {
+                    refills: true;
+                  };
+                };
+                plans: true;
+              };
+            };
+          };
+        }
+      >({
+        method: 'PUT',
+        model: 'Coupon',
+        input: {
+          where: {
+            id: rowId as string,
+          },
+          data: updatedRow,
+          include: {
+            planModel: {
+              include: {
+                bundle: {
+                  include: {
+                    refills: true,
+                  },
+                },
+                plans: true,
+              },
+            },
+          },
+        },
+      });
+      const serializedCoupon = {
+        ...updatedCoupon,
+        validFrom: format(
+          parseISO(updatedCoupon.validFrom.toString()),
+          'dd/MM/yy kk:mm'
+        ),
+        validTo: format(
+          parseISO(updatedCoupon.validTo.toString()),
+          'dd/MM/yy kk:mm'
+        ),
+      };
+      // @ts-ignore
+      setCouponsRows((prev) =>
+        prev.map((coupon) => {
+          if (coupon.id === updatedCoupon.id) {
+            return serializedCoupon;
+          }
+          return coupon;
+        })
+      );
+      return { id: updatedCoupon.id, columnToFocus: undefined };
+    } catch (error) {
+      console.error(error);
+      return error as Error;
+    }
+  };
 
   const addRow = async (
     data: Coupon
   ): Promise<{ id: string; columnToFocus: undefined }> => {
     setAddRowLoading(true);
-    const newCoupon = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/coupon`,
+    const newCoupon = await adminApi.callApi<
+      CouponData,
+      'create',
       {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        select: {
+          planModel: {
+            include: {
+              bundle: {
+                include: {
+                  refills: true;
+                };
+              };
+              plans: true;
+            };
+          };
+        };
       }
-    );
-    const newCouponJson = await newCoupon.json();
-    if (!newCouponJson.success) throw new Error('Coupon creation failed');
+    >({
+      method: 'POST',
+      model: 'Coupon',
+      input: {
+        data,
+        include: {
+          planModel: {
+            include: {
+              bundle: {
+                include: {
+                  refills: true,
+                },
+              },
+              plans: true,
+            },
+          },
+        },
+      },
+    });
     const serializedCoupon = {
-      ...newCouponJson.data,
-      validFrom: format(newCouponJson.validFrom, 'dd/MM/yyyy kk:mm'),
-      validTo: format(newCouponJson.validTo, 'dd/MM/yyyy kk:mm'),
+      ...newCoupon,
+      validFrom: format(
+        parseISO(newCoupon.validFrom.toString()),
+        'dd/MM/yy kk:mm'
+      ),
+      validTo: format(parseISO(newCoupon.validTo.toString()), 'dd/MM/yy kk:mm'),
     };
-    setCouponsRows([...couponsRows, serializedCoupon]);
+    // @ts-ignore
+    setCouponsRows((oldCouponsRows) => [...oldCouponsRows, serializedCoupon]);
     setAddRowLoading(false);
     await modal.hide();
-    return { id: newCouponJson.data.id, columnToFocus: undefined };
+    return { id: newCoupon.id, columnToFocus: undefined };
   };
 
   const showModal = async (): Promise<
@@ -152,7 +403,14 @@ const Coupons = ({
 
   return (
     <AdminLayout>
-      <AdminTable columns={columns} data={couponsRows} addRow={showModal} />
+      <AdminTable
+        columns={columns}
+        data={couponsRows}
+        addRow={showModal}
+        deleteRows={handleDeleteRows}
+        deleteRow={handleDeleteRow}
+        processRowUpdate={handleRowUpdate}
+      />
       <FormModal
         id="add-coupons"
         {...bootstrapDialog(modal)}
@@ -160,6 +418,13 @@ const Coupons = ({
       >
         <CouponsForm plansModel={plansModel} loading={addRowLoading} />
       </FormModal>
+      <AdminOffcanvas
+        show={!!planModelData}
+        title="Plan Model"
+        onHide={() => setPlanModelData(null)}
+      >
+        <PlanModelData planModel={planModelData as PlanModelDataType} />
+      </AdminOffcanvas>
     </AdminLayout>
   );
 };
@@ -170,14 +435,57 @@ export async function getServerSideProps(context: NextPageContext) {
     orderBy: {
       validTo: 'desc',
     },
+    include: {
+      planModel: {
+        include: {
+          bundle: {
+            include: {
+              refills: true,
+            },
+          },
+          plans: true,
+        },
+      },
+    },
   });
   const plansModel = await prisma.planModel.findMany({
     orderBy: {
       updatedAt: 'asc',
     },
+    include: {
+      refill: true,
+    },
   });
   const serializedCoupons = coupons.map((coupon) => ({
     ...coupon,
+    planModel: coupon.planModel
+      ? {
+          ...coupon.planModel,
+          bundle: {
+            ...coupon.planModel.bundle,
+            refills: coupon.planModel.bundle.refills.map((refill) => ({
+              ...refill,
+              createdAt: format(refill.createdAt, 'dd/MM/yyyy kk:mm'),
+              updatedAt: format(refill.updatedAt, 'dd/MM/yyyy kk:mm'),
+            })),
+            createdAt: format(
+              coupon.planModel.bundle.createdAt,
+              'dd/MM/yyyy kk:mm'
+            ),
+            updatedAt: format(
+              coupon.planModel.bundle.updatedAt,
+              'dd/MM/yyyy kk:mm'
+            ),
+          },
+          plans: coupon.planModel.plans.map((plan) => ({
+            ...plan,
+            createdAt: format(plan.createdAt, 'dd/MM/yyyy kk:mm'),
+            updatedAt: format(plan.updatedAt, 'dd/MM/yyyy kk:mm'),
+          })),
+          createdAt: format(coupon.planModel.createdAt, 'dd/MM/yyyy kk:mm'),
+          updatedAt: format(coupon.planModel.updatedAt, 'dd/MM/yyyy kk:mm'),
+        }
+      : null,
     validFrom: format(coupon.validFrom, 'dd/MM/yy kk:mm'),
     validTo: format(coupon.validTo, 'dd/MM/yy kk:mm'),
     createdAt: format(coupon.createdAt, 'dd/MM/yy kk:mm'),
@@ -185,6 +493,11 @@ export async function getServerSideProps(context: NextPageContext) {
   }));
   const serializedPlansModel = plansModel.map((planModel) => ({
     ...planModel,
+    refill: {
+      ...planModel.refill,
+      createdAt: format(planModel.refill.createdAt, 'dd/MM/yy kk:mm'),
+      updatedAt: format(planModel.refill.updatedAt, 'dd/MM/yy kk:mm'),
+    },
     createdAt: format(planModel.createdAt, 'dd/MM/yy kk:mm'),
     updatedAt: format(planModel.updatedAt, 'dd/MM/yy kk:mm'),
   }));

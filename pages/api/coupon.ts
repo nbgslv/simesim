@@ -1,38 +1,52 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Coupon } from '@prisma/client';
+import { Coupon, Prisma } from '@prisma/client';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<Partial<Coupon>>>
+  res: NextApiResponse<ApiResponse<Partial<Coupon> | Prisma.BatchPayload>>
 ) {
   try {
     const { method } = req;
     if (method === 'POST') {
-      const newCouponData = req.body;
+      const { input } = req.body;
 
-      const planModel = newCouponData.planModel
+      const planModel = input.data.planModel
         ? {
             connect: {
-              id: newCouponData.planModel,
+              id: input.data.planModel,
             },
           }
         : undefined;
 
       const newCoupon = await prisma.coupon.create({
+        ...input,
         data: {
-          code: newCouponData.code,
-          discount: newCouponData.discount,
-          discountType: newCouponData.type,
-          validFrom: newCouponData.validFrom,
-          validTo: newCouponData.validTo,
-          maxUsesPerUser: newCouponData.maxUsesPerUser,
-          maxUsesTotal: newCouponData.maxUsesTotal,
+          ...input.data,
           planModel,
         },
       });
-      res.status(201).json({ success: true, data: { ...newCoupon } });
+      res.status(201).json({ success: true, data: newCoupon });
+    } else if (method === 'PUT') {
+      const { input } = req.body;
+      const update = await prisma.coupon.update({
+        ...input,
+      });
+      res.status(200).json({ success: true, data: update });
+    } else if (method === 'DELETE') {
+      const { action, input } = req.body;
+      if (action === 'deleteMany') {
+        const deleteMany = await prisma.coupon.deleteMany({
+          ...input,
+        });
+        res.status(200).json({ success: true, data: deleteMany });
+      } else if (action === 'delete') {
+        const deleted = await prisma.coupon.delete({
+          ...input,
+        });
+        res.status(200).json({ success: true, data: deleted });
+      }
     } else {
       res.status(405).json({
         name: 'METHOD_NOT_ALLOWED',

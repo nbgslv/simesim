@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useModal } from '@ebay/nice-modal-react';
+import styles from './PlansModelForm.module.scss';
 
 type PlansModelFormProps = {
   bundles: Bundle[];
@@ -33,6 +34,8 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
   const [filteredRefills, setFilteredRefills] = React.useState<Refill[]>(
     refills
   );
+  const [chosenBundle, setChosenBundle] = React.useState<Bundle | null>(null);
+  const [chosenRefill, setChosenRefill] = React.useState<Refill | null>(null);
   const { resolve, hide } = useModal('add-plansmodel');
   const {
     register,
@@ -54,14 +57,42 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
     },
   });
   const selectedBundle = watch('bundleId');
+  const selectedRefill = watch('refillId');
 
   useEffect(() => {
-    if (selectedBundle !== 'none') {
+    if (selectedBundle === 'none') {
+      setFilteredRefills(refills);
+      setChosenBundle(null);
+      return;
+    }
+    const bundle = bundles.find(
+      (bundleOfBundles) => bundleOfBundles.id === selectedBundle
+    );
+    if (!bundle) {
+      setFilteredRefills(refills);
+      setChosenBundle(null);
+    } else {
       setFilteredRefills(
         refills.filter((refill) => refill.bundleId === selectedBundle)
       );
+      setChosenBundle(bundle);
     }
-  }, [selectedBundle]);
+  }, [selectedBundle, bundles, refills]);
+
+  useEffect(() => {
+    if (selectedRefill === 'none') {
+      setChosenRefill(null);
+    } else {
+      const refill = refills.find(
+        (refillOfRefills) => refillOfRefills.id === selectedRefill
+      );
+      if (!refill) {
+        setChosenRefill(null);
+      } else {
+        setChosenRefill(refill);
+      }
+    }
+  }, [selectedRefill, refills]);
 
   return (
     <Form>
@@ -78,6 +109,9 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
             <option value="none">No Bundles</option>
           )}
         </Form.Select>
+        {chosenBundle && (
+          <Form.Text>Description: {chosenBundle.description}</Form.Text>
+        )}
         <Form.Control.Feedback type="invalid">
           {errors.bundleId?.message}
         </Form.Control.Feedback>
@@ -95,6 +129,13 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
             <option value="none">No Refills</option>
           )}
         </Form.Select>
+        {chosenRefill && (
+          <Form.Text>
+            Title: {chosenRefill.title}; MB: {chosenRefill.amount_mb}; Days:{' '}
+            {chosenRefill.amount_days || '\u221E'}; Price:{' '}
+            {chosenRefill.price_usd}$
+          </Form.Text>
+        )}
         <Form.Control.Feedback type="invalid">
           {errors.refillId?.message}
         </Form.Control.Feedback>
@@ -172,10 +213,18 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
           {errors.couponsIds?.message}
         </Form.Control.Feedback>
       </Form.Group>
-      <Button variant="secondary" onClick={() => hide()}>
+      <Button
+        variant="secondary"
+        onClick={() => hide()}
+        className={`${styles.closeButton} me-2`}
+      >
         Close
       </Button>
-      <Button variant="primary" onClick={handleSubmit((data) => resolve(data))}>
+      <Button
+        variant="primary"
+        onClick={handleSubmit((data) => resolve(data))}
+        className={styles.submitButton}
+      >
         Save Changes
       </Button>
     </Form>

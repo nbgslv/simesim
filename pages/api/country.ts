@@ -13,7 +13,13 @@ export default async function handler(
 ) {
   try {
     const { method } = req;
-    if (method === 'GET') {
+    if (method === 'POST') {
+      const { input } = req.body;
+      const country = await prisma.country.create({
+        ...input,
+      });
+      res.status(200).json({ success: true, data: country });
+    } else if (method === 'GET') {
       const countries: Partial<Country>[] = await prisma.country.findMany({
         where: {
           show: true,
@@ -25,43 +31,30 @@ export default async function handler(
       });
       res.status(200).json({ success: true, data: { countries } });
     } else if (method === 'PUT') {
-      const {
-        body: { id, translation, lockTranslation, show },
-      } = req;
+      const { input } = req.body;
       const update: Country = await prisma.country.update({
-        where: {
-          id,
-        },
-        data: {
-          translation,
-          lockTranslation,
-          show,
-        },
+        ...input,
       });
       res.status(200).json({ success: true, data: update });
     } else if (method === 'DELETE') {
-      const {
-        body: { id },
-      } = req;
-      if (!id) {
-        throw new Error('No ID provided');
-      }
-      const deleted: Prisma.BatchPayload = await prisma.country.deleteMany({
-        where: {
-          id: {
-            in: id,
-          },
-        },
-      });
-      res.status(200).json({ success: true, data: deleted });
-    } else {
-      res
-        .status(405)
-        .json({
-          name: 'METHOD_NOT_ALLOWED',
-          success: false,
-          message: 'Method not allowed',
+      const { action, input } = req.body;
+      if (action === 'deleteMany') {
+        const deleteMany = await prisma.country.deleteMany({
+          ...input,
         });
+        res.status(200).json({ success: true, data: deleteMany });
+      } else if (action === 'delete') {
+        const deleted = await prisma.country.delete({
+          ...input,
+        });
+        res.status(200).json({ success: true, data: deleted });
+      }
+    } else {
+      res.status(405).json({
+        name: 'METHOD_NOT_ALLOWED',
+        success: false,
+        message: 'Method not allowed',
+      });
     }
   } catch (error: unknown) {
     console.error(error);

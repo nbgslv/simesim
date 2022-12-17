@@ -13,12 +13,11 @@ import prisma from '../../lib/prisma';
 import { verifyAdmin } from '../../utils/auth';
 import styles from '../../styles/bundles.module.scss';
 
-const Bundles = ({
-  bundlesList,
-}: {
-  bundlesList: (Bundle &
-    Prisma.BundleGetPayload<{ select: { refills: true } }>)[];
-}) => {
+type BundleData = Bundle &
+  Prisma.BundleGetPayload<{ select: { refills: true } }>;
+
+type BundleAsAdminTableData = (GridRowId & BundleData)[];
+const Bundles = ({ bundlesList }: { bundlesList: BundleAsAdminTableData }) => {
   const [showRefills, setShowRefills] = React.useState<boolean>(false);
   const [refills, setRefills] = React.useState<Refill[]>([]);
   const [showCountries, setShowCountries] = React.useState<boolean>(false);

@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { PlanModel, Prisma } from '@prisma/client';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
-import { AdminApiData, Input } from '../../utils/api/services/adminApi';
+import { Input } from '../../utils/api/services/adminApi';
 
 export default async function handler(
   req: NextApiRequest,
@@ -11,37 +11,19 @@ export default async function handler(
   try {
     const { method } = req;
     if (method === 'POST') {
-      const {
-        bundleId,
-        refillId,
-        name,
-        description,
-        price,
-        vat,
-        couponsIds,
-      } = req.body;
+      const { input } = req.body;
       const couponsRecord =
-        couponsIds !== 'none' ? { connect: couponsIds } : undefined;
+        input.data.couponsIds !== 'none'
+          ? { connect: input.data.couponsIds }
+          : undefined;
       const planModel = await prisma.planModel.create({
+        ...input,
         data: {
-          bundle: {
-            connect: {
-              id: bundleId,
-            },
-          },
-          refill: {
-            connect: {
-              id: refillId,
-            },
-          },
-          name,
-          description,
-          price,
-          vat,
+          ...input.data,
           coupons: couponsRecord,
         },
       });
-      res.status(201).json({ success: true, data: { ...planModel } });
+      res.status(201).json({ success: true, data: planModel });
     } else if (method === 'PUT') {
       const { input }: { input: Input<PlanModel, 'update'> } = req.body;
       const refill = Object.keys(input.data).includes('refill') && {

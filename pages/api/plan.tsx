@@ -10,24 +10,16 @@ export default async function handler(
   try {
     const { method } = req;
     if (method === 'POST') {
-      const {
-        planModel,
-        price,
-        user,
-        allowRefill,
-        // eslint-disable-next-line
-        createLine,
-        // eslint-disable-next-line
-        sendPayment,
-        payment: paymentData,
-      } = req.body;
+      const { input } = req.body;
       const payment =
-        paymentData === 'none' ? undefined : { connect: { id: paymentData } };
+        input.data.pdaymentData === 'none'
+          ? undefined
+          : { connect: { id: input.data.pdaymentData } };
       // TODO handle send payment
       // TODO handle create line
       const existingPlanModel = await prisma.planModel.findUnique({
         where: {
-          id: planModel,
+          id: input.data.planModel,
         },
       });
       if (!existingPlanModel) {
@@ -35,17 +27,15 @@ export default async function handler(
       }
 
       const newPlan = await prisma.plan.create({
-        // @ts-ignore
+        ...input,
         data: {
-          planModel,
-          price,
+          ...input.data,
           status: 'ACTIVE',
           user: {
             connect: {
-              id: user,
+              id: input.data.user,
             },
           },
-          allowRefill,
           payment,
           bundle: {
             connect: {
@@ -59,85 +49,62 @@ export default async function handler(
           },
         },
       });
-      res.status(201).json({ success: true, data: { ...newPlan } });
+      res.status(201).json({ success: true, data: newPlan });
     } else if (method === 'PUT') {
-      const { id, ...data } = req.body;
-      console.log({ data });
-      const payment = Object.keys(data).includes('payment') && {
+      const { input } = req.body;
+      const payment = Object.keys(input.data).includes('payment') && {
         connect: {
-          id: data.payment,
+          id: input.data.payment,
         },
       };
       if (payment) {
-        data.payment = payment;
+        input.data.payment = payment;
       }
-      const user = Object.keys(data).includes('user') && {
+      const user = Object.keys(input.data).includes('user') && {
         connect: {
-          id: data.user,
+          id: input.data.user,
         },
       };
       if (user) {
-        data.user = user;
+        input.data.user = user;
       }
-      const line = Object.keys(data).includes('line') && {
+      const line = Object.keys(input.data).includes('line') && {
         connect: {
-          id: data.line,
+          id: input.data.line,
         },
       };
       if (line) {
-        data.line = line;
+        input.data.line = line;
       }
-      const bundle = Object.keys(data).includes('bundle') && {
+      const bundle = Object.keys(input.data).includes('bundle') && {
         connect: {
-          id: data.bundle,
+          id: input.data.bundle,
         },
       };
       if (bundle) {
-        data.bundle = bundle;
+        input.data.bundle = bundle;
       }
 
       const updatedPlan = await prisma.plan.update({
-        where: {
-          id,
-        },
-        data: {
-          ...data,
-        },
-        include: {
-          planModel: {
-            include: {
-              bundle: true,
-              refill: true,
-            },
-          },
-          user: true,
-          payment: {
-            include: {
-              paymentMethod: true,
-            },
-          },
-          line: true,
-          bundle: {
-            include: {
-              refills: true,
-            },
-          },
-        },
+        ...input,
       });
       if (!updatedPlan) {
         throw new Error('Error updating plan');
       }
-      res.status(200).json({ success: true, data: { ...updatedPlan } });
+      res.status(200).json({ success: true, data: updatedPlan });
     } else if (method === 'DELETE') {
-      const { ids } = req.body;
-      const deleteCount = await prisma.plan.deleteMany({
-        where: {
-          id: {
-            in: ids,
-          },
-        },
-      });
-      res.status(200).json({ success: true, data: { ...deleteCount } });
+      const { action, input } = req.body;
+      if (action === 'deleteMany') {
+        const deletedPlans = await prisma.plan.deleteMany({
+          ...input,
+        });
+        res.status(200).json({ success: true, data: deletedPlans });
+      } else if (action === 'delete') {
+        const deletedPlan = await prisma.plan.delete({
+          ...input,
+        });
+        res.status(200).json({ success: true, data: deletedPlan });
+      }
     } else {
       res.status(405).json({
         name: 'METHOD_NOT_ALLOWED',

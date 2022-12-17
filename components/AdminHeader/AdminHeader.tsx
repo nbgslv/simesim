@@ -9,31 +9,31 @@ const AdminHeader = () => (
     <Navbar.Toggle aria-controls="basic-navbar-nav" />
     <Navbar.Collapse id="basic-navbar-nav">
       <Nav>
-        <Nav.Link eventKey="/" href="/admin/main">
+        <Nav.Link eventKey="/admin/main" href="/admin/main">
           ראשי
         </Nav.Link>
-        <Nav.Link eventKey="/plans" href="/admin/plans">
+        <Nav.Link eventKey="/admin/plans" href="/admin/plans">
           תכניות
         </Nav.Link>
-        <Nav.Link eventKey="/lines" href="/admin/lines">
+        <Nav.Link eventKey="/admin/lines" href="/admin/lines">
           קווים
         </Nav.Link>
-        <Nav.Link eventKey="/bundles" href="/admin/bundles">
+        <Nav.Link eventKey="/admin/bundles" href="/admin/bundles">
           חבילות
         </Nav.Link>
-        <Nav.Link eventKey="/plansModel" href="/admin/plansModel">
+        <Nav.Link eventKey="/admin/plansModel" href="/admin/plansModel">
           מודלים
         </Nav.Link>
-        <Nav.Link eventKey="/countries" href="/admin/countries">
+        <Nav.Link eventKey="/admin/countries" href="/admin/countries">
           מדינות
         </Nav.Link>
-        <Nav.Link eventKey="/plansModel" href="/admin/coupons">
+        <Nav.Link eventKey="/admin/coupons" href="/admin/coupons">
           קופונים
         </Nav.Link>
-        <Nav.Link eventKey="/users" href="/admin/users">
+        <Nav.Link eventKey="/admin/users" href="/admin/users">
           משתמשים
         </Nav.Link>
-        <Nav.Link eventKey="/inquiries" href="/admin/users">
+        <Nav.Link eventKey="/admin/inquiries" href="/admin/inquiries">
           פניות
         </Nav.Link>
         <Nav.Link disabled eventKey="/settings" href="/admin/main">

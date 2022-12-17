@@ -45,12 +45,16 @@ const EditToolbar = ({
           setRowModesModel((oldModel) => ({
             ...oldModel,
             [newRowData.id]: {
-              mode: GridRowModes.Edit,
+              mode: newRowData.columnToFocus
+                ? GridRowModes.Edit
+                : GridRowModes.View,
               fieldToFocus: newRowData.columnToFocus,
             },
           }));
         }
       }
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }

@@ -177,7 +177,7 @@ const Contact = () => {
                           </Form.Label>
                           <Controller
                             name="phone"
-                            aria-labeledby="phone-label"
+                            aria-labelledby="phone-label"
                             control={control}
                             render={({ field, fieldState }) => (
                               <Input
@@ -196,7 +196,7 @@ const Contact = () => {
                             {text.contact.email}
                           </Form.Label>
                           <Controller
-                            aria-labeledby="email-label"
+                            aria-labelledby="email-label"
                             name="email"
                             control={control}
                             render={({ field, fieldState }) => (
@@ -216,7 +216,7 @@ const Contact = () => {
                             {text.contact.message}
                           </Form.Label>
                           <Form.Control
-                            aria-labeledby="message-label"
+                            aria-labelledby="message-label"
                             {...register('message')}
                             as="textarea"
                             className={styles.textArea}

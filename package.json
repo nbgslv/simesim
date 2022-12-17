@@ -54,6 +54,7 @@
     "react-hook-form": "^7.38.0",
     "react-lottie": "^1.2.3",
     "react-otp-input": "^2.4.0",
+    "react-select": "^5.7.0",
     "react-svg-pan-zoom": "^3.11.0",
     "react-svg-pan-zoom-loader": "^1.4.1",
     "sass": "^1.55.0",
