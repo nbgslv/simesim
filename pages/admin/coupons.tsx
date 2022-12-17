@@ -44,6 +44,7 @@ type PlanModelDataType = PlanModel &
         };
       };
       plans: true;
+      coupons: true;
     };
   }>;
 

@@ -8,31 +8,20 @@ import AdminApi from '../../../utils/api/services/adminApi';
 import BundleData from '../BundleData/BundleData';
 import Section, { SectionType } from '../Section';
 
-export type PlanModelDataType =
-  | (PlanModel &
-      Prisma.PlanModelGetPayload<{
-        select: {
-          bundle: {
-            include: {
-              refills: true;
-            };
-          };
-          plans: true;
-          coupons: true;
+type PlanModelDataTypeWithCoupons = PlanModel &
+  Prisma.PlanModelGetPayload<{
+    select: {
+      bundle: {
+        include: {
+          refills: true;
         };
-      }>)
-  | (PlanModel &
-      Prisma.PlanModelGetPayload<{
-        select: {
-          bundle: {
-            include: {
-              refills: true;
-            };
-          };
-          plans: true;
-          coupons: false;
-        };
-      }>);
+      };
+      plans: true;
+      coupons: true;
+    };
+  }>;
+
+export type PlanModelDataType = PlanModelDataTypeWithCoupons;
 
 const PlanModelData = ({
   planModel,
@@ -108,7 +97,7 @@ const PlanModelData = ({
         },
         {
           title: 'Coupons',
-          value: planModel.coupons,
+          value: (planModel as PlanModelDataTypeWithCoupons).coupons,
           type: 'text',
           RenderData: (): ReactNode => (
             <Button>

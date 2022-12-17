@@ -47,6 +47,7 @@ const syncCountries = async () => {
             create: {
               name: country.name,
               translation: country.translation,
+              show: false,
             },
             where: {
               name: country.name,

@@ -100,9 +100,19 @@ type Transactions = {
   };
 };
 
+type FilterObject<T> = {
+  from: number;
+  to: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  current_page: number;
+  items: T[];
+};
+
 export type KeepGoResponseParams = {
   ack: string;
-  sim_cards?: [Line];
+  sim_cards?: FilterObject<Line>;
   filters?: [FilterData];
   sim_card?: LineDetails[] | Line | CreateLine;
   available_refills?: [Refill];

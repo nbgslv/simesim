@@ -174,8 +174,7 @@ const Section = <T extends object>({
               <div className="data-container" key={data.title}>
                 <Row
                   style={{
-                    height:
-                      data.discountType === 'textarea' ? '5rem' : 'inherit',
+                    height: data.type === 'textarea' ? '5rem' : 'inherit',
                   }}
                 >
                   <Col lg={6}>
@@ -186,13 +185,13 @@ const Section = <T extends object>({
                     {editData === section.id && data.editable
                       ? data.renderEditComponent?.(data.value) ??
                         (() => {
-                          switch (data.discountType) {
+                          switch (data.type) {
                             case 'text':
                             case 'number':
                             case 'date':
                               return (
                                 <input
-                                  type={data.discountType}
+                                  type={data.type}
                                   {...register(
                                     sanitizeName(data.title) as never
                                   )}

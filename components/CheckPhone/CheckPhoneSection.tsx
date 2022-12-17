@@ -22,7 +22,7 @@ export type PhonesList = {
 };
 
 type ListItem = {
-  id: number;
+  id: string;
   displayValue: string;
 };
 
@@ -118,13 +118,13 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
     phonesList.forEach((list) => {
       list.brands.forEach((brand, id) => {
         brandsArray.push({
-          id,
+          id: id.toString(),
           displayValue: brand.title,
           exceptions: brand.exceptions ? brand.exceptions.toString() : '',
         });
         brand.models.forEach((model) => {
           phonesArray.push({
-            id: index + 1,
+            id: (index + 1).toString(),
             displayValue: model,
             brand: brand.title,
           });

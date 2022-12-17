@@ -136,7 +136,7 @@ model PaymentMethod {
 
 model Line {
   id                 String               @id @default(cuid())
-  iccid              String
+  iccid              String               @unique
   deactivationDate   DateTime?
   expiredAt          DateTime?
   allowedUsageKb     Int?
