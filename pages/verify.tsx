@@ -103,9 +103,14 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
   }, [otp]);
 
   const handleReLogin = async (method?: string) => {
+    if (!executeRecaptcha) {
+      throw new Error('Recaptcha not loaded');
+    }
+    const token = await executeRecaptcha('verify');
     const params = {
       email: phoneNumber,
       method: method || 'whatsapp',
+      recaptchaToken: token,
       csrfToken,
       callbackUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/login`,
       json: 'true',
@@ -181,51 +186,53 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
             </motion.div>
           </>
         )}
-        <Alert variant="info" className={styles.alert}>
-          {resendLoading ? (
-            <Spinner
-              as="span"
-              animation="border"
-              role="status"
-              aria-hidden="true"
-            />
-          ) : (
-            <>
-              {allowResend ? (
-                <>
-                  שלחו לי קוד אימות חדש
-                  <Nav className="d-flex flex-column">
-                    <Nav.Link onClick={() => handleReLogin('sms')}>
-                      <FontAwesomeIcon icon={solid('caret-left')} /> באמצעות
-                      מסרון(הודעת SMS)
-                    </Nav.Link>
-                    <Nav.Link onClick={() => handleReLogin('whatsapp')}>
-                      <FontAwesomeIcon icon={solid('caret-left')} /> או באמצעות
-                      וואצאפ
-                    </Nav.Link>
-                    <Nav.Link onClick={() => handleReLogin('voice')}>
-                      <FontAwesomeIcon icon={solid('caret-left')} /> או באמצעות
-                      שיחה קולית
-                    </Nav.Link>
-                  </Nav>
-                </>
-              ) : (
-                <>
-                  לא קיבלת קוד? ניתן יהיה לנסות שוב בעוד&nbsp;
-                  <Countdown
-                    ref={countdownRef as LegacyRef<Countdown>}
-                    date={timer}
-                    autoStart
-                    renderer={({ minutes, seconds }) =>
-                      `${zeroPad(minutes, 2)}:${zeroPad(seconds, 2)}`
-                    }
-                    onComplete={() => setAllowResend(true)}
-                  />
-                </>
-              )}
-            </>
-          )}
-        </Alert>
+        {allowResend && (
+          <Alert variant="info" className={styles.alert}>
+            {resendLoading ? (
+              <Spinner
+                as="span"
+                animation="border"
+                role="status"
+                aria-hidden="true"
+              />
+            ) : (
+              <>
+                {allowResend ? (
+                  <>
+                    שלחו לי קוד אימות חדש
+                    <Nav className="d-flex flex-column">
+                      <Nav.Link onClick={() => handleReLogin('sms')}>
+                        <FontAwesomeIcon icon={solid('caret-left')} /> באמצעות
+                        מסרון(הודעת SMS)
+                      </Nav.Link>
+                      <Nav.Link onClick={() => handleReLogin('whatsapp')}>
+                        <FontAwesomeIcon icon={solid('caret-left')} /> או
+                        באמצעות וואצאפ
+                      </Nav.Link>
+                      <Nav.Link onClick={() => handleReLogin('voice')}>
+                        <FontAwesomeIcon icon={solid('caret-left')} /> או
+                        באמצעות שיחה קולית
+                      </Nav.Link>
+                    </Nav>
+                  </>
+                ) : (
+                  <>
+                    לא קיבלת קוד? ניתן יהיה לנסות שוב בעוד&nbsp;
+                    <Countdown
+                      ref={countdownRef as LegacyRef<Countdown>}
+                      date={timer}
+                      autoStart
+                      renderer={({ minutes, seconds }) =>
+                        `${zeroPad(minutes, 2)}:${zeroPad(seconds, 2)}`
+                      }
+                      onComplete={() => setAllowResend(true)}
+                    />
+                  </>
+                )}
+              </>
+            )}
+          </Alert>
+        )}
       </Form>
     </MainLayout>
   );

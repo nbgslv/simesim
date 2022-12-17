@@ -1,0 +1,11 @@
+@import "styles/variables";
+
+.main {
+  :global * {
+    color: $text-color;
+  }
+}
+
+.button {
+  color: $background-color !important;
+}

@@ -6,6 +6,7 @@ import { NextPageContext } from 'next';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
+import Link from 'next/link';
 import styles from '../styles/login.module.scss';
 import MainLayout from '../components/Layouts/MainLayout';
 
@@ -75,27 +76,29 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
         `${process.env.NEXT_PUBLIC_BASE_URL}/order/payment?paymentUrl=${router.query.paymentUrl}&total=${router.query.total}`
       );
       setPhoneNumber(router.query.phone as string);
-      handleLogin();
+    } else if (
+      router.query.phone &&
+      router.query.action &&
+      router.query.action === 'updateDetails'
+    ) {
+      setCallbackUrl(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/user/changeDetails?action=updateDetails`
+      );
+      setPhoneNumber(router.query.phone as string);
     }
-  }, [router.query]);
-
-  useEffect(() => {
-    (async () => {
-      if (
-        router.query.orderId &&
-        router.query.phone &&
-        phoneNumber !== '' &&
-        callbackUrl !== ''
-      ) {
-        await handleLogin();
-      } else {
-        setPageLoading(false);
-      }
-    })();
-  }, [phoneNumber, callbackUrl]);
+    setPageLoading(false);
+  }, [router.query, executeRecaptcha]);
 
   if (status === 'loading' || pageLoading)
-    return <Spinner animation="border" role="status" />;
+    return (
+      <MainLayout hideJumbotron>
+        <div
+          className={`${styles.signIn} w-100 d-flex justify-content-center align-items-center`}
+        >
+          <Spinner animation="border" role="status" />
+        </div>
+      </MainLayout>
+    );
 
   if (status === 'authenticated') {
     router.push('/');
@@ -111,6 +114,22 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
             <Alert className="text-center" variant="info">
               לפני שנמשיך, וכדי לוודא שאתם לא רובוטים,
               <br /> נשלח לטלפון שתזינו הודעה עם קוד, אותו תתבקשו להזין במסך הבא
+            </Alert>
+          )}
+          {router.query.action && router.query.action === 'updateDetails' && (
+            <Alert className="text-center" variant="info">
+              על-מנת לעדכן את פרטי החשבון, עלינו לאמת את זהותך.
+              <br />
+              נשלח לטלפון שתזינו הודעה עם קוד, אותו תתבקשו להזין במסך הבא
+              <br />
+              <br />
+              <div className="text-muted small">
+                חשוב: אם עדכנת את מספר הטלפון, חשוב להזין את מספר הטלפון הקודם
+                <br />
+                אם אינך מחזיק עוד במספר הקודם, ניתן{' '}
+                <Link href={'/contact'}>ליצור עימנו קשר</Link> ונסייע לעדכן את
+                חשבונך
+              </div>
             </Alert>
           )}
           {alertVariant && <Alert variant={alertVariant}>{alertMessage}</Alert>}

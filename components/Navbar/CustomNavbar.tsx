@@ -123,6 +123,9 @@ function CustomNavbar({
                 }}
               >
                 <NavDropdown.Item href="/user/orders">הזמנות</NavDropdown.Item>
+                <NavDropdown.Item href="/user/changeDetails">
+                  עדכון פרטים
+                </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item onClick={() => signOut()}>
                   התנתק
