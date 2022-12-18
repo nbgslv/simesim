@@ -41,3 +41,4 @@ next-env.d.ts
 /.idea/prettier.xml
 /.idea/codeStyles/Project.xml
 /.idea/inspectionProfiles/Project_Default.xml
+/.sentryclirc
