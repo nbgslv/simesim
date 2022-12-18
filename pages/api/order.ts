@@ -16,8 +16,6 @@ export default async function handler(
       res as NextApiResponse,
       authOptions(req as NextApiRequest, res as NextApiResponse)
     );
-    // eslint-disable-next-line no-console
-    console.log({ session });
     const { method } = req;
     if (method === 'POST') {
       const newOrderData = JSON.parse(req.body);

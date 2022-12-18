@@ -13,6 +13,7 @@ import {
   Country,
   Coupon,
   Inquiry,
+  ApiKey,
 } from '@prisma/client';
 import { camelCase } from 'lodash';
 
@@ -207,6 +208,19 @@ type MapPrismaTypes<
       deleteMany: Prisma.InquiryDeleteManyArgs;
       upsert: Prisma.InquiryUpsertArgs;
     }
+  ],
+  [
+    ApiKey,
+    {
+      findFirst: Prisma.ApiKeyFindFirstArgs;
+      findMany: Prisma.ApiKeyFindManyArgs;
+      create: Prisma.ApiKeyCreateArgs;
+      update: Prisma.ApiKeyUpdateArgs;
+      updateMany: Prisma.ApiKeyUpdateManyArgs;
+      delete: Prisma.ApiKeyDeleteArgs;
+      deleteMany: Prisma.ApiKeyDeleteManyArgs;
+      upsert: Prisma.ApiKeyUpsertArgs;
+    }
   ]
 ];
 
@@ -265,6 +279,7 @@ export default class AdminApi {
     user: '/user',
     payment: '/payment',
     line: '/line',
+    apiKey: '/auth/api/genkey',
   };
 
   callApi = async <
