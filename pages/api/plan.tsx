@@ -1,20 +1,74 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Plan, Prisma } from '@prisma/client';
+import * as yup from 'yup';
+import { unstable_getServerSession } from 'next-auth';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
+import { deleteSchema } from '../../utils/api/validation';
+import { authOptions } from './auth/[...nextauth]';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse<Plan | Prisma.BatchPayload>>
 ) {
   try {
+    const session = await unstable_getServerSession(
+      req as NextApiRequest,
+      res as NextApiResponse,
+      authOptions(req as NextApiRequest, res as NextApiResponse)
+    );
     const { method } = req;
     if (method === 'POST') {
+      if (!session || session.user.role !== 'ADMIN') {
+        res.status(401).json({
+          name: 'UNAUTHORIZED',
+          success: false,
+          message: 'Unauthorized',
+        });
+        return;
+      }
       const { input } = req.body;
+      const postSchema = yup.object({
+        input: yup.object({
+          data: yup.object({
+            planModel: yup
+              .string()
+              .required('Plan model is required')
+              .test(
+                'planModel',
+                'Plan model is required',
+                (value) => value !== 'none'
+              ),
+            price: yup
+              .number()
+              .required('Price is required')
+              .min(0, 'Price must be greater than 0'),
+            user: yup
+              .string()
+              .required('User is required')
+              .test('user', 'User is required', (value) => value !== 'none'),
+            allowRefill: yup.boolean().required('Allow refill is required'),
+            createLine: yup.boolean().required('Create line is required'),
+            payment: yup.string(),
+            sendPayment: yup
+              .boolean()
+              .required('Send payment is required')
+              .test(
+                'payment',
+                "Can't send payment with a payment chosen",
+                (value) =>
+                  ((yup.ref('payment') as unknown) as string) === 'none' ||
+                  !value
+              ),
+          }),
+          include: yup.object(),
+        }),
+      });
+      await postSchema.validate({ input });
       const payment =
-        input.data.pdaymentData === 'none'
+        input.data.paymentData === 'none'
           ? undefined
-          : { connect: { id: input.data.pdaymentData } };
+          : { connect: { id: input.data.paymentData } };
       // TODO handle send payment
       // TODO handle create line
       const existingPlanModel = await prisma.planModel.findUnique({
@@ -51,6 +105,14 @@ export default async function handler(
       });
       res.status(201).json({ success: true, data: newPlan });
     } else if (method === 'PUT') {
+      if (!session || session.user.role !== 'ADMIN') {
+        res.status(401).json({
+          name: 'UNAUTHORIZED',
+          success: false,
+          message: 'Unauthorized',
+        });
+        return;
+      }
       const { input } = req.body;
       const payment = Object.keys(input.data).includes('payment') && {
         connect: {
@@ -93,7 +155,16 @@ export default async function handler(
       }
       res.status(200).json({ success: true, data: updatedPlan });
     } else if (method === 'DELETE') {
+      if (!session || session.user.role !== 'ADMIN') {
+        res.status(401).json({
+          name: 'UNAUTHORIZED',
+          success: false,
+          message: 'Unauthorized',
+        });
+        return;
+      }
       const { action, input } = req.body;
+      await deleteSchema.validate({ action, input });
       if (action === 'deleteMany') {
         const deletedPlans = await prisma.plan.deleteMany({
           ...input,

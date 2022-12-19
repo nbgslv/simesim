@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { CouponUser, Coupon } from '@prisma/client';
+import * as yup from 'yup';
 import prisma from '../../../../lib/prisma';
 import { ApiResponse } from '../../../../lib/types/api';
 
@@ -12,6 +13,11 @@ export default async function handler(
     method,
   } = req;
   if (method === 'GET') {
+    const getSchema = yup.object({
+      id: yup.string().required(),
+      phoneNumber: yup.string().length(10).required(),
+    });
+    await getSchema.validate({ id, phoneNumber });
     const existingUser = await prisma.user.findUnique({
       where: {
         email: phoneNumber as string,
@@ -60,12 +66,10 @@ export default async function handler(
       res.status(404).json({ success: false, message: 'הקופון לא קיים' });
     }
   } else {
-    res
-      .status(405)
-      .json({
-        name: 'METHOD_NOT_ALLOWED',
-        success: false,
-        message: 'Method not allowed',
-      });
+    res.status(405).json({
+      name: 'METHOD_NOT_ALLOWED',
+      success: false,
+      message: 'Method not allowed',
+    });
   }
 }

@@ -8,6 +8,8 @@ export default async function handler(
   res: NextApiResponse<ApiResponse<null>>
 ) {
   try {
+    // eslint-disable-next-line no-console
+    console.log(req);
     if (req.method === 'POST') {
       const { authorization } = req.headers;
       if (!authorization) {

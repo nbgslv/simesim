@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import * as yup from 'yup';
 import prisma from '../../lib/prisma';
 import TwilioApi from '../../utils/api/services/twilio/twilio';
 
@@ -10,6 +11,12 @@ export default async function handler(
     const { method } = req;
     if (method === 'POST') {
       const { phoneNumber, token, callbackUrl } = req.body;
+      const postSchema = yup.object({
+        phoneNumber: yup.string().length(10).required(),
+        token: yup.string().required(),
+        callbackUrl: yup.string(),
+      });
+      await postSchema.validate({ phoneNumber, token, callbackUrl });
       const twilioApi = new TwilioApi(
         process.env.TWILIO_ACCOUNT_SID!,
         process.env.TWILIO_AUTH_TOKEN!,

@@ -8,26 +8,24 @@ export default async function handler(
   res: NextApiResponse<ApiResponse<null>>
 ) {
   try {
+    // eslint-disable-next-line no-console
+    console.log(req);
     if (req.method === 'POST') {
       const { authorization } = req.headers;
       if (!authorization) {
-        res
-          .status(401)
-          .json({
-            name: 'UNAUTHORIZED',
-            success: false,
-            message: 'Unauthorized',
-          });
+        res.status(401).json({
+          name: 'UNAUTHORIZED',
+          success: false,
+          message: 'Unauthorized',
+        });
         return;
       }
       if (!(await verifyApi(authorization))) {
-        res
-          .status(401)
-          .json({
-            name: 'UNAUTHORIZED',
-            success: false,
-            message: 'Unauthorized',
-          });
+        res.status(401).json({
+          name: 'UNAUTHORIZED',
+          success: false,
+          message: 'Unauthorized',
+        });
         return;
       }
       await syncBundles();

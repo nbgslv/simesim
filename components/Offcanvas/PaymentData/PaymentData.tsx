@@ -97,7 +97,7 @@ const PaymentData = ({
         },
         {
           title: 'Is Bit Payment',
-          value: payment.paymentMethod?.IsBitPayment ? 'Yes' : 'No',
+          value: payment.paymentMethod?.isBitPayment ? 'Yes' : 'No',
           type: 'boolean',
           editable: true,
         },
@@ -127,13 +127,6 @@ const PaymentData = ({
 
   const handlePaymentUpdate = async (updatedPayment: Payment) => {
     try {
-      const sanitizedUpdatedPayment: Payment & { IsBitPayment?: boolean } = {
-        ...updatedPayment,
-      };
-      if (Object.keys(updatedPayment).includes('isBitPayment')) {
-        // @ts-ignore
-        sanitizedUpdatedPayment.IsBitPayment = updatedPayment.isBitPayment;
-      }
       const updatedPaymentRecord = await adminApi.callApi<
         Payment & Prisma.PaymentGetPayload<{ select: { paymentMethod: true } }>,
         'update',

@@ -38,6 +38,8 @@ function compareKeys(storedKey: string, suppliedKey: string) {
 
 export const verifyApi = async (authorization: string) => {
   const [type, key, id] = authorization.split(' ');
+  // eslint-disable-next-line no-console
+  console.log({ type, key, id });
   if (type !== 'Bearer' || !key || !id) {
     return false;
   }

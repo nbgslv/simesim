@@ -123,7 +123,7 @@ model Payment {
 model PaymentMethod {
   id           String   @id @default(cuid())
   token        String?  @unique
-  IsBitPayment Boolean? @default(false)
+  isBitPayment Boolean? @default(false)
   cardType     String
   last4        String
   user         User     @relation(fields: [userId], references: [id])

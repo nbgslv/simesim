@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { unstable_getServerSession } from 'next-auth';
 import { Plan } from '@prisma/client';
+import * as yup from 'yup';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
 import Invoice4UClearing from '../../utils/api/services/i4u/api';
@@ -33,6 +34,18 @@ export default async function handler(
       ) {
         throw new Error('Google reCAPTCHA verification failed');
       }
+
+      const postSchema = yup.object({
+        firstName: yup.string().required(),
+        lastName: yup.string().required(),
+        email: yup.string().email().required(),
+        phoneNumber: yup.string().length(10).required(),
+        price: yup.number().min(0).required(),
+        recaptchaToken: yup.string().required(),
+        coupon: yup.string(),
+        planModel: yup.string(),
+      });
+      await postSchema.validate(newOrderData);
 
       // Check if user exists; if not, create user
       const userExists = await prisma.user.findUnique({
