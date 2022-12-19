@@ -96,7 +96,7 @@ export default async function handler(
               status: 'PAID',
               paymentMethod: {
                 create: {
-                  IsBitPayment: clearingLog.d[0].IsBitPayment,
+                  isBitPayment: clearingLog.d[0].IsBitPayment,
                   cardType: clearingLog.d[0].CreditTypeName,
                   last4: clearingLog.d[0].CreditNumber,
                   user: {
