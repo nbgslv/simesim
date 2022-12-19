@@ -5,4 +5,3 @@ lib/gtag.js
 lib/content/blurDataUri.json
 next.config.js
 babel-plugin-macros.config.js
-/prisma/**

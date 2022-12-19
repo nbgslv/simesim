@@ -42,5 +42,3 @@ next-env.d.ts
 /.idea/codeStyles/Project.xml
 /.idea/inspectionProfiles/Project_Default.xml
 /.sentryclirc
-
-/prisma/
