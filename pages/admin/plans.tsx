@@ -482,7 +482,7 @@ const Plans = ({
     (plansRows.find((row) => row.id === rowId) as Plan);
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Plans">
       <AdminTable
         data={plansRows}
         columns={columns}

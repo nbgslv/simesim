@@ -357,7 +357,7 @@ const PlansModel = ({
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Plans Model">
       <AdminTable
         data={plansRows}
         columns={columns}

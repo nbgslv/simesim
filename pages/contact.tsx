@@ -91,7 +91,7 @@ const Contact = () => {
   };
 
   return (
-    <MainLayout hideJumbotron>
+    <MainLayout title="צור קשר" hideJumbotron>
       <div className={styles.main}>
         <h1 className="text-center p-2">{text.contact.title}</h1>
         <Container className="h-75 w-100 mt-2 d-flex justify-content-between">

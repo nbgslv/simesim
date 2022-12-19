@@ -4,7 +4,7 @@ import MainLayout from '../components/Layouts/MainLayout';
 import styles from '../styles/about.module.scss';
 
 const About = () => (
-  <MainLayout hideJumbotron>
+  <MainLayout title="אודות" hideJumbotron>
     <div className={styles.wrapper}>
       <Container className={styles.container}>
         <h1 className="text-center p-2">עלינו</h1>

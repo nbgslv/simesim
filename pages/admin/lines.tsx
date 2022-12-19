@@ -156,7 +156,7 @@ const Lines = ({ lines }: LinesProps) => {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Lines">
       {/* TODO add new line */}
       <AdminTable
         data={lineRows}

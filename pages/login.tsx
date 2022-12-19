@@ -91,7 +91,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
 
   if (status === 'loading' || pageLoading)
     return (
-      <MainLayout hideJumbotron>
+      <MainLayout title="טוען..." hideJumbotron>
         <div
           className={`${styles.signIn} w-100 d-flex justify-content-center align-items-center`}
         >
@@ -106,7 +106,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
 
   if (status === 'unauthenticated')
     return (
-      <MainLayout hideJumbotron>
+      <MainLayout title="התחברות" hideJumbotron>
         <Form
           className={`${styles.signIn} d-flex flex-column align-items-center justify-content-center`}
         >

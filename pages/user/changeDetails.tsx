@@ -13,7 +13,7 @@ import styles from '../../styles/changeDetails.module.scss';
 const ChangeDetails = ({ user }: { user: Partial<User> }) => {
   const router = useRouter();
   return (
-    <MainLayout hideJumbotron>
+    <MainLayout title="עדכון פרטים" hideJumbotron>
       <Container className={styles.main}>
         <h1 className="text-center mb-3 p-2">הפרטים שלי</h1>
         <ChangeDetailsForm user={user} />

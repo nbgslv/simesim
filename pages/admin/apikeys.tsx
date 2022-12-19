@@ -87,7 +87,7 @@ const ApiKeys = ({ apiKeys }: { apiKeys: ApiAsAdminTableData }) => {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout title="API Keys">
       {addApiKeyLoading && <Spinner animation={'border'} />}
       <AdminTable
         columns={columns}

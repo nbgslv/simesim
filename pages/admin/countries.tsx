@@ -251,7 +251,7 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Countries">
       <AdminTable<Country>
         columns={columns}
         data={countriesRows}

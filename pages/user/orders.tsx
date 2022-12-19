@@ -16,7 +16,7 @@ const Orders = ({
   plans: (Plan &
     Prisma.PlanGetPayload<{ select: { planModel: true; line: true } }>)[];
 }) => (
-  <MainLayout hideJumbotron>
+  <MainLayout title="ההזמנות שלי" hideJumbotron>
     <div className={styles.main}>
       <Container>
         <h1 className="text-center mb-3 p-2">ההזמנות שלי</h1>

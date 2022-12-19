@@ -403,7 +403,7 @@ const Coupons = ({
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Coupons">
       <AdminTable
         columns={columns}
         data={couponsRows}

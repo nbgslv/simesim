@@ -99,7 +99,7 @@ const Bundles = ({ bundlesList }: { bundlesList: BundleAsAdminTableData }) => {
     },
   ];
   return (
-    <AdminLayout>
+    <AdminLayout title="Bundles">
       <AdminTable
         columns={columns}
         data={bundlesList}

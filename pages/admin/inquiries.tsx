@@ -72,7 +72,7 @@ const Inquiries = ({ inquiries }: { inquiries: InquiriesAsAdminTableData }) => {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Inquiries">
       <AdminTable
         columns={columns}
         data={inquiriesRows}

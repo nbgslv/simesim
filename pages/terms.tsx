@@ -4,7 +4,7 @@ import MainLayout from '../components/Layouts/MainLayout';
 import styles from '../styles/terms.module.scss';
 
 const Terms = () => (
-  <MainLayout hideJumbotron>
+  <MainLayout title="תנאי שימוש" hideJumbotron>
     <div className={styles.wrapper}>
       <Container className={styles.container}>
         <h1 className="text-center p-2">

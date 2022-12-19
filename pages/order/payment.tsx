@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
+import Head from 'next/head';
 import PaymentModal from '../../components/PaymentModal/PaymentModal';
 
 const Payment = () => {
@@ -19,11 +20,16 @@ const Payment = () => {
   }, [paymentUrl]);
 
   return (
-    <PaymentModal
-      show={showPaymentModal}
-      paymentUrl={paymentUrl as string}
-      total={total as string}
-    />
+    <>
+      <Head>
+        <title>תשלום</title>
+      </Head>
+      <PaymentModal
+        show={showPaymentModal}
+        paymentUrl={paymentUrl as string}
+        total={total as string}
+      />
+    </>
   );
 };
 

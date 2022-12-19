@@ -31,7 +31,7 @@ const Error = () => {
   }, [router.query]);
 
   return (
-    <MainLayout hideJumbotron>
+    <MainLayout title="התרחשה שגיאה" hideJumbotron>
       <Container className={styles.container}>
         <Alert variant={alertVariant}>{alertMessage}</Alert>
         <Button variant="primary" href="/">

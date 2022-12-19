@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Spinner } from 'react-bootstrap';
+import Head from 'next/head';
 import styles from '../../styles/Transfer.module.scss';
 
 const Transfer = () => {
@@ -16,9 +17,14 @@ const Transfer = () => {
   }, [id]);
 
   return (
-    <div className={styles.main}>
-      <Spinner animation="border" role="status" style={{ color: '#000' }} />
-    </div>
+    <>
+      <Head>
+        <title>טוען...</title>
+      </Head>
+      <div className={styles.main}>
+        <Spinner animation="border" role="status" style={{ color: '#000' }} />
+      </div>
+    </>
   );
 };
 

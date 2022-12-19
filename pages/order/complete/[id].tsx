@@ -64,7 +64,7 @@ const Checkout = () => {
   }, [id]);
 
   return (
-    <MainLayout hideJumbotron>
+    <MainLayout title="הזמנה" hideJumbotron>
       {pageLoading ? (
         <div className={styles.main}>
           <Spinner animation="border" role="status" style={{ color: '#000' }} />

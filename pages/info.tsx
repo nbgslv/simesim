@@ -4,7 +4,7 @@ import MainLayout from '../components/Layouts/MainLayout';
 import styles from '../styles/info.module.scss';
 
 const Info = () => (
-  <MainLayout hideJumbotron>
+  <MainLayout title="eSim" hideJumbotron>
     <div className={styles.wrapper}>
       <Container className={styles.container}>
         <h1 className="text-center p-2">מה זה eSim?</h1>

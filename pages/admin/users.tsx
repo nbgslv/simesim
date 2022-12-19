@@ -236,7 +236,7 @@ const Users = ({ users }: UsersProps) => {
   };
 
   return (
-    <AdminLayout>
+    <AdminLayout title="Users">
       <AdminTable
         data={userRows}
         columns={columns}

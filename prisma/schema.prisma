@@ -47,8 +47,6 @@ model VerificationToken {
 
 model PlanModel {
   id          String   @id @default(cuid())
-  bundle      Bundle   @relation(fields: [bundleId], references: [id])
-  bundleId    String
   refill      Refill   @relation(fields: [refillId], references: [id])
   refillId    String
   name        String
@@ -84,10 +82,6 @@ model Plan {
   updatedAt   DateTime   @updatedAt
   line        Line?      @relation(fields: [lineId], references: [id])
   lineId      String?    @unique
-  bundle      Bundle     @relation(fields: [bundleId], references: [id])
-  bundleId    String
-  refill      Refill     @relation(fields: [refillId], references: [id])
-  refillId    String
 }
 
 enum PaymentStatus {

@@ -7,7 +7,7 @@ import AdminLayout from '../../components/Layouts/AdminLayout';
 import { verifyAdmin } from '../../utils/auth';
 
 const Main = () => (
-  <AdminLayout>
+  <AdminLayout title="Main">
     <div className={styles.main}>
       {/* <AdminTable data={lastLines} limit={10} /> */}
     </div>

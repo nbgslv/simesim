@@ -141,7 +141,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
   };
 
   return (
-    <MainLayout hideJumbotron>
+    <MainLayout title="התחברות" hideJumbotron>
       <Form
         className={`${styles.signIn} d-flex flex-column align-items-center justify-content-center`}
       >
