@@ -140,15 +140,6 @@ export default async function handler(
       if (refill) {
         input.data.refill = refill as Prisma.RefillUpdateOneRequiredWithoutPlanModelNestedInput;
       }
-
-      const bundle = Object.keys(input.data).includes('bundle') && {
-        connect: {
-          id: input.data.bundle,
-        },
-      };
-      if (bundle) {
-        input.data.bundle = bundle as Prisma.BundleUpdateOneRequiredWithoutPlanModelNestedInput;
-      }
       const update: PlanModel = await prisma.planModel.update(({
         ...input,
       } as unknown) as Prisma.PlanModelUpdateArgs);

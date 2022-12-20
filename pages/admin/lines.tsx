@@ -201,12 +201,15 @@ export async function getServerSideProps(context: NextPageContext) {
           payment: true,
           planModel: {
             include: {
-              bundle: {
+              refill: {
                 include: {
-                  refills: true,
+                  bundle: {
+                    include: {
+                      refills: true,
+                    },
+                  },
                 },
               },
-              refill: true,
               plans: true,
               coupons: true,
             },
@@ -251,18 +254,20 @@ export async function getServerSideProps(context: NextPageContext) {
           planModel: {
             ...line.plan.planModel,
             bundle: {
-              ...line.plan.planModel.bundle,
-              refills: line.plan.planModel.bundle.refills.map((refill) => ({
-                ...refill,
-                createdAt: format(refill.createdAt, 'dd/MM/yy kk:mm'),
-                updatedAt: format(refill.updatedAt, 'dd/MM/yy kk:mm'),
-              })),
+              ...line.plan.planModel.refill.bundle,
+              refills: line.plan.planModel.refill.bundle.refills.map(
+                (refill) => ({
+                  ...refill,
+                  createdAt: format(refill.createdAt, 'dd/MM/yy kk:mm'),
+                  updatedAt: format(refill.updatedAt, 'dd/MM/yy kk:mm'),
+                })
+              ),
               createdAt: format(
-                line.plan.planModel.bundle.createdAt,
+                line.plan.planModel.refill.bundle.createdAt,
                 'dd/MM/yy kk:mm'
               ),
               updatedAt: format(
-                line.plan.planModel.bundle.updatedAt,
+                line.plan.planModel.refill.bundle.updatedAt,
                 'dd/MM/yy kk:mm'
               ),
             },

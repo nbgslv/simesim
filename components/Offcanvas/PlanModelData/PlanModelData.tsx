@@ -10,10 +10,14 @@ import Section, { SectionType } from '../Section';
 
 type PlanModelDataTypeWithCoupons = PlanModel &
   Prisma.PlanModelGetPayload<{
-    select: {
-      bundle: {
+    include: {
+      refill: {
         include: {
-          refills: true;
+          bundle: {
+            include: {
+              refills: true;
+            };
+          };
         };
       };
       plans: true;
@@ -115,10 +119,14 @@ const PlanModelData = ({
         PlanModelDataType,
         'update',
         {
-          select: {
-            bundle: {
+          include: {
+            refill: {
               include: {
-                refills: true;
+                bundle: {
+                  include: {
+                    refills: true;
+                  };
+                };
               };
             };
             plans: true;
@@ -136,9 +144,13 @@ const PlanModelData = ({
           include: {
             plans: true,
             coupons: true,
-            bundle: {
+            refill: {
               include: {
-                refills: true,
+                bundle: {
+                  include: {
+                    refills: true,
+                  },
+                },
               },
             },
           },
@@ -183,7 +195,7 @@ const PlanModelData = ({
           />
           <h2 className="mt-3">Bundle</h2>
           <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.6)' }} />
-          <BundleData bundle={planModel.bundle} />
+          <BundleData bundle={planModel.refill.bundle} />
         </>
       )}
     </div>

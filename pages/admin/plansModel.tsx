@@ -29,7 +29,9 @@ import { verifyAdmin } from '../../utils/auth';
 
 type PlanModelData = PlanModel &
   Prisma.PlanModelGetPayload<{
-    select: { bundle: { include: { refills: true } }; refill: true };
+    include: {
+      refill: { include: { bundle: { include: { refills: true } } } };
+    };
   }>;
 
 type PlansModelAsAdminTableData = (GridValidRowModel & PlanModelData)[];
@@ -85,13 +87,16 @@ const PlansModel = ({
         PlanModelData,
         'update',
         {
-          select: {
-            bundle: {
+          include: {
+            refill: {
               include: {
-                refills: true;
+                bundle: {
+                  include: {
+                    refills: true;
+                  };
+                };
               };
             };
-            refill: true;
           };
         }
       >({
@@ -254,13 +259,16 @@ const PlansModel = ({
       PlanModelData,
       'create',
       {
-        select: {
-          bundle: {
+        include: {
+          refill: {
             include: {
-              refills: true;
+              bundle: {
+                include: {
+                  refills: true;
+                };
+              };
             };
           };
-          refill: true;
         };
       }
     >({
@@ -268,6 +276,17 @@ const PlansModel = ({
       model: 'PlanModel',
       input: {
         data,
+        include: {
+          refill: {
+            include: {
+              bundle: {
+                include: {
+                  refills: true,
+                },
+              },
+            },
+          },
+        },
       },
     });
     setPlansRows([...plansRows, newPlanModel]);
@@ -275,20 +294,7 @@ const PlansModel = ({
   };
 
   const handleDeleteRows = async (ids: GridRowId[]) => {
-    await adminApi.callApi<
-      PlanModelData,
-      'deleteMany',
-      {
-        select: {
-          bundle: {
-            include: {
-              refills: true;
-            };
-          };
-          refill: true;
-        };
-      }
-    >({
+    await adminApi.callApi<PlanModelData, 'deleteMany'>({
       method: 'DELETE',
       action: AdminApiAction.deleteMany,
       model: 'PlanModel',
@@ -326,13 +332,16 @@ const PlansModel = ({
       PlanModelData,
       'update',
       {
-        select: {
-          bundle: {
+        include: {
+          refill: {
             include: {
-              refills: true;
+              bundle: {
+                include: {
+                  refills: true;
+                };
+              };
             };
           };
-          refill: true;
         };
       }
     >({
@@ -342,12 +351,15 @@ const PlansModel = ({
         where: { id: rowId as string },
         data: updatedData,
         include: {
-          bundle: {
+          refill: {
             include: {
-              refills: true,
+              bundle: {
+                include: {
+                  refills: true,
+                },
+              },
             },
           },
-          refill: true,
         },
       },
     });
@@ -398,10 +410,13 @@ export async function getServerSideProps(context: NextPageContext) {
   await verifyAdmin(context);
   const plansModel = await prisma.planModel.findMany({
     include: {
-      bundle: {
-        include: { refills: true },
+      refill: {
+        include: {
+          bundle: {
+            include: { refills: true },
+          },
+        },
       },
-      refill: true,
     },
     orderBy: {
       updatedAt: 'desc',
@@ -428,20 +443,20 @@ export async function getServerSideProps(context: NextPageContext) {
 
   const serializedPlansModel = plansModel.map((planModel) => ({
     ...planModel,
-    bundle: {
-      ...planModel.bundle,
-      refills: planModel.bundle.refills.map((refill) => ({
-        ...refill,
-        createdAt: format(refill.createdAt, 'dd/MM/yy kk:mm'),
-        updatedAt: format(refill.updatedAt, 'dd/MM/yy kk:mm'),
-      })),
-      createdAt: format(planModel.bundle.createdAt, 'dd/MM/yy kk:mm'),
-      updatedAt: format(planModel.bundle.updatedAt, 'dd/MM/yy kk:mm'),
-    },
     refill: {
       ...planModel.refill,
       createdAt: format(planModel.refill.createdAt, 'dd/MM/yy kk:mm'),
       updatedAt: format(planModel.refill.updatedAt, 'dd/MM/yy kk:mm'),
+      bundle: {
+        ...planModel.refill.bundle,
+        refills: planModel.refill.bundle.refills.map((refill) => ({
+          ...refill,
+          createdAt: format(refill.createdAt, 'dd/MM/yy kk:mm'),
+          updatedAt: format(refill.updatedAt, 'dd/MM/yy kk:mm'),
+        })),
+        createdAt: format(planModel.refill.bundle.createdAt, 'dd/MM/yy kk:mm'),
+        updatedAt: format(planModel.refill.bundle.updatedAt, 'dd/MM/yy kk:mm'),
+      },
     },
     createdAt: format(planModel.createdAt, 'dd/MM/yy kk:mm'),
     updatedAt: format(planModel.updatedAt, 'dd/MM/yy kk:mm'),

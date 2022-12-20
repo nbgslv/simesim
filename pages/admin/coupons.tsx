@@ -37,10 +37,14 @@ type CouponData = Coupon &
 
 type PlanModelDataType = PlanModel &
   Prisma.PlanModelGetPayload<{
-    select: {
-      bundle: {
+    include: {
+      refill: {
         include: {
-          refills: true;
+          bundle: {
+            include: {
+              refills: true;
+            };
+          };
         };
       };
       plans: true;
@@ -295,9 +299,13 @@ const Coupons = ({
           include: {
             planModel: {
               include: {
-                bundle: {
+                refill: {
                   include: {
-                    refills: true,
+                    bundle: {
+                      include: {
+                        refills: true,
+                      },
+                    },
                   },
                 },
                 plans: true,
@@ -362,9 +370,13 @@ const Coupons = ({
         include: {
           planModel: {
             include: {
-              bundle: {
+              refill: {
                 include: {
-                  refills: true,
+                  bundle: {
+                    include: {
+                      refills: true,
+                    },
+                  },
                 },
               },
               plans: true,
@@ -439,9 +451,13 @@ export async function getServerSideProps(context: NextPageContext) {
     include: {
       planModel: {
         include: {
-          bundle: {
+          refill: {
             include: {
-              refills: true,
+              bundle: {
+                include: {
+                  refills: true,
+                },
+              },
             },
           },
           plans: true,
@@ -463,18 +479,18 @@ export async function getServerSideProps(context: NextPageContext) {
       ? {
           ...coupon.planModel,
           bundle: {
-            ...coupon.planModel.bundle,
-            refills: coupon.planModel.bundle.refills.map((refill) => ({
+            ...coupon.planModel.refill.bundle,
+            refills: coupon.planModel.refill.bundle.refills.map((refill) => ({
               ...refill,
               createdAt: format(refill.createdAt, 'dd/MM/yyyy kk:mm'),
               updatedAt: format(refill.updatedAt, 'dd/MM/yyyy kk:mm'),
             })),
             createdAt: format(
-              coupon.planModel.bundle.createdAt,
+              coupon.planModel.refill.bundle.createdAt,
               'dd/MM/yyyy kk:mm'
             ),
             updatedAt: format(
-              coupon.planModel.bundle.updatedAt,
+              coupon.planModel.refill.bundle.updatedAt,
               'dd/MM/yyyy kk:mm'
             ),
           },

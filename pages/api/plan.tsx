@@ -91,11 +91,6 @@ export default async function handler(
             },
           },
           payment,
-          bundle: {
-            connect: {
-              id: existingPlanModel.bundleId,
-            },
-          },
           refill: {
             connect: {
               id: existingPlanModel.refillId,

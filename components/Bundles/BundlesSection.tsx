@@ -13,7 +13,9 @@ import OrderModal from '../Order/OrderModal';
 type BundlesSectionProps = {
   countriesList: Country[];
   bundlesList: (PlanModel &
-    Prisma.PlanModelGetPayload<{ select: { bundle: true; refill: true } }>)[];
+    Prisma.PlanModelGetPayload<{
+      include: { refill: { include: { bundle: true } } };
+    }>)[];
 };
 
 const BundlesSection = ({
@@ -36,8 +38,8 @@ const BundlesSection = ({
       if (country !== selectedCountry) {
         setSelectedBundle(null);
         setFilteredBundles(
-          bundlesList.filter((bundle) =>
-            bundle.bundle.coverage.includes(country.name as string)
+          bundlesList.filter((planModel) =>
+            planModel.refill.bundle.coverage.includes(country.name as string)
           )
         );
       }

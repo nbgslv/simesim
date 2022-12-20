@@ -130,16 +130,6 @@ export default async function handler(
               },
             },
           },
-          bundle: {
-            connect: {
-              id: planModel.bundleId,
-            },
-          },
-          refill: {
-            connect: {
-              id: planModel.refillId,
-            },
-          },
         },
       });
 

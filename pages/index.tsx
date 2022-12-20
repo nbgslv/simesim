@@ -14,7 +14,9 @@ import MainLayout from '../components/Layouts/MainLayout';
 type HomeProps = {
   countriesList: Country[];
   bundlesList: (PlanModel &
-    Prisma.PlanModelGetPayload<{ select: { bundle: true; refill: true } }>)[];
+    Prisma.PlanModelGetPayload<{
+      include: { refill: { include: { bundle: true } } };
+    }>)[];
   phonesList: PhonesList[];
 };
 
@@ -52,18 +54,11 @@ export async function getStaticProps() {
     select: {
       id: true,
       name: true,
-      bundle: {
-        select: {
-          id: true,
-          name: true,
-          typeId: true,
-          coverage: true,
-        },
-      },
       refill: {
         select: {
           id: true,
           amount_days: true,
+          bundle: true,
         },
       },
       description: true,

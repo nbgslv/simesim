@@ -32,9 +32,16 @@ export default async function handler(
           id: id as string,
         },
         include: {
+          planModel: {
+            include: {
+              refill: {
+                include: {
+                  bundle: true,
+                },
+              },
+            },
+          },
           payment: true,
-          refill: true,
-          bundle: true,
           user: true,
         },
       });
@@ -42,9 +49,9 @@ export default async function handler(
       // Check if plan exists
       if (
         !plan ||
-        !plan.payment ||
-        !plan.refill ||
-        !plan.bundle ||
+        !plan.planModel ||
+        !plan.planModel.refill ||
+        !plan.planModel.refill.bundle ||
         !plan.user
       ) {
         throw new Error('No plan found');
@@ -61,7 +68,7 @@ export default async function handler(
         await i4uApi.verifyLogin();
       }
       const clearingLog = await i4uApi.getClearingLogByParams(
-        plan.payment.paymentId as string
+        plan.payment?.paymentId as string
       );
       // eslint-disable-next-line no-console
       console.log({ clearingLog: clearingLog.d[0] });
@@ -114,7 +121,7 @@ export default async function handler(
           }
 
           // Handle coupon, if exists
-          if (plan.payment.couponId) {
+          if (plan.payment?.couponId) {
             await prisma.coupon.update({
               where: {
                 id: plan.payment.couponId,
@@ -145,9 +152,9 @@ export default async function handler(
 
             // Create line
             const newLine = await keepGoApi.createLine({
-              refillMb: plan.refill.amount_mb,
-              refillDays: plan.refill.amount_days,
-              bundleId: parseInt(plan.bundle.externalId, 10),
+              refillMb: plan.planModel.refill.amount_mb,
+              refillDays: plan.planModel.refill.amount_days,
+              bundleId: parseInt(plan.planModel.refill.bundle.externalId, 10),
             });
 
             // eslint-disable-next-line no-console
@@ -257,11 +264,6 @@ export default async function handler(
                 notes: (newLineDetails.sim_card as Line)?.notes,
                 iccid: (newLine.sim_card as CreateLine)?.iccid,
                 lpaCode: (newLine.sim_card as CreateLine)?.lpa_code,
-                bundle: {
-                  connect: {
-                    id: plan.bundle.id,
-                  },
-                },
                 qrCode,
               },
             });
@@ -312,7 +314,7 @@ export default async function handler(
                     },
                     {
                       var: 'amountDays',
-                      value: `${plan.refill.amount_days}`,
+                      value: `${plan.planModel.refill.amount_days}`,
                     },
                   ],
                 },

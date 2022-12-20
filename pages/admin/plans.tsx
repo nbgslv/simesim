@@ -41,11 +41,18 @@ import { verifyAdmin } from '../../utils/auth';
 
 type PlanData = Plan &
   Prisma.PlanGetPayload<{
-    select: {
+    include: {
       planModel: {
         include: {
-          bundle: true;
-          refill: true;
+          refill: {
+            include: {
+              bundle: {
+                include: {
+                  refills: true;
+                };
+              };
+            };
+          };
         };
       };
       user: true;
@@ -55,11 +62,6 @@ type PlanData = Plan &
         };
       };
       line: true;
-      bundle: {
-        include: {
-          refills: true;
-        };
-      };
     };
   }>;
 
@@ -108,11 +110,18 @@ const Plans = ({
         PlanData,
         'update',
         {
-          select: {
+          include: {
             planModel: {
               include: {
-                bundle: true;
-                refill: true;
+                refill: {
+                  include: {
+                    bundle: {
+                      include: {
+                        refills: true;
+                      };
+                    };
+                  };
+                };
               };
             };
             user: true;
@@ -122,11 +131,6 @@ const Plans = ({
               };
             };
             line: true;
-            bundle: {
-              include: {
-                refills: true;
-              };
-            };
           };
         }
       >({
@@ -140,8 +144,15 @@ const Plans = ({
           include: {
             planModel: {
               include: {
-                bundle: true,
-                refill: true,
+                refill: {
+                  include: {
+                    bundle: {
+                      include: {
+                        refills: true,
+                      },
+                    },
+                  },
+                },
               },
             },
             user: true,
@@ -151,11 +162,6 @@ const Plans = ({
               },
             },
             line: true,
-            bundle: {
-              include: {
-                refills: true,
-              },
-            },
           },
         },
       });
@@ -354,32 +360,7 @@ const Plans = ({
   ];
 
   const handleDeleteRows = async (ids: GridRowId[]) => {
-    await adminApi.callApi<
-      PlanData,
-      'deleteMany',
-      {
-        select: {
-          planModel: {
-            include: {
-              bundle: true;
-              refill: true;
-            };
-          };
-          user: true;
-          payment: {
-            include: {
-              paymentMethod: true;
-            };
-          };
-          line: true;
-          bundle: {
-            include: {
-              refills: true;
-            };
-          };
-        };
-      }
-    >({
+    await adminApi.callApi<PlanData, 'deleteMany'>({
       method: 'DELETE',
       action: AdminApiAction.deleteMany,
       model: 'Plan',
@@ -406,11 +387,18 @@ const Plans = ({
       PlanData,
       'create',
       {
-        select: {
+        include: {
           planModel: {
             include: {
-              bundle: true;
-              refill: true;
+              refill: {
+                include: {
+                  bundle: {
+                    include: {
+                      refills: true;
+                    };
+                  };
+                };
+              };
             };
           };
           user: true;
@@ -420,11 +408,6 @@ const Plans = ({
             };
           };
           line: true;
-          bundle: {
-            include: {
-              refills: true;
-            };
-          };
         };
       }
     >({
@@ -435,8 +418,15 @@ const Plans = ({
         include: {
           planModel: {
             include: {
-              bundle: true,
-              refill: true,
+              refill: {
+                include: {
+                  bundle: {
+                    include: {
+                      refills: true,
+                    },
+                  },
+                },
+              },
             },
           },
           user: true,
@@ -446,11 +436,6 @@ const Plans = ({
             },
           },
           line: true,
-          bundle: {
-            include: {
-              refills: true,
-            },
-          },
         },
       },
     });
@@ -608,8 +593,15 @@ export async function getServerSideProps(context: NextPageContext) {
     include: {
       planModel: {
         include: {
-          bundle: true,
-          refill: true,
+          refill: {
+            include: {
+              bundle: {
+                include: {
+                  refills: true,
+                },
+              },
+            },
+          },
         },
       },
       user: true,
@@ -619,11 +611,6 @@ export async function getServerSideProps(context: NextPageContext) {
         },
       },
       line: true,
-      bundle: {
-        include: {
-          refills: true,
-        },
-      },
     },
     orderBy: {
       createdAt: 'desc',
@@ -633,15 +620,26 @@ export async function getServerSideProps(context: NextPageContext) {
     ...plan,
     planModel: {
       ...plan.planModel,
-      bundle: {
-        ...plan.planModel.bundle,
-        createdAt: format(plan.planModel.bundle.createdAt, 'dd/MM/yy kk:mm'),
-        updatedAt: format(plan.planModel.bundle.updatedAt, 'dd/MM/yy kk:mm'),
-      },
       refill: {
         ...plan.planModel.refill,
         createdAt: format(plan.planModel.refill.createdAt, 'dd/MM/yy kk:mm'),
         updatedAt: format(plan.planModel.refill.updatedAt, 'dd/MM/yy kk:mm'),
+        bundle: {
+          ...plan.planModel.refill.bundle,
+          createdAt: format(
+            plan.planModel.refill.bundle.createdAt,
+            'dd/MM/yy kk:mm'
+          ),
+          updatedAt: format(
+            plan.planModel.refill.bundle.updatedAt,
+            'dd/MM/yy kk:mm'
+          ),
+          refills: plan.planModel.refill.bundle.refills.map((refill) => ({
+            ...refill,
+            createdAt: format(refill.createdAt, 'dd/MM/yy kk:mm'),
+            updatedAt: format(refill.updatedAt, 'dd/MM/yy kk:mm'),
+          })),
+        },
       },
       createdAt: format(plan.planModel.createdAt, 'dd/MM/yy kk:mm'),
       updatedAt: format(plan.planModel.updatedAt, 'dd/MM/yy kk:mm'),
@@ -684,16 +682,6 @@ export async function getServerSideProps(context: NextPageContext) {
       ...plan.line,
       createdAt: format(plan.line?.createdAt || new Date(), 'dd/MM/yy kk:mm'),
       updatedAt: format(plan.line?.updatedAt || new Date(), 'dd/MM/yy kk:mm'),
-    },
-    bundle: {
-      ...plan.bundle,
-      refills: plan.bundle.refills.map((refill) => ({
-        ...refill,
-        createdAt: format(refill.createdAt, 'dd/MM/yy kk:mm'),
-        updatedAt: format(refill.updatedAt, 'dd/MM/yy kk:mm'),
-      })),
-      createdAt: format(plan.planModel.bundle.createdAt, 'dd/MM/yy kk:mm'),
-      updatedAt: format(plan.planModel.bundle.updatedAt, 'dd/MM/yy kk:mm'),
     },
     createdAt: format(plan.createdAt, 'dd/MM/yy kk:mm'),
     updatedAt: format(plan.updatedAt, 'dd/MM/yy kk:mm'),

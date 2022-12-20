@@ -10,7 +10,7 @@ import UserData from '../UserData/UserData';
 
 export type PlanDataType = Plan &
   Prisma.PlanGetPayload<{
-    select: {
+    include: {
       user: {
         include: {
           plans: true;
@@ -25,12 +25,15 @@ export type PlanDataType = Plan &
       };
       planModel: {
         include: {
-          bundle: {
+          refill: {
             include: {
-              refills: true;
+              bundle: {
+                include: {
+                  refills: true;
+                };
+              };
             };
           };
-          refill: true;
           plans: true;
           coupons: true;
         };
@@ -136,12 +139,15 @@ const PlanData = ({
             };
             planModel: {
               include: {
-                bundle: {
+                refill: {
                   include: {
-                    refills: true;
+                    bundle: {
+                      include: {
+                        refills: true;
+                      };
+                    };
                   };
                 };
-                refill: true;
                 plans: true;
                 coupons: true;
               };
@@ -171,9 +177,13 @@ const PlanData = ({
             },
             planModel: {
               include: {
-                bundle: {
+                refill: {
                   include: {
-                    refills: true,
+                    bundle: {
+                      include: {
+                        refills: true,
+                      },
+                    },
                   },
                 },
                 plans: true,

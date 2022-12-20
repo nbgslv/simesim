@@ -18,7 +18,9 @@ type BundlesSectionProps = {
   show: boolean;
   onHide: () => void;
   bundle?: PlanModel &
-    Prisma.PlanModelGetPayload<{ select: { bundle: true; refill: true } }>;
+    Prisma.PlanModelGetPayload<{
+      include: { refill: { include: { bundle: true } } };
+    }>;
   country?: string;
 };
 
