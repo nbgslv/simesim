@@ -2,8 +2,12 @@
 
 .wrapper {
   background-color: $background-color;
-  height: 65vh;
+  height: $page-height;
   padding: 1rem;
+
+  @media (max-width: map-get($grid-breakpoints, "xl")) {
+    height: 100%;
+  }
 
   :global * {
     color: $text-color;

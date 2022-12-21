@@ -40,15 +40,30 @@ const syncLines = async () => {
     if (allLines.length) {
       await prisma.$transaction(
         allLines.map((line: ApiLineType) =>
-          prisma.line.update({
-            data: {
-              deactivationDate: line.deactivation_date,
+          prisma.line.upsert({
+            update: {
+              deactivationDate: line.deactivation_date || null,
               expiredAt: line.expired_at,
               remainingUsageKb: line.remaining_usage_kb,
               remainingDays: line.remaining_days,
               status: line.status,
               autoRefillTurnedOn: line.auto_refill_turned_on,
-              autoRefillAmountMb: line.auto_refill_amount_mb.toString(),
+              autoRefillAmountMb: line.auto_refill_amount_mb?.toString(),
+              autoRefillPrice: line.auto_refill_price,
+              autoRefillCurrency: line.auto_refill_currency,
+            },
+            create: {
+              iccid: line.iccid,
+              notes: line.notes,
+              qrCode: '',
+              lpaCode: '',
+              deactivationDate: line.deactivation_date || null,
+              expiredAt: line.expired_at,
+              remainingUsageKb: line.remaining_usage_kb,
+              remainingDays: line.remaining_days,
+              status: line.status,
+              autoRefillTurnedOn: line.auto_refill_turned_on,
+              autoRefillAmountMb: line.auto_refill_amount_mb?.toString(),
               autoRefillPrice: line.auto_refill_price,
               autoRefillCurrency: line.auto_refill_currency,
             },

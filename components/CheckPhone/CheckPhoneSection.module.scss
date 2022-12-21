@@ -3,6 +3,16 @@
 .main {
   height: 100vh;
   background-color: map-get($theme-colors, 'light');
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    height: 100% !important;
+  }
+}
+
+.mainRow {
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    flex-direction: column !important;
+  }
 }
 
 .resultsContainer {
@@ -67,6 +77,10 @@
   position: absolute;
   bottom: 5rem;
   right: 0;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    position: unset;
+  }
 }
 
 .disclaimer small {

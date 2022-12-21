@@ -186,7 +186,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
             </motion.div>
           </>
         )}
-        {allowResend && (
+        {alertVariant !== 'danger' && (
           <Alert variant="info" className={styles.alert}>
             {resendLoading ? (
               <Spinner

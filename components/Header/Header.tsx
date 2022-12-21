@@ -44,9 +44,16 @@ const Header = ({ hideJumbotron = false }: { hideJumbotron?: boolean }) => {
         />
         {!hideJumbotron && (
           <Container className="d-flex mt-auto mb-auto text-center">
-            <Row className="d-flex mr-auto justify-content-between align-items-center">
+            <Row
+              className={`d-flex mr-auto justify-content-between align-items-center ${styles.container}`}
+            >
               <Col>
-                <Image alt="תמונת קאבר" src={coverImage} />
+                <Image
+                  alt="תמונת קאבר"
+                  src={coverImage}
+                  priority
+                  className={styles.coverImage}
+                />
               </Col>
               <Col>
                 <div>

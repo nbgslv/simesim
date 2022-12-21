@@ -10,6 +10,22 @@
     font-weight: 800;
     font-size: 0.9rem;
   }
+
+  :global .navbar-collapse {
+    @media (max-width: map-get($grid-breakpoints, 'lg')) {
+      background-color: rgba($background-color, 0.9);
+    }
+  }
+
+  :global .navbar-brand {
+    @media (max-width: map-get($grid-breakpoints, 'lg')) {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: map-get($grid-breakpoints, 'lg')) {
+    padding: 0 !important;
+  }
 }
 
 .navLinkTextDark {
@@ -22,6 +38,10 @@
 
 .navLinkTextLight {
   color: #ffffff !important;
+
+  @media (max-width: map-get($grid-breakpoints, 'lg')) {
+    color: $primary-color !important;
+  }
 
   &:hover {
     color: map-get($theme-colors, 'primary') !important;

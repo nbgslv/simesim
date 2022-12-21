@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { useRouter } from 'next/router';
 import { Coupon, PlanModel, Prisma } from '@prisma/client';
+import Link from 'next/link';
 import { Context, useUserStore } from '../../lib/context/UserStore';
 import { Action } from '../../lib/reducer/reducer';
 import styles from './OrderModal.module.scss';
@@ -257,7 +258,10 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
           {state.user.id && (
             <Row className={styles.orderModalRow}>
               <small>
-                <strong>נא לוודא שפרטיך נכונים. לעדכון הפרטים האישיים</strong>
+                <strong>
+                  נא לוודא שפרטיך נכונים.{' '}
+                  <Link href="/user/changeDetails">לעדכון הפרטים</Link>
+                </strong>
               </small>
             </Row>
           )}

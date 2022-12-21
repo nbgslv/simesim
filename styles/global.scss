@@ -30,10 +30,37 @@ h6 {
 
 .navbar {
   --bs-navbar-active-color: map-get($theme-colors, 'primary');
+  --bs-navbar-toggler-border-color: rgba(0, 0, 0, 0);
 }
 
 .navbar-nav {
   --bs-nav-link-hover-color: map-get($theme-colors, 'primary');
+}
+
+.accordion {
+  --bs-accordion-active-color: #f5f5f5;
+  --bs-accordion-active-bg: #4502c6;
+  --bs-accordion-btn-bg: #4502c6;
+  --bs-accordion-btn-color: #f5f5f5;
+}
+
+.accordion-button::after {
+  color: #ffffff;
+  background-image: url("/plus.svg");
+}
+
+.accordion-button:not(.collapsed)::after {
+  color: #ffffff;
+  background-image: url("/plus.svg");
+}
+
+.accordion-collapse.collapse.show {
+  background-color: #f5f5f5;
+  color: $text-color !important;
+
+  .accordion-body {
+    color: $text-color !important;
+  }
 }
 
 .nav-link {
@@ -77,10 +104,18 @@ a.dropdown-item {
 
 body.trigger-position-left #enable-toolbar-trigger {
   left: 20px !important;
+
+  @media (max-width: 767px) {
+    left: 5px !important;
+  }
 }
 
 #enable-toolbar-trigger {
   top: -15px !important;
+
+  @media (max-width: 767px) {
+    top: -5px !important;
+  }
 }
 
 .keyboard-shorcut {

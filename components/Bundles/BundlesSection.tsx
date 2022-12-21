@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import Lottie from 'react-lottie';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useMediaQuery } from 'react-responsive';
 import Section from '../Section/Section';
 import CountrySearch, { ExtendedCountry } from '../CountrySearch/CountrySearch';
 import styles from './BundlesSection.module.scss';
@@ -30,6 +31,7 @@ const BundlesSection = ({
   const [filteredBundles, setFilteredBundles] = useState<PlanModel[]>([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
+  const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
 
   const handleCountrySelect = (country: ExtendedCountry | null) => {
     setSelectedCountry(country);
@@ -122,16 +124,18 @@ const BundlesSection = ({
               </>
             ) : null}
           </Col>
-          <Col role="presentation">
-            <Lottie
-              ariaLabel="Traveling animation"
-              options={{
-                loop: true,
-                autoplay: true,
-                animationData: travelImageData,
-              }}
-            />
-          </Col>
+          {!isMobile && !selectedCountry && (
+            <Col role="presentation">
+              <Lottie
+                ariaLabel="Traveling animation"
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: travelImageData,
+                }}
+              />
+            </Col>
+          )}
         </Row>
       </Section>
     </AnimatePresence>

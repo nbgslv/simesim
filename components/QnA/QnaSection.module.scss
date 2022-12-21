@@ -2,11 +2,19 @@
 
 .qnaSection {
   background-color: $background-color;
-  height: 100vh;
+  height: 100%;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    height: 100% !important;
+  }
 }
 
 .qnaImage {
   width: 57%;
   margin-right: auto;
   margin-left: auto;
+}
+
+.qnaColor {
+  color: $text-color;
 }

@@ -1,4 +1,4 @@
-@import '../../styles/_variables';
+@import 'styles/variables';
 
 .cover {
   background-image: linear-gradient(
@@ -25,6 +25,11 @@
   height: 100vh;
   width: 100%;
   position: relative;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    height: 100% !important;
+    padding: 1rem;
+  }
 }
 
 .actionButton {
@@ -39,5 +44,11 @@
 
   &:hover {
     border-color: map-get($theme-colors, 'secondary') !important;
+  }
+}
+
+.container {
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    flex-direction: column;
   }
 }

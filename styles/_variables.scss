@@ -10,6 +10,15 @@ $theme-colors: (
   'orange': #ff3904,
 );
 
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
 $text-color: map-get($theme-colors, 'dark');
 $background-color: map-get($theme-colors, 'light');
 $primary-color: map-get($theme-colors, 'primary');

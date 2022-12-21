@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { AnimatePresence, motion, useAnimation, Variants } from 'framer-motion';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useMediaQuery } from 'react-responsive';
 import styles from './CheckPhoneSection.module.scss';
 import SearchAutocomplete, {
   Item,
@@ -49,6 +50,7 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
     setSelectedPhone,
   ] = React.useState<PhoneListItem | null>(null);
   const phoneSearchRef = useRef<any>(null);
+  const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
   const controls = useAnimation();
 
   const ListBox = ({ children }: { children: ReactNode | ReactNode[] }) => {
@@ -221,7 +223,9 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
       title={'הטלפון שלי תומך ב-eSim?'}
       className={styles.main}
     >
-      <Row className="h-100 w-100 d-flex align-items-center">
+      <Row
+        className={`h-100 w-100 d-flex align-items-center ${styles.mainRow}`}
+      >
         <Col
           className={`d-flex flex-column h-100 ${
             selectedBrand ? 'justify-content-start' : 'justify-content-center'
@@ -276,19 +280,21 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
             </small>
           </div>
         </Col>
-        <Col className="w-100 h-100 p-6">
-          <motion.div
-            style={{
-              ...getRandomTransformOrigin(),
-            }}
-            variants={variants}
-            animate={controls}
-            onAnimationComplete={handleAnimationComplete}
-            className="w-100 h-100 d-flex justify-content-center align-items-center position-relative"
-          >
-            <Image src="/phone.svg" alt={'phone'} layout="fill" />
-          </motion.div>
-        </Col>
+        {!isMobile && (
+          <Col className="w-100 h-100 p-6">
+            <motion.div
+              style={{
+                ...getRandomTransformOrigin(),
+              }}
+              variants={variants}
+              animate={controls}
+              onAnimationComplete={handleAnimationComplete}
+              className="w-100 h-100 d-flex justify-content-center align-items-center position-relative"
+            >
+              <Image src="/phone.svg" alt={'phone'} layout="fill" />
+            </motion.div>
+          </Col>
+        )}
       </Row>
     </Section>
   );

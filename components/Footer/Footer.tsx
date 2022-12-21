@@ -13,7 +13,7 @@ import text from '../../lib/content/text.json';
 const Footer = () => (
   <footer className={styles.main}>
     <Container className="h-100 d-flex flex-column justify-content-between">
-      <Row>
+      <Row className={styles.row}>
         <Col className="m-auto">
           <Image
             src={'/logoTextWhite.png'}
@@ -60,7 +60,9 @@ const Footer = () => (
           </Nav>
         </Col>
         <Col className="d-flex flex-column justify-content-between">
-          <div className="d-flex align-items-center justify-content-between">
+          <div
+            className={`d-flex align-items-center justify-content-between ${styles.logo}`}
+          >
             <div>
               <Image
                 src={logoImageWhiteText}
@@ -72,11 +74,11 @@ const Footer = () => (
             </div>
           </div>
           <div className="d-flex flex-column justify-content-between">
-            <div className="d-flex align-items-center">
+            <div className={`d-flex align-items-center ${styles.logo}`}>
               <FontAwesomeIcon icon={regular('envelope')} />
               <Nav.Link href={`mailto:${text.email}`}>{text.email}</Nav.Link>
             </div>
-            <div className="d-flex align-items-center">
+            <div className={`d-flex align-items-center ${styles.logo}`}>
               <FontAwesomeIcon icon={brands('whatsapp')} />
               <Nav.Link href={`https://wa.me/${text.phoneNumber}`}>
                 {text.phoneNumber}

@@ -2,7 +2,7 @@
 
 .main {
   background-color: $background-color;
-  height: $page-height;
+  height: 100%;
 
   :global * {
     color: $text-color;
@@ -16,8 +16,25 @@
 }
 
 .container {
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    display: block !important;
+  }
+}
+
+.containerRow {
   width: 50%;
   margin-left: auto;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    flex-direction: column !important;
+    margin: auto;
+  }
+}
+
+.contactDetails {
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    flex-direction: row !important;
+  }
 }
 
 .iconWrapper {
@@ -43,4 +60,12 @@
   border-radius: 0.5rem;
   width: 100%;
   height: 4rem;
+}
+
+.buttonContainer {
+  :global button {
+    @media (max-width: map-get($grid-breakpoints, 'md')) {
+      text-align: center !important;
+    }
+  }
 }

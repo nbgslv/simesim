@@ -94,16 +94,20 @@ const Contact = () => {
     <MainLayout title="צור קשר" hideJumbotron>
       <div className={styles.main}>
         <h1 className="text-center p-2">{text.contact.title}</h1>
-        <Container className="h-75 w-100 mt-2 d-flex justify-content-between">
+        <Container
+          className={`h-75 w-100 mt-2 d-flex justify-content-between ${styles.container}`}
+        >
           <Col>
-            <Row>
+            <Row className="mb-3">
               <Col>{text.contact.description}</Col>
             </Row>
             <Row
-              className={`${styles.container} w-100 h-100 align-items-center`}
+              className={`${styles.containerRow} w-100 h-100 align-items-center`}
             >
               <Col>
-                <Row className="d-flex align-items-center">
+                <Row
+                  className={`d-flex align-items-center ${styles.contactDetails}`}
+                >
                   <Col lg={1} className={styles.iconWrapper}>
                     <FontAwesomeIcon
                       className={styles.iconContainer}
@@ -116,7 +120,9 @@ const Contact = () => {
                     </Nav.Link>
                   </Col>
                 </Row>
-                <Row className="d-flex align-items-center w-auto">
+                <Row
+                  className={`d-flex align-items-center w-auto ${styles.contactDetails}`}
+                >
                   <Col lg={1} className={styles.iconWrapper}>
                     <FontAwesomeIcon
                       className={styles.iconContainer}
@@ -130,7 +136,7 @@ const Contact = () => {
                   </Col>
                 </Row>
               </Col>
-              <Col className="h-100 w-100 d-flex align-items-center justify-content-center flex-column">
+              <Col className="h-100 w-100">
                 <AnimatePresence>
                   {success && (
                     <motion.div layout>
@@ -229,7 +235,9 @@ const Contact = () => {
                       </Form>
                     </Row>
                     <Row>
-                      <Col className="d-flex justify-content-end mt-3">
+                      <Col
+                        className={`d-flex justify-content-center mt-3 mb-3 ${styles.buttonContainer}`}
+                      >
                         <Button
                           className={styles.submitButton}
                           variant="primary"

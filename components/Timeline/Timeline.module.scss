@@ -1,0 +1,7 @@
+@import "styles/variables";
+
+.main {
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    flex-direction: column !important;
+  }
+}

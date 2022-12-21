@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
+import { useMediaQuery } from 'react-responsive';
 import styles from './TimelineItem.module.scss';
 
 type TimelineItemProps = {
@@ -22,6 +23,7 @@ const TimelineItem = ({
   const [active, setActive] = useState<boolean>(false);
   const [animationActive, setAnimationActive] = useState<boolean>(false);
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
+  const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
   const controls = useAnimation();
 
   useEffect(() => {
@@ -90,23 +92,7 @@ const TimelineItem = ({
       onMouseLeave={handleMouseLeave}
     >
       <AnimatePresence initial={false} mode="wait">
-        {!active && (
-          <motion.div
-            key={1}
-            initial={{ opacity: 1 }}
-            exit={{ x: 100, opacity: 0 }}
-            className={styles.timelineItemText}
-          >
-            <motion.div
-              variants={variants}
-              animate={controls}
-              onAnimationComplete={handleAnimationComplete}
-            >
-              {children}
-            </motion.div>
-          </motion.div>
-        )}
-        {active && (
+        {isMobile ? (
           <motion.div
             key={2}
             initial={{ opacity: 0 }}
@@ -114,8 +100,38 @@ const TimelineItem = ({
             transition={{ duration: 0.2 }}
             className={styles.timelineContent}
           >
+            {children}
             <p>{tooltipText}</p>
           </motion.div>
+        ) : (
+          <>
+            {!active ? (
+              <motion.div
+                key={1}
+                initial={{ opacity: 1 }}
+                exit={{ x: 100, opacity: 0 }}
+                className={styles.timelineItemText}
+              >
+                <motion.div
+                  variants={variants}
+                  animate={controls}
+                  onAnimationComplete={handleAnimationComplete}
+                >
+                  {children}
+                </motion.div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={2}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                className={styles.timelineContent}
+              >
+                <p>{tooltipText}</p>
+              </motion.div>
+            )}
+          </>
         )}
       </AnimatePresence>
       <AnimatePresence initial={false}>

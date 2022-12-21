@@ -61,6 +61,7 @@ export async function getStaticProps() {
           bundle: {
             select: {
               id: true,
+              coverage: true,
             },
           },
         },

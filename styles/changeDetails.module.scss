@@ -1,8 +1,16 @@
 @import "styles/variables";
 
 .main {
-  height: 65vh;
+  height: $page-height;
   width: 50%;
+  background-color: $background-color;
+
+  @media (max-width: map-get($grid-breakpoints, "lg")) {
+    height: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
 
   :global * {
       color: $text-color;

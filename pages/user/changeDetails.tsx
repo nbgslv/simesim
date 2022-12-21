@@ -14,8 +14,8 @@ const ChangeDetails = ({ user }: { user: Partial<User> }) => {
   const router = useRouter();
   return (
     <MainLayout title="עדכון פרטים" hideJumbotron>
-      <Container className={styles.main}>
-        <h1 className="text-center mb-3 p-2">הפרטים שלי</h1>
+      <Container className={`${styles.main} p-2`}>
+        <h1 className="text-center mb-3">הפרטים שלי</h1>
         <ChangeDetailsForm user={user} />
         {router.query.success && (
           <Alert variant="success" className="mt-3 text-center">

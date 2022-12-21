@@ -3,10 +3,18 @@
 .bundlesSection {
   background-color: $primary-color;
   height: 100vh;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    height: 118vh !important;
+  }
 }
 
 .row {
   height: 100%;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    flex-direction: column !important;
+  }
 }
 
 .bundlesSearch {

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import styles from './QnaSection.module.scss';
 import Section from '../Section/Section';
+import text from '../../lib/content/text.json';
 
 const QnaSection = () => (
   <Section
@@ -12,50 +13,19 @@ const QnaSection = () => (
     className={styles.qnaSection}
   >
     <Accordion defaultActiveKey="0" className="shadow">
-      <Accordion.Item eventKey="0">
-        <Accordion.Header>Accordion Item #1</Accordion.Header>
-        <Accordion.Body>
-          <strong>This is the first item&apos;s accordion body.</strong> It is
-          shown by default, until the collapse plugin adds the appropriate
-          classes that we use to style each element. These classes control the
-          overall appearance, as well as the showing and hiding via CSS
-          transitions. You can modify any of this with custom CSS or overriding
-          our default variables. It&apos;s also worth noting
-        </Accordion.Body>
-      </Accordion.Item>
-      <Accordion.Item eventKey="1">
-        <Accordion.Header>Accordion Item #1</Accordion.Header>
-        <Accordion.Body>
-          <strong>This is the first item&apos;s accordion body.</strong> It is
-          shown by default, until the collapse plugin adds the appropriate
-          classes that we use to style each element. These classes control the
-          overall appearance, as well as the showing and hiding via CSS
-          transitions. You can modify any of this with custom CSS or overriding
-          our default variables. It&apos;s also worth noting
-        </Accordion.Body>
-      </Accordion.Item>
-      <Accordion.Item eventKey="2">
-        <Accordion.Header>Accordion Item #1</Accordion.Header>
-        <Accordion.Body>
-          <strong>This is the first item&apos;s accordion body.</strong> It is
-          shown by default, until the collapse plugin adds the appropriate
-          classes that we use to style each element. These classes control the
-          overall appearance, as well as the showing and hiding via CSS
-          transitions. You can modify any of this with custom CSS or overriding
-          our default variables. It&apos;s also worth noting
-        </Accordion.Body>
-      </Accordion.Item>
-      <Accordion.Item eventKey="3">
-        <Accordion.Header>Accordion Item #1</Accordion.Header>
-        <Accordion.Body>
-          <strong>This is the first item&apos;s accordion body.</strong> It is
-          shown by default, until the collapse plugin adds the appropriate
-          classes that we use to style each element. These classes control the
-          overall appearance, as well as the showing and hiding via CSS
-          transitions. You can modify any of this with custom CSS or overriding
-          our default variables. It&apos;s also worth noting
-        </Accordion.Body>
-      </Accordion.Item>
+      {text.qna.map((qna, index) => (
+        <Accordion.Item eventKey={index.toString()} key={index}>
+          <Accordion.Header>{qna.question}</Accordion.Header>
+          <Accordion.Body>
+            <p className={styles.qnaColor}>{qna.answer}</p>
+            {qna.a_text && qna.a_href ? (
+              <p className={styles.qnaColor}>
+                <a href={qna.a_href}>{qna.a_text}</a>
+              </p>
+            ) : null}
+          </Accordion.Body>
+        </Accordion.Item>
+      ))}
     </Accordion>
     <motion.div
       className={styles.qnaImage}
