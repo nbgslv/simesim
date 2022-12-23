@@ -62,7 +62,7 @@ export const authOptions = (
         // TODO handle other way with errors, not with redirect
         if (!user) {
           res.redirect('/error?error=Verification');
-        } else {
+        } else if (process.env.CUSTOM_ENV === 'production') {
           const message = await twilioApi.sendVerificationCode(
             phone,
             token,
@@ -71,6 +71,9 @@ export const authOptions = (
           if (message !== 'pending') {
             res.redirect('/error?error=Configuration');
           }
+        } else {
+          // eslint-disable-next-line no-console
+          console.log({ token });
         }
       },
       generateVerificationToken: async () =>
