@@ -38,17 +38,23 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     setCountriesRows(countries);
   }, [countries]);
 
-  const updateRow = useCallback(
-    async (data: BodyInit) =>
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/country`, {
+  const updateRow = 
+    async (data: Partial<Country>) => 
+      await adminApi.callApi<
+        Country,
+          'update'
+      >({
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: data,
-      }),
-    [changeShowLoading, changeLockTranslationLoading]
-  );
+        model: 'Country',
+        input: {
+          where: {
+            id: data.id,
+          },
+          data,
+        }
+      });
+    
+
 
   const handleLockTranslationToggle = async (
     checked: boolean,
@@ -58,27 +64,14 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     try {
       setChangeLockTranslationLoading(rowId);
       const update = await updateRow(
-        JSON.stringify({
-          ...row,
+        {
           lockTranslation: checked,
-          id: row.id,
-        })
-      );
-      const updateJson = await update.json();
-      if (!updateJson.success)
-        throw new Error('Failed to update lockTranslation');
-      const serializedUpdate = { ...updateJson.data };
-      serializedUpdate.createdAt = format(
-        parseISO(serializedUpdate.createdAt),
-        'dd/MM/yy kk:mm'
-      );
-      serializedUpdate.updatedAt = format(
-        parseISO(serializedUpdate.updatedAt),
-        'dd/MM/yy kk:mm'
+          id: rowId as string,
+        }
       );
       setCountriesRows((oldCountries) =>
         oldCountries.map((country) =>
-          country.id === rowId ? serializedUpdate : country
+          country.id === rowId ? update : country
         )
       );
     } catch (e) {
@@ -96,27 +89,14 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     try {
       setChangeShowLoading(rowId);
       const update = await updateRow(
-        JSON.stringify({
-          ...row,
+        {
           show: checked,
-          id: row.id,
-        })
-      );
-      const updateJson = await update.json();
-      if (!updateJson.success)
-        throw new Error('Failed to update lockTranslation');
-      const serializedUpdate = { ...updateJson.data };
-      serializedUpdate.createdAt = format(
-        parseISO(serializedUpdate.createdAt),
-        'dd/MM/yy kk:mm'
-      );
-      serializedUpdate.updatedAt = format(
-        parseISO(serializedUpdate.updatedAt),
-        'dd/MM/yy kk:mm'
+          id: rowId as string,
+        }
       );
       setCountriesRows((oldCountries) =>
         oldCountries.map((country) =>
-          country.id === rowId ? serializedUpdate : country
+          country.id === rowId ? update : country
         )
       );
     } catch (e) {
