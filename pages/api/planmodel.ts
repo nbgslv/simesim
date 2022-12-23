@@ -34,32 +34,15 @@ export default async function handler(
           .object({
             data: yup
               .object({
-                code: yup.string().required('Code is required'),
-                discount: yup
-                  .number()
-                  .required('Discount is required')
-                  .min(0, 'Discount must be greater than 0'),
-                discountType: yup
-                  .mixed()
-                  .oneOf(['PERCENT', 'AMOUNT'])
-                  .required('Type is required'),
-                validFrom: yup
-                  .date()
-                  .required('Valid from is required')
-                  .nullable(true),
-                validTo: yup
-                  .date()
-                  .required('Valid from is required')
-                  .nullable(true),
-                maxUsesPerUser: yup
-                  .number()
-                  .required('Max uses per user is required')
-                  .min(1, 'Max uses per user must be greater than 0'),
-                maxUsesTotal: yup
-                  .number()
-                  .required('Max uses total is required')
-                  .min(-1, 'Max uses total must be greater than 0'),
-                planModel: yup.string(),
+                refillId: yup
+                    .string()
+                    .test('is-none', 'Refill is required', (value) => value !== 'none')
+                    .required(),
+                name: yup.string().required('Name is required'),
+                description: yup.string(),
+                price: yup.number().required('Price is required'),
+                vat: yup.boolean(),
+                couponsIds: yup.string(),
               })
               .required(),
             include: yup.object(),
@@ -71,6 +54,7 @@ export default async function handler(
         input.data.couponsIds !== 'none'
           ? { connect: input.data.couponsIds }
           : undefined;
+      delete input.data.couponsIds;
       const planModel = await prisma.planModel.create({
         ...input,
         data: {

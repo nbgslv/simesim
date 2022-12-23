@@ -2,7 +2,7 @@ import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Tooltip } from '@mui/material';
 import { NextPageContext } from 'next';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Bundle, Coupon, PlanModel, Prisma, Refill } from '@prisma/client';
 import {
   GridCellParams,
@@ -50,35 +50,15 @@ const PlansModel = ({
   existingRefills,
   existingCoupons,
 }: PlansModelProps) => {
+  const [addPlanModelLoading, setAddPlanModelLoading] = useState(false);
   const [plansRows, setPlansRows] = React.useState<PlansModelAsAdminTableData>(
     plansModel
   );
   const [vatToggleLoading, setVatToggleLoading] = React.useState<GridRowId>('');
-  const [chosenBundle, setChosenBundle] = React.useState<
-    (Bundle & Prisma.BundleGetPayload<{ select: { refills: true } }>) | null
-  >(null);
-  const [refills, setRefills] = React.useState<Refill[]>(existingRefills);
   const [bundleData, setBundleData] = React.useState<Bundle | null>(null);
   const [refillData, setRefillData] = React.useState<Refill | null>(null);
   const [adminApi] = useState<AdminApi>(new AdminApi());
   const modal = useModal('add-plansmodel');
-
-  useEffect(() => {
-    setRefills((oldRefills) =>
-      oldRefills.filter(
-        (refill) =>
-          !chosenBundle?.refills
-            .map((refillInRefills) => refillInRefills.id)
-            .includes(refill.id)
-      )
-    );
-  }, [chosenBundle]);
-
-  const handleBundleSet = (
-    bundle: Bundle & Prisma.BundleGetPayload<{ select: { refills: true } }>
-  ) => {
-    setChosenBundle(bundle);
-  };
 
   const handleVatToggle = async (checked: boolean, rowId: GridRowId) => {
     try {
@@ -131,7 +111,7 @@ const PlansModel = ({
       field: 'bundle',
       headerName: 'Bundle',
       renderCell: (params) => (
-        <Button onClick={() => setBundleData(params.row.bundle)}>
+        <Button onClick={() => setBundleData(params.row.refill.bundle)}>
           <FontAwesomeIcon icon={solid('up-right-from-square')} />
         </Button>
       ),
@@ -255,6 +235,7 @@ const PlansModel = ({
   const addRow = async (
     data: PlanModel
   ): Promise<{ id: GridRowId; columnToFocus: undefined } | Error> => {
+    setAddPlanModelLoading(true);
     const newPlanModel = await adminApi.callApi<
       PlanModelData,
       'create',
@@ -321,6 +302,7 @@ const PlansModel = ({
     } finally {
       await modal.hide();
       modal.remove();
+      setAddPlanModelLoading(false);
     }
   };
 
@@ -385,9 +367,9 @@ const PlansModel = ({
       >
         <PlansModelForm
           bundles={existingBundles}
-          refills={refills}
+          refills={existingRefills}
           coupons={existingCoupons}
-          setBundle={handleBundleSet}
+          loading={addPlanModelLoading}
         />
       </FormModal>
       <AdminOffcanvas
