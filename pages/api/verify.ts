@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import * as yup from 'yup';
 import prisma from '../../lib/prisma';
-import TwilioApi from '../../utils/api/services/twilio/twilio';
 
 export default async function handler(
   req: NextApiRequest,
