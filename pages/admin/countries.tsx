@@ -1,11 +1,10 @@
 import { NextPageContext } from 'next';
-import React, { useCallback, useEffect, useState } from 'react';
-import { format, parseISO } from 'date-fns';
+import React, { useEffect, useState } from 'react';
+import { format } from 'date-fns';
 import { Country } from '@prisma/client';
 import {
   GridColumns,
   GridRowId,
-  GridRowModel,
   GridSelectionModel,
   GridValidRowModel,
 } from '@mui/x-data-grid';
@@ -40,7 +39,7 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
 
   const updateRow = 
     async (data: Partial<Country>) => 
-      await adminApi.callApi<
+      adminApi.callApi<
         Country,
           'update'
       >({
@@ -58,8 +57,7 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
 
   const handleLockTranslationToggle = async (
     checked: boolean,
-    rowId: GridRowId,
-    row: GridRowModel<Country>
+    rowId: GridRowId
   ) => {
     try {
       setChangeLockTranslationLoading(rowId);
@@ -83,8 +81,7 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
 
   const handleShowToggle = async (
     checked: boolean,
-    rowId: GridRowId,
-    row: GridRowModel<Country>
+    rowId: GridRowId
   ) => {
     try {
       setChangeShowLoading(rowId);
