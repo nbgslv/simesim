@@ -89,8 +89,8 @@ export default async function handler(
               .required(),
             data: yup
               .object({
-                name: yup.string().matches(/^[A-Za-z]+$/),
-                translation: yup.string().matches(/^[\u0590-\u05fe]+$/),
+                name: yup.string().matches(/^[A-Za-z | \u0020-\u002F]+$/),
+                translation: yup.string().matches(/^[\u0590-\u05fe | \u0020-\u002F]+$/),
                 lockTranslation: yup.boolean(),
                 show: yup.boolean(),
               })
