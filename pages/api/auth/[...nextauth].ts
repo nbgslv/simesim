@@ -4,12 +4,13 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import otpGenerator from 'otp-generator';
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '../../../lib/prisma';
+import TwilioApi, { Channel } from '../../../utils/api/services/twilio/twilio';
 
-// const twilioApi = new TwilioApi(
-//   process.env.TWILIO_ACCOUNT_SID!,
-//   process.env.TWILIO_AUTH_TOKEN!,
-//   process.env.TWILIO_VERIFY_SID!
-// );
+const twilioApi = new TwilioApi(
+  process.env.TWILIO_ACCOUNT_SID!,
+  process.env.TWILIO_AUTH_TOKEN!,
+  process.env.TWILIO_VERIFY_SID!
+);
 
 export const authOptions = (
   req: NextApiRequest,
@@ -23,6 +24,7 @@ export const authOptions = (
       maxAge: 60 * 60 * 2, // 2 hours
       sendVerificationRequest: async ({ identifier: phone, token }) => {
         const { body } = req;
+        let { method } = body;
         const { recaptchaToken } = body;
 
         const googleRecaptchaResponse = await fetch(
@@ -40,17 +42,17 @@ export const authOptions = (
           throw new Error('Google reCAPTCHA verification failed');
         }
 
-        // if (method) {
-        //   if (method === 'sms') {
-        //     method = Channel.SMS;
-        //   } else if (method === 'voice') {
-        //     method = Channel.VOICE;
-        //   } else if (method === 'whatsapp') {
-        //     method = Channel.WHATSAPP;
-        //   }
-        // } else {
-        //   method = Channel.WHATSAPP;
-        // }
+        if (method) {
+          if (method === 'sms') {
+            method = Channel.SMS;
+          } else if (method === 'voice') {
+            method = Channel.VOICE;
+          } else if (method === 'whatsapp') {
+            method = Channel.WHATSAPP;
+          }
+        } else {
+          method = Channel.WHATSAPP;
+        }
         const user = await prisma.user.findUnique({
           where: {
             email: phone,
@@ -60,17 +62,18 @@ export const authOptions = (
         // TODO handle other way with errors, not with redirect
         if (!user) {
           res.redirect('/error?error=Verification');
+        } else if (process.env.CUSTOM_ENV === 'production') {
+          const message = await twilioApi.sendVerificationCode(
+            phone,
+            token,
+            method
+          );
+          if (message !== 'pending') {
+            res.redirect('/error?error=Configuration');
+          }
         } else {
-          // const message = await twilioApi.sendVerificationCode(
-          //   phone,
-          //   token,
-          //   method
-          // );
-          // if (message !== 'pending') {
-          //   res.redirect('/error?error=Configuration');
-          // }
           // eslint-disable-next-line no-console
-          console.log({ token })
+          console.log({ token });
         }
       },
       generateVerificationToken: async () =>
