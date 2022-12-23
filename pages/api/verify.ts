@@ -17,15 +17,15 @@ export default async function handler(
         callbackUrl: yup.string(),
       });
       await postSchema.validate({ phoneNumber, token, callbackUrl });
-      // const twilioApi = new TwilioApi(
-      //   process.env.TWILIO_ACCOUNT_SID!,
-      //   process.env.TWILIO_AUTH_TOKEN!,
-      //   process.env.TWILIO_VERIFY_SID!
-      // );
-      // const verificationStatus = await twilioApi.validateVerificationCode(
-      //   phoneNumber
-      // );
-      // if (verificationStatus) {
+      const twilioApi = new TwilioApi(
+        process.env.TWILIO_ACCOUNT_SID!,
+        process.env.TWILIO_AUTH_TOKEN!,
+        process.env.TWILIO_VERIFY_SID!
+      );
+      const verificationStatus = await twilioApi.validateVerificationCode(
+        phoneNumber
+      );
+      if (verificationStatus) {
         await prisma.user.update({
           where: {
             email: phoneNumber,
@@ -40,9 +40,9 @@ export default async function handler(
             callbackUrl || 'https://simesim.co.il'
           )}`
         );
-      // } else {
-      //   res.redirect(302, '/error?error=Verification');
-      // }
+      } else {
+        res.redirect(302, '/error?error=Verification');
+      }
     } else {
       res.status(405).json({
         name: 'METHOD_NOT_ALLOWED',
