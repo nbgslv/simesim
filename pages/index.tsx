@@ -26,7 +26,10 @@ export default function Home({
   phonesList,
 }: HomeProps): JSX.Element {
   return (
-    <MainLayout title="שים eSim">
+    <MainLayout
+      title="שים eSim"
+      metaDescription={'שים eSim חבילות גלישה זולות לחו"ל בלי להחליף כרטיס sim'}
+    >
       <TimelineSection />
       <BundlesSection countriesList={countriesList} bundlesList={bundlesList} />
       <QnaSection />
