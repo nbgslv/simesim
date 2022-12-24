@@ -7,10 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3cb43c12-8f20-4f07-ae7c-06611bb9ac05" name="Changes" comment="added sitemap.xml">
+
+    <list default="true" id="3cb43c12-8f20-4f07-ae7c-06611bb9ac05" name="Changes" comment="fixed planmodel delete schema and update">
+      <change afterPath="$PROJECT_DIR$/public/sitemap.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/login.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/styles/login.module.scss" beforeDir="false" afterPath="$PROJECT_DIR$/styles/login.module.scss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +107,7 @@
       <workItem from="1671793305389" duration="6087000" />
       <workItem from="1671801602737" duration="93000" />
       <workItem from="1671801779723" duration="103000" />
-      <workItem from="1671801891779" duration="12493000" />
+      <workItem from="1671801891779" duration="11888000" />
     </task>
     <task id="LOCAL-00001" summary="finished admin">
       <created>1671264533416</created>
@@ -329,6 +329,7 @@
     <MESSAGE value="merge" />
     <MESSAGE value="added custom env for staging" />
     <MESSAGE value="fixed planmodel delete schema and update" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed planmodel delete schema and update" />
     <MESSAGE value="added sitemap.xml" />
     <option name="LAST_COMMIT_MESSAGE" value="added sitemap.xml" />
   </component>
