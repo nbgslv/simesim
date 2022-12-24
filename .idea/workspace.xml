@@ -7,11 +7,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3cb43c12-8f20-4f07-ae7c-06611bb9ac05" name="Changes" comment="fixed refill dropdown and plan model addition">
+    <list default="true" id="3cb43c12-8f20-4f07-ae7c-06611bb9ac05" name="Changes" comment="fixed planmodel delete schema and update">
+      <change afterPath="$PROJECT_DIR$/public/sitemap.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/PlansModel/PlansModelForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/PlansModel/PlansModelForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/admin/plansModel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/pages/admin/plansModel.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pages/api/planmodel.ts" beforeDir="false" afterPath="$PROJECT_DIR$/pages/api/planmodel.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +55,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "js.linters.configure.manually.selectedeslint": "true",
-    "last_opened_file_path": "C:/Coding/NBogus/simesim",
+    "last_opened_file_path": "C:/Coding/NBogus/simesim/public",
     "list.type.of.created.stylesheet": "SCSS",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.standard": "true",
@@ -68,7 +66,7 @@
     "nodejs_package_manager_path": "npm",
     "prettierjs.PrettierConfiguration.Package": "C:\\Coding\\NBogus\\simesim\\node_modules\\prettier",
     "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "settings.javascript.linters.eslint",
+    "settings.editor.selected.configurable": "settings.javascript.prettier",
     "ts.external.directory.path": "C:\\Coding\\NBogus\\simesim\\node_modules\\typescript\\lib",
     "ts.rename.search.for.dynamic.occurrences": "true",
     "vue.rearranger.settings.migration": "true"
@@ -107,7 +105,7 @@
       <workItem from="1671793305389" duration="6087000" />
       <workItem from="1671801602737" duration="93000" />
       <workItem from="1671801779723" duration="103000" />
-      <workItem from="1671801891779" duration="6761000" />
+      <workItem from="1671801891779" duration="11888000" />
     </task>
     <task id="LOCAL-00001" summary="finished admin">
       <created>1671264533416</created>
@@ -256,7 +254,28 @@
       <option name="project" value="LOCAL" />
       <updated>1671812114375</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="merge">
+      <created>1671814216994</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1671814216994</updated>
+    </task>
+    <task id="LOCAL-00023" summary="added custom env for staging">
+      <created>1671815386328</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1671815386328</updated>
+    </task>
+    <task id="LOCAL-00024" summary="fixed planmodel delete schema and update">
+      <created>1671888867507</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1671888867507</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -298,7 +317,10 @@
     <MESSAGE value="reverted to production" />
     <MESSAGE value="fixed linting errors" />
     <MESSAGE value="fixed refill dropdown and plan model addition" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed refill dropdown and plan model addition" />
+    <MESSAGE value="merge" />
+    <MESSAGE value="added custom env for staging" />
+    <MESSAGE value="fixed planmodel delete schema and update" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed planmodel delete schema and update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
