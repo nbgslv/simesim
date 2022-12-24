@@ -107,69 +107,75 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
   if (status === 'unauthenticated')
     return (
       <MainLayout title="התחברות" hideJumbotron>
-        <Form
-          className={`${styles.signIn} d-flex flex-column align-items-center justify-content-center`}
-        >
-          {router.query.paymentUrl && (
-            <Alert className="text-center" variant="info">
-              לפני שנמשיך, וכדי לוודא שאתם לא רובוטים,
-              <br /> נשלח לטלפון שתזינו הודעה עם קוד, אותו תתבקשו להזין במסך הבא
-            </Alert>
-          )}
-          {router.query.action && router.query.action === 'updateDetails' && (
-            <Alert className="text-center" variant="info">
-              על-מנת לעדכן את פרטי החשבון, עלינו לאמת את זהותך.
-              <br />
-              נשלח לטלפון שתזינו הודעה עם קוד, אותו תתבקשו להזין במסך הבא
-              <br />
-              <br />
-              <div className="text-muted small">
-                חשוב: אם עדכנת את מספר הטלפון, חשוב להזין את מספר הטלפון הקודם
+        <div className={styles.main}>
+          <h1 className="text-center p-2">התחברות</h1>
+          <Form
+            className={`${styles.signIn} d-flex flex-column align-items-center justify-content-center`}
+          >
+            {router.query.paymentUrl && (
+              <Alert className="text-center" variant="info">
+                לפני שנמשיך, וכדי לוודא שאתם לא רובוטים,
+                <br /> נשלח לטלפון שתזינו הודעה עם קוד, אותו תתבקשו להזין במסך
+                הבא
+              </Alert>
+            )}
+            {router.query.action && router.query.action === 'updateDetails' && (
+              <Alert className="text-center" variant="info">
+                על-מנת לעדכן את פרטי החשבון, עלינו לאמת את זהותך.
                 <br />
-                אם אינך מחזיק עוד במספר הקודם, ניתן{' '}
-                <Link href={'/contact'}>ליצור עימנו קשר</Link> ונסייע לעדכן את
-                חשבונך
-              </div>
-            </Alert>
-          )}
-          {alertVariant && <Alert variant={alertVariant}>{alertMessage}</Alert>}
-          <Form.Control type="hidden" name="csrfToken" value={csrfToken} />
-          <Form.Group className={styles.formGroup}>
-            <Form.Label>טלפון נייד</Form.Label>
-            <Form.Control
-              dir="ltr"
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className={styles.buttonColor}
-              type="text"
-              name="email"
-              id="email"
-              size="lg"
-              autoFocus
-            />
-          </Form.Group>
-          <motion.div layout>
-            <Button
-              disabled={loading}
-              className={styles.button}
-              variant="primary"
-              type="submit"
-              onClick={() => handleLogin()}
-            >
-              {loading ? (
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                  style={{ color: '#ffffff' }}
-                />
-              ) : (
-                'כניסה'
-              )}
-            </Button>
-          </motion.div>
-        </Form>
+                נשלח לטלפון שתזינו הודעה עם קוד, אותו תתבקשו להזין במסך הבא
+                <br />
+                <br />
+                <div className="text-muted small">
+                  חשוב: אם עדכנת את מספר הטלפון, חשוב להזין את מספר הטלפון הקודם
+                  <br />
+                  אם אינך מחזיק עוד במספר הקודם, ניתן{' '}
+                  <Link href={'/contact'}>ליצור עימנו קשר</Link> ונסייע לעדכן את
+                  חשבונך
+                </div>
+              </Alert>
+            )}
+            {alertVariant && (
+              <Alert variant={alertVariant}>{alertMessage}</Alert>
+            )}
+            <Form.Control type="hidden" name="csrfToken" value={csrfToken} />
+            <Form.Group className={styles.formGroup}>
+              <Form.Label>טלפון נייד</Form.Label>
+              <Form.Control
+                dir="ltr"
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className={styles.buttonColor}
+                type="text"
+                name="email"
+                id="email"
+                size="lg"
+                autoFocus
+              />
+            </Form.Group>
+            <motion.div layout>
+              <Button
+                disabled={loading}
+                className={styles.button}
+                variant="primary"
+                type="submit"
+                onClick={() => handleLogin()}
+              >
+                {loading ? (
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                    style={{ color: '#ffffff' }}
+                  />
+                ) : (
+                  'כניסה'
+                )}
+              </Button>
+            </motion.div>
+          </Form>
+        </div>
       </MainLayout>
     );
 

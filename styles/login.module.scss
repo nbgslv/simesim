@@ -1,5 +1,13 @@
 @import 'variables';
 
+.main {
+  background-color: $background-color;
+
+  :global h1 {
+    color: $text-color;
+  }
+}
+
 .signIn {
   height: $page-height;
   background-color: $background-color;
