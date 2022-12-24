@@ -4,7 +4,11 @@ import MainLayout from '../components/Layouts/MainLayout';
 import styles from '../styles/guide.module.scss';
 
 const Guide = () => (
-  <MainLayout title="מדריך eSim" hideJumbotron>
+  <MainLayout
+    title="מדריך eSim"
+    metaDescription={'מדריך שימוש והתקנה של כרטיס eSim בפשטות ובמהירות'}
+    hideJumbotron
+  >
     <div className={styles.wrapper}>
       <Container className={styles.container}>
         <h1 className="text-center p-2">הדרכה בנושאים שונים</h1>

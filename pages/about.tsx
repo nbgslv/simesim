@@ -4,7 +4,13 @@ import MainLayout from '../components/Layouts/MainLayout';
 import styles from '../styles/about.module.scss';
 
 const About = () => (
-  <MainLayout title="אודות" hideJumbotron>
+  <MainLayout
+    title="אודות"
+    metaDescription={
+      'שים eSim שמה לעצמה למטרה לספק חויית שירות איכותית וטובה, ולספק מבחר אפשרויות רכישה זולות, של חבילות גלישה בחו"ל'
+    }
+    hideJumbotron
+  >
     <div className={styles.wrapper}>
       <Container className={styles.container}>
         <h1 className="text-center p-2">עלינו</h1>

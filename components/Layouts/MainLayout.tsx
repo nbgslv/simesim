@@ -7,14 +7,17 @@ const MainLayout = ({
   title,
   children,
   hideJumbotron = false,
+  metaDescription,
 }: {
   title: string;
   children: ReactNode;
   hideJumbotron?: boolean;
+  metaDescription?: string;
 }) => (
   <>
     <Head>
       <title>{title}</title>
+      {metaDescription && <meta name="description" content={metaDescription} />}
     </Head>
     <Header hideJumbotron={hideJumbotron} />
     <main>{children}</main>
