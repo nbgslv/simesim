@@ -15,7 +15,11 @@ export const deleteSchema = yup.object({
     otherwise: yup.object({
       where: yup
         .object({
-          ids: yup.array().of(yup.string()).required(),
+          id: yup
+            .object({
+              in: yup.array().of(yup.string()).required(),
+            })
+            .required(),
         })
         .required(),
     }),
