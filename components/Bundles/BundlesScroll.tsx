@@ -17,6 +17,7 @@ const BundlesScroll = ({
 }) => {
   const [currentBundle, setCurrentBundle] = React.useState<number>(0);
   const [direction, setDirection] = React.useState<number>(0);
+  const isDragging = React.useRef<boolean>(false);
   const variants = {
     enter: (slideDirection: number) => ({
       x: slideDirection > 0 ? 1000 : -1000,
@@ -49,6 +50,11 @@ const BundlesScroll = ({
       setCurrentBundle(bundlesList.length - 1);
       setDirection(0);
     }
+  };
+
+  const handleBundleSelect = (id: string | null) => {
+    setBundle(id);
+    setDirection(0);
   };
 
   if (bundlesList.length === 0)
@@ -92,17 +98,31 @@ const BundlesScroll = ({
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={1}
+              onDragStart={() => {
+                isDragging.current = true;
+              }}
               onDragEnd={(e, { offset }) => {
                 if (offset.x < 0) {
                   paginate(1);
                 } else if (offset.x > 0) {
                   paginate(-1);
                 }
+                setTimeout(() => {
+                  isDragging.current = false;
+                }, 500);
+              }}
+              style={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                height: '100%',
               }}
             >
               <BundleCard
                 bundle={bundlesList[currentBundle]}
-                setBundle={setBundle}
+                setBundle={(id) => {
+                  if (!isDragging.current) handleBundleSelect(id);
+                }}
               />
             </motion.div>
           </AnimatePresence>
