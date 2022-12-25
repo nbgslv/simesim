@@ -1,5 +1,6 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useLayoutEffect } from 'react';
 import Head from 'next/head';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import AdminHeader from '../AdminHeader/AdminHeader';
 import styles from './AdminLayout.module.scss';
 import useHideRecaptcha from '../../lib/hooks/useHideRecaptcha';
@@ -12,10 +13,13 @@ const AdminLayout = ({
   children: ReactNode;
 }) => {
   const { hideRecaptcha } = useHideRecaptcha();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
-  useEffect(() => {
-    hideRecaptcha();
-  }, [hideRecaptcha]);
+  useLayoutEffect(() => {
+    if (executeRecaptcha) {
+      hideRecaptcha();
+    }
+  }, [executeRecaptcha]);
 
   return (
     <div className={styles.main}>

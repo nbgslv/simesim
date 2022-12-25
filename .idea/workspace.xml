@@ -7,9 +7,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3cb43c12-8f20-4f07-ae7c-06611bb9ac05" name="Changes" comment="added meta description">
+    <list default="true" id="3cb43c12-8f20-4f07-ae7c-06611bb9ac05" name="Changes" comment="removed main tag from AdminLayout.tsx">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/Layouts/AdminLayout.module.scss" beforeDir="false" afterPath="$PROJECT_DIR$/components/Layouts/AdminLayout.module.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Layouts/AdminLayout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/Layouts/AdminLayout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/hooks/useHideRecaptcha.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/lib/hooks/useHideRecaptcha.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +108,7 @@
       <workItem from="1671801602737" duration="93000" />
       <workItem from="1671801779723" duration="103000" />
       <workItem from="1671801891779" duration="16477000" />
-      <workItem from="1671984248824" duration="226000" />
+      <workItem from="1671984248824" duration="1058000" />
     </task>
     <task id="LOCAL-00001" summary="finished admin">
       <created>1671264533416</created>
@@ -305,7 +306,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671915932155</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="removed main tag from AdminLayout.tsx">
+      <created>1671984635555</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1671984635555</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -326,7 +334,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added user change details" />
     <MESSAGE value="added sentry" />
     <MESSAGE value="added Google Analytics" />
     <MESSAGE value="added console log to check cron req url" />
@@ -351,7 +358,8 @@
     <MESSAGE value="added sitemap.xml" />
     <MESSAGE value="added h1 to login page" />
     <MESSAGE value="added meta description" />
-    <option name="LAST_COMMIT_MESSAGE" value="added meta description" />
+    <MESSAGE value="removed main tag from AdminLayout.tsx" />
+    <option name="LAST_COMMIT_MESSAGE" value="removed main tag from AdminLayout.tsx" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
