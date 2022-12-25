@@ -1,7 +1,8 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import Head from 'next/head';
 import AdminHeader from '../AdminHeader/AdminHeader';
 import styles from './AdminLayout.module.scss';
+import useHideRecaptcha from '../../lib/hooks/useHideRecaptcha';
 
 const AdminLayout = ({
   title,
@@ -9,14 +10,22 @@ const AdminLayout = ({
 }: {
   title: string;
   children: ReactNode;
-}) => (
-  <div className={styles.main}>
-    <Head>
-      <title>{title}</title>
-    </Head>
-    <AdminHeader />
-    {children}
-  </div>
-);
+}) => {
+  const { hideRecaptcha } = useHideRecaptcha();
+
+  useEffect(() => {
+    hideRecaptcha();
+  }, [hideRecaptcha]);
+
+  return (
+    <div className={styles.main}>
+      <Head>
+        <title>{title}</title>
+      </Head>
+      <AdminHeader />
+      <main>{children}</main>
+    </div>
+  );
+};
 
 export default AdminLayout;
