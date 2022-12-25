@@ -23,7 +23,7 @@ const AdminLayout = ({
         <title>{title}</title>
       </Head>
       <AdminHeader />
-      <main>{children}</main>
+      {children}
     </div>
   );
 };
