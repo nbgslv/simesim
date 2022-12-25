@@ -11,7 +11,6 @@ const BundleCard = ({
   bundle: PlanModel | undefined;
   setBundle: (planModelId: string | null) => void;
 }) => {
-  const [chosenPlanModel, setChosenPlanModel] = React.useState<string>('');
   const controls = useAnimationControls();
 
   const variants = {
@@ -32,15 +31,8 @@ const BundleCard = ({
   }, []);
 
   const handlePlanModelSelect = (id: string) => {
-    if (chosenPlanModel === id) {
-      setChosenPlanModel('');
-      setBundle(null);
-      controls.start('start');
-    } else {
-      setChosenPlanModel(id);
-      setBundle(id);
-      controls.stop();
-    }
+    setBundle(id);
+    controls.stop();
   };
 
   if (!bundle) return null;
