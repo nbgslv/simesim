@@ -99,6 +99,12 @@ const BundlesScroll = ({
                   paginate(-1);
                 }
               }}
+              style={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                height: '100%',
+              }}
             >
               <BundleCard
                 bundle={bundlesList[currentBundle]}
