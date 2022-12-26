@@ -41,11 +41,12 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
           callbackUrl: callbackUrl || 'https://simesim.co.il',
           recaptchaToken: token,
         });
-        setLoading(false);
       }
     } catch (error) {
       console.error(error);
       await router.push('/login?error=Default');
+    } finally {
+      setLoading(false);
     }
   };
 
