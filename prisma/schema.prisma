@@ -224,9 +224,9 @@ model Transaction {
   currency          String
   type              String
   invoiceHash       String
-  refillAmountMb    Int
+  refillAmountMb    Int?
   reason            String
-  productId         String
+  transactionId     String @unique
 }
 
 model Country {

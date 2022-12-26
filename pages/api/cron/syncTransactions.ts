@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import syncBundles from '../../../lib/cron/bundlesSync';
 import { verifyApi } from '../../../utils/auth';
 import { ApiResponse } from '../../../lib/types/api';
+import syncTransactions from '../../../lib/cron/transactionsSync';
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,7 +26,7 @@ export default async function handler(
         });
         return;
       }
-      await syncBundles();
+      await syncTransactions();
       res.status(200).json({ success: true, data: null });
     } else {
       res.status(405).json({
@@ -38,7 +38,7 @@ export default async function handler(
   } catch (error: Error | any) {
     console.error(error);
     res.status(500).json({
-      name: 'CRON_BUNDLES_ERR',
+      name: 'CRON_TRANSACTIONS_ERR',
       success: false,
       message: (error as Error).message,
     });
