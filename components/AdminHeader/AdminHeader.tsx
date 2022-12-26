@@ -30,6 +30,9 @@ const AdminHeader = () => (
         <Nav.Link eventKey="/admin/coupons" href="/admin/coupons">
           קופונים
         </Nav.Link>
+        <Nav.Link eventKey="/admin/users" href="/admin/transactions">
+          תנועות
+        </Nav.Link>
         <Nav.Link eventKey="/admin/users" href="/admin/users">
           משתמשים
         </Nav.Link>

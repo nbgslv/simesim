@@ -98,9 +98,25 @@ export default class KeepGoApi {
     }
   }
 
-  public async getTransactions(id: string): Promise<KeepGoResponse | Error> {
+  public async getLineTransactions(
+    id: string
+  ): Promise<KeepGoResponse | Error> {
     try {
       const response = await fetch(`${this.baseUrl}/line/${id}/transactions`, {
+        headers: {
+          ...this.authHeaders,
+        },
+      });
+      return await response.json();
+    } catch (error) {
+      console.error(error);
+      return getErrorMessage(error);
+    }
+  }
+
+  public async getTransactions(): Promise<KeepGoResponse | Error> {
+    try {
+      const response = await fetch(`${this.baseUrl}/transactions`, {
         headers: {
           ...this.authHeaders,
         },
