@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Button, Form, InputGroup } from 'react-bootstrap';
-import { Prisma, Bundle, Refill, Coupon } from '@prisma/client';
+import { Button, Form, InputGroup, Spinner } from 'react-bootstrap';
+import { Bundle, Refill, Coupon } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -10,16 +10,11 @@ import styles from './PlansModelForm.module.scss';
 type PlansModelFormProps = {
   bundles: Bundle[];
   refills: Refill[];
-  setBundle: (
-    bundle: Bundle & Prisma.BundleGetPayload<{ select: { refills: true } }>
-  ) => void;
   coupons: Coupon[];
+  loading: boolean;
 };
 
 const schema = yup.object().shape({
-  bundleId: yup
-    .string()
-    .test('is-none', 'Bundle is required', (value) => value !== 'none'),
   refillId: yup
     .string()
     .test('is-none', 'Refill is required', (value) => value !== 'none'),
@@ -30,7 +25,7 @@ const schema = yup.object().shape({
   couponsIds: yup.string(),
 });
 
-const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
+const PlansModelForm = ({ bundles, refills, coupons, loading }: PlansModelFormProps) => {
   const [filteredRefills, setFilteredRefills] = React.useState<Refill[]>(
     refills
   );
@@ -40,6 +35,7 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
   const {
     register,
     watch,
+      setValue,
     formState: { errors },
     handleSubmit,
   } = useForm({
@@ -47,7 +43,6 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
     reValidateMode: 'onChange',
     resolver: yupResolver(schema),
     defaultValues: {
-      bundleId: 'none',
       refillId: 'none',
       name: '',
       description: '',
@@ -56,49 +51,39 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
       couponsIds: 'none',
     },
   });
-  const selectedBundle = watch('bundleId');
   const selectedRefill = watch('refillId');
 
   useEffect(() => {
-    if (selectedBundle === 'none') {
-      setFilteredRefills(refills);
-      setChosenBundle(null);
-      return;
+    if (bundles.length > 0 && !chosenBundle) {
+      setChosenBundle(bundles[0]);
+      const tempRefills = refills.filter((refill) => refill.bundleId === bundles[0].id)
+      setFilteredRefills(tempRefills);
+      setChosenRefill(tempRefills[0]);
+      setValue('refillId', tempRefills[0].id);
     }
-    const bundle = bundles.find(
-      (bundleOfBundles) => bundleOfBundles.id === selectedBundle
-    );
-    if (!bundle) {
-      setFilteredRefills(refills);
-      setChosenBundle(null);
-    } else {
-      setFilteredRefills(
-        refills.filter((refill) => refill.bundleId === selectedBundle)
-      );
-      setChosenBundle(bundle);
-    }
-  }, [selectedBundle, bundles, refills]);
+  }, [bundles])
 
   useEffect(() => {
-    if (selectedRefill === 'none') {
-      setChosenRefill(null);
-    } else {
-      const refill = refills.find(
-        (refillOfRefills) => refillOfRefills.id === selectedRefill
-      );
-      if (!refill) {
-        setChosenRefill(null);
-      } else {
-        setChosenRefill(refill);
-      }
+    const tempRefills = refills.filter((refill) => refill.bundleId === chosenBundle?.id)
+    if (tempRefills.length > 0) {
+        setFilteredRefills(tempRefills);
+        setChosenRefill(tempRefills[0]);
+        setValue('refillId', tempRefills[0].id);
     }
-  }, [selectedRefill, refills]);
+  }, [chosenBundle]);
+
+  useEffect(() => {
+    if (selectedRefill !== 'none' && selectedRefill !== chosenRefill?.id) {
+      const refill = filteredRefills.find((filteredRefill) => filteredRefill.id === selectedRefill);
+      setChosenRefill(refill || null);
+    }
+  }, [selectedRefill]);
 
   return (
     <Form>
       <Form.Group>
         <Form.Label>Bundle</Form.Label>
-        <Form.Select {...register('bundleId')} isInvalid={!!errors.bundleId}>
+        <Form.Select onChange={(e) => setChosenBundle(bundles.find((bundle) => bundle.id === e.target.value) || null)}>
           {bundles.length ? (
             bundles.map((bundle) => (
               <option key={bundle.id} value={bundle.id as string}>
@@ -112,9 +97,6 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
         {chosenBundle && (
           <Form.Text>Description: {chosenBundle.description}</Form.Text>
         )}
-        <Form.Control.Feedback type="invalid">
-          {errors.bundleId?.message}
-        </Form.Control.Feedback>
       </Form.Group>
       <Form.Group>
         <Form.Label>Refill</Form.Label>
@@ -224,8 +206,14 @@ const PlansModelForm = ({ bundles, refills, coupons }: PlansModelFormProps) => {
         variant="primary"
         onClick={handleSubmit((data) => resolve(data))}
         className={styles.submitButton}
+        disabled={loading}
       >
-        Save Changes
+        {loading ? (
+          <Spinner animation="border" size="sm" style={{ color: '#fff' }} />
+        ) : (
+          'Save Changes'
+        )}
+
       </Button>
     </Form>
   );

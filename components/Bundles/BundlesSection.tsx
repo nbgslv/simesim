@@ -1,6 +1,6 @@
 import { Country, PlanModel, Prisma } from '@prisma/client';
-import React, { useState } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Row, Col } from 'react-bootstrap';
 import Lottie from 'react-lottie';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMediaQuery } from 'react-responsive';
@@ -33,6 +33,14 @@ const BundlesSection = ({
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
   const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
 
+  useEffect(() => {
+    if (currentStep === 2) {
+      setOrderModalOpen(true);
+    } else {
+      setOrderModalOpen(false);
+    }
+  }, [currentStep]);
+
   const handleCountrySelect = (country: ExtendedCountry | null) => {
     setSelectedCountry(country);
     if (country) {
@@ -64,6 +72,12 @@ const BundlesSection = ({
   const handleBundleReset = () => {
     setSelectedBundle(null);
     setCurrentStep(1);
+  };
+
+  const handleOrderModalClose = () => {
+    setOrderModalOpen(false);
+    setCurrentStep(1);
+    setSelectedBundle(null);
   };
 
   return (
@@ -103,26 +117,26 @@ const BundlesSection = ({
                 </div>
               </div>
             ) : null}
-            {currentStep >= 2 ? (
-              <>
-                <Button
-                  variant="primary"
-                  size="lg"
-                  className={`${styles.orderButton} w-100`}
-                  onClick={() => setOrderModalOpen(true)}
-                >
-                  3. מזמינים
-                </Button>
-                <OrderModal
-                  show={orderModalOpen}
-                  onHide={() => setOrderModalOpen(false)}
-                  country={selectedCountry?.displayValue}
-                  bundle={bundlesList.find(
-                    (bundle) => bundle.id === selectedBundle
-                  )}
-                />
-              </>
-            ) : null}
+            {/* {currentStep >= 2 ? ( */}
+            {/*  <> */}
+            {/*    <Button */}
+            {/*      variant="primary" */}
+            {/*      size="lg" */}
+            {/*      className={`${styles.orderButton} w-100`} */}
+            {/*      onClick={() => setOrderModalOpen(true)} */}
+            {/*    > */}
+            {/*      3. מזמינים */}
+            {/*    </Button> */}
+            {/*  </> */}
+            {/* ) : null} */}
+            <OrderModal
+              show={orderModalOpen}
+              onHide={handleOrderModalClose}
+              country={selectedCountry?.displayValue}
+              bundle={bundlesList.find(
+                (bundle) => bundle.id === selectedBundle
+              )}
+            />
           </Col>
           {!isMobile && !selectedCountry && (
             <Col role="presentation">

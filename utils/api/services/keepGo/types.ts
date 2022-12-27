@@ -82,22 +82,20 @@ export type Refill = {
   price_eur: number;
 };
 
-type Transaction = {
-  createdAt: string;
+export type Transaction = {
+  created_at: string;
   status: string;
   amount: string;
   currency: string;
   type: string;
-  invoiceHash: string;
-  refillAmountMb: number;
+  invoice_hash: string;
+  refill_amount_mb: number;
   reason: string;
-  productId: string;
+  transaction_id: string;
 };
 
 type Transactions = {
-  transaction: {
-    data: [Transaction];
-  };
+  data: [Transaction];
 };
 
 type FilterObject<T> = {

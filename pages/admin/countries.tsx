@@ -1,11 +1,10 @@
 import { NextPageContext } from 'next';
-import React, { useCallback, useEffect, useState } from 'react';
-import { format, parseISO } from 'date-fns';
+import React, { useEffect, useState } from 'react';
+import { format } from 'date-fns';
 import { Country } from '@prisma/client';
 import {
   GridColumns,
   GridRowId,
-  GridRowModel,
   GridSelectionModel,
   GridValidRowModel,
 } from '@mui/x-data-grid';
@@ -38,47 +37,39 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     setCountriesRows(countries);
   }, [countries]);
 
-  const updateRow = useCallback(
-    async (data: BodyInit) =>
-      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/country`, {
+  const updateRow = 
+    async (data: Partial<Country>) => 
+      adminApi.callApi<
+        Country,
+          'update'
+      >({
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: data,
-      }),
-    [changeShowLoading, changeLockTranslationLoading]
-  );
+        model: 'Country',
+        input: {
+          where: {
+            id: data.id,
+          },
+          data,
+        }
+      });
+    
+
 
   const handleLockTranslationToggle = async (
     checked: boolean,
-    rowId: GridRowId,
-    row: GridRowModel<Country>
+    rowId: GridRowId
   ) => {
     try {
       setChangeLockTranslationLoading(rowId);
       const update = await updateRow(
-        JSON.stringify({
-          ...row,
+        {
           lockTranslation: checked,
-          id: row.id,
-        })
-      );
-      const updateJson = await update.json();
-      if (!updateJson.success)
-        throw new Error('Failed to update lockTranslation');
-      const serializedUpdate = { ...updateJson.data };
-      serializedUpdate.createdAt = format(
-        parseISO(serializedUpdate.createdAt),
-        'dd/MM/yy kk:mm'
-      );
-      serializedUpdate.updatedAt = format(
-        parseISO(serializedUpdate.updatedAt),
-        'dd/MM/yy kk:mm'
+          id: rowId as string,
+        }
       );
       setCountriesRows((oldCountries) =>
         oldCountries.map((country) =>
-          country.id === rowId ? serializedUpdate : country
+          country.id === rowId ? update : country
         )
       );
     } catch (e) {
@@ -90,33 +81,19 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
 
   const handleShowToggle = async (
     checked: boolean,
-    rowId: GridRowId,
-    row: GridRowModel<Country>
+    rowId: GridRowId
   ) => {
     try {
       setChangeShowLoading(rowId);
       const update = await updateRow(
-        JSON.stringify({
-          ...row,
+        {
           show: checked,
-          id: row.id,
-        })
-      );
-      const updateJson = await update.json();
-      if (!updateJson.success)
-        throw new Error('Failed to update lockTranslation');
-      const serializedUpdate = { ...updateJson.data };
-      serializedUpdate.createdAt = format(
-        parseISO(serializedUpdate.createdAt),
-        'dd/MM/yy kk:mm'
-      );
-      serializedUpdate.updatedAt = format(
-        parseISO(serializedUpdate.updatedAt),
-        'dd/MM/yy kk:mm'
+          id: rowId as string,
+        }
       );
       setCountriesRows((oldCountries) =>
         oldCountries.map((country) =>
-          country.id === rowId ? serializedUpdate : country
+          country.id === rowId ? update : country
         )
       );
     } catch (e) {

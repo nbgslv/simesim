@@ -77,7 +77,10 @@
 
 .couponButton {
   color: map-get($theme-colors, 'success') !important;
-  margin-top: 1rem;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    margin-top: 1rem;
+  }
 
   &:hover {
     color: map-get($theme-colors, 'light') !important;
