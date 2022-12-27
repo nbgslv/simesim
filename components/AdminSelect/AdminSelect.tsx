@@ -31,7 +31,9 @@ const AdminSelect = <
   onSelect,
   defaultValue,
   isMulti,
+  menuPosition = 'fixed',
 }: AdminSelectProps<IsMulti, Group>) => {
+  console.log({ options, defaultValue });
   const [selected, setSelected] = React.useState<
     AdminSelectOption | MultiValue<AdminSelectOption> | null
   >(null);
@@ -65,6 +67,10 @@ const AdminSelect = <
           ...baseStyles,
           direction: 'ltr',
         }),
+        menuPortal: (baseStyles) => ({
+          ...baseStyles,
+          zIndex: 9999,
+        }),
         option: (baseStyle) => ({
           ...baseStyle,
           color: '#000',
@@ -72,7 +78,7 @@ const AdminSelect = <
       }}
       isMulti={isMulti}
       menuPortalTarget={document.body}
-      menuPosition={'fixed'}
+      menuPosition={menuPosition}
     />
   );
 };

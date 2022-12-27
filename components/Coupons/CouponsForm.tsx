@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect } from 'react';
+import React, { ChangeEvent, useEffect, useLayoutEffect, useRef } from 'react';
 import { Button, Form, InputGroup, Spinner } from 'react-bootstrap';
 import { PlanModel, Prisma } from '@prisma/client';
 import { useForm, Controller } from 'react-hook-form';
@@ -8,6 +8,7 @@ import { useModal } from '@ebay/nice-modal-react';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
 import styles from './CouponsForm.module.scss';
+import AdminSelect from '../AdminSelect/AdminSelect';
 
 const schema = yup.object().shape({
   code: yup.string().required('Code is required'),
@@ -189,21 +190,23 @@ const CouponsForm = ({
       </Form.Group>
       <Form.Group>
         <Form.Label>Plan Model</Form.Label>
-        <Form.Select {...register('planModel')} isInvalid={!!errors.planModel}>
-          <option value={''}>None</option>
-          {plansModel.length ? (
-            plansModel.map((planModelOfPlansModel) => (
-              <option
-                key={planModelOfPlansModel.id}
-                value={planModelOfPlansModel.id as string}
-              >
-                {planModelOfPlansModel.name}
-              </option>
-            ))
-          ) : (
-            <option value="none">No Plans</option>
+        <Controller
+          name="planModel"
+          control={control}
+          render={({ field }) => (
+            <AdminSelect
+              isSearchable
+              isMulti
+              menuPosition={'absolute'}
+              ariaLabel="Select Plan Model(s)"
+              options={plansModel.map((planModelOfPlansModel) => ({
+                value: planModelOfPlansModel.id,
+                label: planModelOfPlansModel.name,
+              }))}
+              onSelect={(option) => field.onChange(option)}
+            />
           )}
-        </Form.Select>
+        />
         {chosenPlanModel && (
           <Form.Text>
             Name: {chosenPlanModel.name}; Description:{' '}
