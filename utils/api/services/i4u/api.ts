@@ -47,6 +47,7 @@ export default class Invoice4UClearing {
     sum,
     planId,
     items,
+    isBitPayment,
   }: CreatePaymentClearingParams): Promise<CreateCreditClearingRequestResponse> {
     try {
       const request = {
@@ -80,7 +81,7 @@ export default class Invoice4UClearing {
           .reduce((acc: string[], item) => [...acc, item.name], [])
           .join(' | '),
         IsGeneralClient: 'true',
-        IsBitPayment: 'false',
+        IsBitPayment: isBitPayment,
         CallBackUrl: this.callbackUrl,
         ReturnUrl: `${this.returnUrl}/${planId}/`,
         AddToken: 'false',

@@ -25,6 +25,7 @@ export type CreatePaymentClearingParams = {
   sum: number;
   planId: string;
   items: ItemForClearing[];
+  isBitPayment: boolean;
 };
 
 export type CreateCreditClearingRequestBody = {

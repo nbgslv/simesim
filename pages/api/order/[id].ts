@@ -1,20 +1,30 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Plan } from '@prisma/client';
+import { Plan, Prisma, PaymentType } from '@prisma/client';
 import { unstable_getServerSession } from 'next-auth';
 import QRCode from 'qrcode';
-// @ts-ignore
-import MailerSend from 'mailersend';
 import prisma from '../../../lib/prisma';
 import { ApiResponse } from '../../../lib/types/api';
 import Invoice4UClearing from '../../../utils/api/services/i4u/api';
 import KeepGoApi from '../../../utils/api/services/keepGo/api';
 import { CreateLine, Line } from '../../../utils/api/services/keepGo/types';
 import { authOptions } from '../auth/[...nextauth]';
+import Email from '../../../utils/email';
 
 // eslint-disable-next-line consistent-return
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<Partial<Plan>>>
+  res: NextApiResponse<
+    ApiResponse<
+      Partial<
+        Plan &
+          Prisma.PlanGetPayload<{
+            select: {
+              planModel: { select: { name: true; description: true } };
+            };
+          }>
+      >
+    >
+  >
 ) {
   try {
     const session = await unstable_getServerSession(
@@ -23,8 +33,51 @@ export default async function handler(
       authOptions(req, res)
     );
     const { method } = req;
-    if (method === 'PUT') {
+    if (method === 'GET') {
+      const { id: orderId } = req.query;
+
+      const plan = await prisma.plan.findUnique({
+        where: {
+          id: orderId as string,
+        },
+        select: {
+          planModel: {
+            select: {
+              name: true,
+              description: true,
+            },
+          },
+          user: true,
+        },
+      });
+
+      if (!plan) {
+        throw new Error('No plan found');
+      }
+
+      if (
+        !session ||
+        (plan.user.id !== session?.user.id && session?.user.role !== 'ADMIN')
+      ) {
+        res.redirect(
+          302,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/error?error=Order`
+        );
+      }
+
+      res.status(200).json({
+        success: true,
+        data: {
+          planModel: {
+            name: plan.planModel.name,
+            description: plan.planModel.description,
+          },
+        },
+      });
+    } else if (method === 'PUT') {
       const { id } = req.query;
+      const { paymentType } = req.body;
+      const isBitPayment = paymentType === PaymentType.BIT;
 
       // Get plan, payment, refill, bundle, and user
       const plan = await prisma.plan.findUnique({
@@ -103,6 +156,9 @@ export default async function handler(
               status: 'PAID',
               paymentMethod: {
                 create: {
+                  paymentType: isBitPayment
+                    ? PaymentType.BIT
+                    : PaymentType.CREDIT_CARD,
                   isBitPayment: clearingLog.d[0].IsBitPayment,
                   cardType: clearingLog.d[0].CreditTypeName,
                   last4: clearingLog.d[0].CreditNumber,
@@ -161,18 +217,12 @@ export default async function handler(
             console.log({ newLine });
 
             // Instantiate email client
-            const { Recipient, EmailParams } = MailerSend;
+            const emailService = new Email();
 
-            const mailerSend = new MailerSend({
-              api_key: process.env.MAILER_SNED_API_KEY || '',
-            });
-
-            const recipients = [
-              new Recipient(
-                plan.user.emailEmail,
-                `${plan.user.firstName} ${plan.user.lastName}`
-              ),
-            ];
+            const recipients = emailService.setRecipient(
+              plan.user.emailEmail,
+              `${plan.user.firstName} ${plan.user.lastName}`
+            );
 
             // If line wasn't created - send pending email and update plan status
             if (
@@ -189,36 +239,37 @@ export default async function handler(
                 },
               });
 
-              const bcc = [
-                new Recipient('nbgslv@gmail.com', 'נחמן בוגוסלבסקי'),
+              const bcc = emailService.setRecipient(
+                'nbgslv@gmail.com',
+                'נחמן בוגוסלבסקי'
+              );
+              const emailVariables = [
+                {
+                  email: plan.user.emailEmail,
+                  substitutions: [
+                    {
+                      var: 'fullName',
+                      value: `${plan.user.firstName} ${plan.user.lastName}`,
+                    },
+                    {
+                      var: 'orderId',
+                      value: plan.friendlyId.toString(),
+                    },
+                  ],
+                },
               ];
-              const emailParams = new EmailParams()
-                .setFrom('order@simesim.co.il')
-                .setFromName('simEsim')
-                .setRecipients(recipients)
-                .setBcc(bcc)
-                .setTemplateId(
-                  process.env.EMAIL_TEMPLATE_USER_PENDING_LINE || ''
-                )
-                .setSubject('הזמנתך מאתר שים eSim')
-                .setVariables([
-                  {
-                    email: plan.user.emailEmail,
-                    substitutions: [
-                      {
-                        var: 'fullName',
-                        value: `${plan.user.firstName} ${plan.user.lastName}`,
-                      },
-                      {
-                        var: 'orderId',
-                        value: plan.friendlyId,
-                      },
-                    ],
-                  },
-                ]);
-              const emailPending = await mailerSend.send(emailParams);
-              // eslint-disable-next-line no-console
-              console.log({ emailPending });
+
+              emailService.setEmailParams(
+                'order@simesim.co.il',
+                'simEsim',
+                recipients,
+                'הזמנתך מאתר שים eSim',
+                process.env.EMAIL_TEMPLATE_USER_PENDING_LINE || '',
+                bcc,
+                undefined,
+                emailVariables
+              );
+              await emailService.send();
 
               return res.status(200).json({
                 name: 'ORDER_CREATED_WITHOUT_LINE',
@@ -286,41 +337,45 @@ export default async function handler(
             // TODO: add data bundles and refills to line
 
             // Send new order email to user
-            const emailParams = new EmailParams()
-              .setFrom('order@simesim.co.il')
-              .setFromName('simEsim')
-              .setRecipients(recipients)
-              .setTemplateId(process.env.EMAIL_TEMPLATE_USER_NEW_LINE || '')
-              .setSubject('הזמנתך מאתר שים eSim')
-              .setAttachments([
-                {
-                  content: qrCode.replace(/^data:image\/png;base64,/, ''),
-                  filename: 'qrCode.png',
-                  disposition: 'inline',
-                  id: 'qrCode',
-                },
-              ])
-              .setVariables([
-                {
-                  email: plan.user.emailEmail,
-                  substitutions: [
-                    {
-                      var: 'fullName',
-                      value: `${plan.user.firstName} ${plan.user.lastName}`,
-                    },
-                    {
-                      var: 'orderId',
-                      value: plan.friendlyId.toString(),
-                    },
-                    {
-                      var: 'amountDays',
-                      value: `${plan.planModel.refill.amount_days}`,
-                    },
-                  ],
-                },
-              ]);
+            const emailAttachments = [
+              {
+                content: qrCode.replace(/^data:image\/png;base64,/, ''),
+                filename: 'qrCode.png',
+                disposition: 'inline' as 'inline',
+                id: 'qrCode',
+              },
+            ];
+            const emailVariables = [
+              {
+                email: plan.user.emailEmail,
+                substitutions: [
+                  {
+                    var: 'fullName',
+                    value: `${plan.user.firstName} ${plan.user.lastName}`,
+                  },
+                  {
+                    var: 'orderId',
+                    value: plan.friendlyId.toString(),
+                  },
+                  {
+                    var: 'amountDays',
+                    value: `${plan.planModel.refill.amount_days}`,
+                  },
+                ],
+              },
+            ];
+            emailService.setEmailParams(
+              'order@simesim.co.il',
+              'simEsim',
+              recipients,
+              'הזמנתך מאתר שים eSim',
+              process.env.EMAIL_TEMPLATE_USER_NEW_LINE || '',
+              undefined,
+              emailAttachments,
+              emailVariables
+            );
 
-            await mailerSend.send(emailParams);
+            await emailService.send();
 
             res
               .status(200)

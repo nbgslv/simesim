@@ -4,7 +4,6 @@ import { Plan } from '@prisma/client';
 import * as yup from 'yup';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
-import Invoice4UClearing from '../../utils/api/services/i4u/api';
 import { authOptions } from './auth/[...nextauth]';
 
 export default async function handler(
@@ -137,87 +136,20 @@ export default async function handler(
         throw new Error('Error creating plan');
       }
 
-      const i4uPaymentApi = new Invoice4UClearing(
-        process.env.INVOICE4U_API_KEY!,
-        process.env.INVOICE4U_USER!,
-        process.env.INVOICE4U_PASSWORD!,
-        process.env.INVOICE4U_TEST === 'true'
-      );
-
-      const paymentData = await i4uPaymentApi.createPaymentClearing({
-        fullName: `${newOrderData.firstName} ${newOrderData.lastName}`,
-        phone: newOrderData.phoneNumber,
-        email: newOrderData.email,
-        sum: price,
-        planId: plan.id,
-        items: [
-          {
-            name: planModel.name,
-            quantity: 1,
-            price: price.toString(),
-            taxRate: '0',
-          },
-        ],
-      });
-
-      const clearingTraceId = paymentData.d.OpenInfo.find(
-        (item) => item.Key === 'ClearingTraceId'
-      )?.Value;
-      const paymentId = paymentData.d.OpenInfo.find(
-        (item) => item.Key === 'PaymentId'
-      )?.Value;
-      const clearingLogId = paymentData.d.OpenInfo.find(
-        (item) => item.Key === 'I4UClearingLogId'
-      )?.Value;
-
-      if (
-        !paymentData ||
-        (paymentData.d.Errors && paymentData.d.Errors.length) ||
-        !paymentData.d.ClearingRedirectUrl ||
-        !clearingTraceId ||
-        !paymentId ||
-        !clearingLogId
-      ) {
-        await prisma.payment.update({
-          where: {
-            id: plan.paymentId || undefined,
-          },
-          data: {
-            status: 'FAILED',
-          },
-        });
-        throw new Error('Error creating payment');
-      }
-
-      await prisma.payment.update({
-        where: {
-          id: plan.paymentId || undefined,
-        },
-        data: {
-          clearingTraceId,
-          paymentId,
-          i4UClearingLogId: clearingLogId,
-        },
-      });
-
       // Check if user logged in/redirect to login
       if (!session) {
         res.redirect(
           302,
           `${process.env.NEXT_PUBLIC_BASE_URL}/login?phone=${
             newOrderData.phoneNumber
-          }&paymentUrl=${encodeURI(
-            paymentData.d.ClearingRedirectUrl
-          )}&total=${price}`
+          }&orderId=${encodeURI(plan.id)}&total=${price}`
         );
       } else {
         res.redirect(
           302,
           `${
             process.env.NEXT_PUBLIC_BASE_URL
-          }/order/payment?paymentUrl=${encodeURI(
-            paymentData.d.ClearingRedirectUrl
-          )}&total=${price}`
+          }/order/payment?orderId=${encodeURI(plan.id)}&total=${price}`
         );
       }
     } else {

@@ -7,6 +7,7 @@ import { SessionProvider } from 'next-auth/react';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import UserStoreProvider from '../lib/context/UserStore';
 import { initialState, reducer } from '../lib/reducer/reducer';
 import * as gtag from '../lib/gtag';
@@ -58,9 +59,17 @@ function MyApp({ Component, pageProps }: AppProps) {
               reducer={reducer}
             >
               <ThemeProvider dir="rtl">
-                <NiceModal.Provider>
-                  <Component {...pageProps} />
-                </NiceModal.Provider>
+                <PayPalScriptProvider
+                  options={{
+                    'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+                    currency: 'ILS',
+                    'disable-funding': 'credit,card,paylater',
+                  }}
+                >
+                  <NiceModal.Provider>
+                    <Component {...pageProps} />
+                  </NiceModal.Provider>
+                </PayPalScriptProvider>
               </ThemeProvider>
             </UserStoreProvider>
           </SessionProvider>

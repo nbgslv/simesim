@@ -117,18 +117,28 @@ model Payment {
   couponId                   String?
 }
 
+enum PaymentType {
+  CREDIT_CARD
+  BIT
+  PAYPAL
+  APPLE_PAY
+  GOOGLE_PAY
+}
+
 model PaymentMethod {
-  id           String   @id @default(cuid())
-  token        String?  @unique
-  isBitPayment Boolean? @default(false)
-  cardType     String
-  last4        String
-  user         User     @relation(fields: [userId], references: [id])
-  userId       String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  payment      Payment?
-  paymentId    String?  @unique
+  id            String      @id @default(cuid())
+  token         String?     @unique
+  isBitPayment  Boolean?    @default(false)
+  paymentType   PaymentType
+  transactionId String?     @unique
+  cardType      String
+  last4         String
+  user          User        @relation(fields: [userId], references: [id])
+  userId        String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  payment       Payment?
+  paymentId     String?     @unique
 }
 
 model Line {
