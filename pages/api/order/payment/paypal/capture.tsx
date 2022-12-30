@@ -5,6 +5,7 @@ import { PaymentStatus } from '@prisma/client';
 import { ApiResponse } from '../../../../../lib/types/api';
 import { authOptions } from '../../../auth/[...nextauth]';
 import prisma from '../../../../../lib/prisma';
+import createLine, { LineStatus } from '../../../../../utils/createLine';
 
 export default async function handler(
   req: NextApiRequest,
@@ -69,13 +70,71 @@ export default async function handler(
                   },
                 },
               },
-            });
-            res.status(200).json({
-              success: true,
-              data: {
-                orderFriendlyId: updatedPlan.friendlyId,
+              include: {
+                planModel: {
+                  include: {
+                    refill: {
+                      include: {
+                        bundle: true,
+                      },
+                    },
+                  },
+                },
+                user: true,
               },
             });
+            const { status: lineStatus, lineDetails } = await createLine({
+              planId: updatedPlan.id,
+              planFriendlyId: updatedPlan.friendlyId,
+              refillMb: updatedPlan.planModel.refill.amount_mb,
+              refillDays: updatedPlan.planModel.refill.amount_days,
+              bundleExternalId: parseInt(
+                updatedPlan.planModel.refill.bundle.externalId,
+                10
+              ),
+              userEmail: updatedPlan.user.emailEmail,
+              userFirstName: updatedPlan.user.firstName!,
+              userLastName: updatedPlan.user.lastName!,
+            });
+
+            // If line wasn't created - send pending email and update plan status
+            if (
+              lineStatus === LineStatus.CREATED_WITHOUT_LINE ||
+              !lineDetails
+            ) {
+              await prisma.plan.update({
+                where: {
+                  id: updatedPlan.id,
+                },
+                data: {
+                  status: 'PENDING',
+                },
+              });
+
+              res.status(200).json({
+                name: 'ORDER_CREATED_WITHOUT_LINE',
+                success: false,
+                message: updatedPlan.id,
+              });
+            } else {
+              await prisma.plan.update({
+                where: {
+                  id: updatedPlan.id,
+                },
+                data: {
+                  line: {
+                    connect: {
+                      id: lineDetails.id,
+                    },
+                  },
+                },
+              });
+
+              res.status(200).json({
+                success: true,
+                data: { friendlyId: updatedPlan.friendlyId },
+              });
+            }
           } else {
             res.status(400).json({
               name: 'PAYMENT_NOT_APPROVED',

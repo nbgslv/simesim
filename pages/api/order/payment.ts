@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Inquiry } from '@prisma/client';
+import { Inquiry, PaymentStatus } from '@prisma/client';
 import { ApiResponse } from '../../../lib/types/api';
 import Invoice4UClearing from '../../../utils/api/services/i4u/api';
 import prisma from '../../../lib/prisma';
@@ -79,25 +79,46 @@ export default async function handler(
         !paymentId ||
         !clearingLogId
       ) {
-        await prisma.payment.update({
+        await prisma.plan.update({
           where: {
-            id: orderData.paymentId || undefined,
+            id: orderId as string,
           },
           data: {
-            status: 'FAILED',
+            payment: {
+              create: {
+                amount: orderData.price,
+                user: {
+                  connect: {
+                    id: orderData.userId,
+                  },
+                },
+                status: PaymentStatus.FAILED,
+              },
+            },
           },
         });
         throw new Error('Error creating payment');
       }
 
-      await prisma.payment.update({
+      await prisma.plan.update({
         where: {
-          id: orderData.paymentId || undefined,
+          id: orderId as string,
         },
         data: {
-          clearingTraceId,
-          paymentId,
-          i4UClearingLogId: clearingLogId,
+          payment: {
+            create: {
+              clearingTraceId,
+              paymentId,
+              i4UClearingLogId: clearingLogId,
+              amount: orderData.price,
+              user: {
+                connect: {
+                  id: orderData.userId,
+                },
+              },
+              status: PaymentStatus.PENDING,
+            },
+          },
         },
       });
 

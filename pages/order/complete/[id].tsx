@@ -6,10 +6,10 @@ import MainLayout from '../../../components/Layouts/MainLayout';
 
 const Checkout = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, paymentType } = router.query;
 
   useEffect(() => {
-    if (id) {
+    if (id && paymentType) {
       (async () => {
         try {
           const response = await fetch(
@@ -22,6 +22,7 @@ const Checkout = () => {
               body: JSON.stringify({
                 payment: {
                   status: 'PAID',
+                  paymentType,
                 },
               }),
             }
@@ -56,7 +57,7 @@ const Checkout = () => {
         }
       })();
     }
-  }, [id]);
+  }, [id, paymentType]);
 
   return (
     <MainLayout title="הזמנה" hideJumbotron>

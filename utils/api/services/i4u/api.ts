@@ -1,3 +1,4 @@
+import { PaymentType } from '@prisma/client';
 import {
   ClearingType,
   CompanyClearing,
@@ -83,7 +84,9 @@ export default class Invoice4UClearing {
         IsGeneralClient: 'true',
         IsBitPayment: isBitPayment,
         CallBackUrl: this.callbackUrl,
-        ReturnUrl: `${this.returnUrl}/${planId}/`,
+        ReturnUrl: `${this.returnUrl}/${planId}?paymentType=${
+          isBitPayment ? PaymentType.BIT : PaymentType.CREDIT_CARD
+        }`,
         AddToken: 'false',
         AddTokenAndCharge: 'false',
         ChargeWithToken: 'false',

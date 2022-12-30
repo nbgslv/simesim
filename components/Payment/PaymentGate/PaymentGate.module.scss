@@ -1,0 +1,27 @@
+@import "styles/variables";
+
+.container {
+    height: $page-height;
+
+    :global * {
+        color: $text-color;
+    }
+}
+
+.row {
+    height: 55px;
+}
+
+.button {
+    color: #ffffff;
+    height: 55px;
+    width: 100%;
+    max-width: 750px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+
+    :global svg path {
+        color: #ffffff !important;
+    }
+}

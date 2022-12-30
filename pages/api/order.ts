@@ -142,14 +142,14 @@ export default async function handler(
           302,
           `${process.env.NEXT_PUBLIC_BASE_URL}/login?phone=${
             newOrderData.phoneNumber
-          }&orderId=${encodeURI(plan.id)}&total=${price}`
+          }&orderId=${encodeURI(plan.id)}`
         );
       } else {
         res.redirect(
           302,
           `${
             process.env.NEXT_PUBLIC_BASE_URL
-          }/order/payment?orderId=${encodeURI(plan.id)}&total=${price}`
+          }/order/payment?orderId=${encodeURI(plan.id)}`
         );
       }
     } else {
