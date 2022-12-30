@@ -1,20 +1,27 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Plan } from '@prisma/client';
+import { PaymentType, Plan, Prisma } from '@prisma/client';
 import { unstable_getServerSession } from 'next-auth';
-import QRCode from 'qrcode';
-// @ts-ignore
-import MailerSend from 'mailersend';
 import prisma from '../../../lib/prisma';
 import { ApiResponse } from '../../../lib/types/api';
 import Invoice4UClearing from '../../../utils/api/services/i4u/api';
-import KeepGoApi from '../../../utils/api/services/keepGo/api';
-import { CreateLine, Line } from '../../../utils/api/services/keepGo/types';
 import { authOptions } from '../auth/[...nextauth]';
+import createLine, { LineStatus } from '../../../utils/createLine';
 
 // eslint-disable-next-line consistent-return
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<Partial<Plan>>>
+  res: NextApiResponse<
+    ApiResponse<
+      Partial<
+        Plan &
+          Prisma.PlanGetPayload<{
+            select: {
+              planModel: { select: { name: true; description: true } };
+            };
+          }>
+      >
+    >
+  >
 ) {
   try {
     const session = await unstable_getServerSession(
@@ -23,8 +30,51 @@ export default async function handler(
       authOptions(req, res)
     );
     const { method } = req;
-    if (method === 'PUT') {
+    if (method === 'GET') {
+      const { id: orderId } = req.query;
+
+      const plan = await prisma.plan.findUnique({
+        where: {
+          id: orderId as string,
+        },
+        select: {
+          planModel: {
+            select: {
+              name: true,
+              description: true,
+            },
+          },
+          user: true,
+        },
+      });
+
+      if (!plan) {
+        throw new Error('No plan found');
+      }
+
+      if (
+        !session ||
+        (plan.user.id !== session?.user.id && session?.user.role !== 'ADMIN')
+      ) {
+        res.redirect(
+          302,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/error?error=Order`
+        );
+      }
+
+      res.status(200).json({
+        success: true,
+        data: {
+          planModel: {
+            name: plan.planModel.name,
+            description: plan.planModel.description,
+          },
+        },
+      });
+    } else if (method === 'PUT') {
       const { id } = req.query;
+      const { paymentType } = req.body;
+      const isBitPayment = paymentType === PaymentType.BIT;
 
       // Get plan, payment, refill, bundle, and user
       const plan = await prisma.plan.findUnique({
@@ -72,47 +122,54 @@ export default async function handler(
       );
       // eslint-disable-next-line no-console
       console.log({ clearingLog: clearingLog.d[0] });
-      if (
-        !clearingLog ||
-        !clearingLog.d ||
-        !clearingLog.d[0] ||
-        clearingLog.d.length === 0
-      ) {
-        throw new Error('No clearing log found');
-      } else if (
-        clearingLog.d[0]?.Errors &&
-        clearingLog.d[0]?.Errors.length > 0
-      ) {
-        console.error(clearingLog.d[0].Errors);
-        throw new Error(clearingLog.d[0].Errors.toString());
+
+      if (!process.env.INVOICE4U_TEST) {
+        if (
+          !clearingLog ||
+          !clearingLog.d ||
+          !clearingLog.d[0] ||
+          clearingLog.d.length === 0
+        ) {
+          throw new Error('No clearing log found');
+        } else if (
+          clearingLog.d[0]?.Errors &&
+          clearingLog.d[0]?.Errors.length > 0
+        ) {
+          console.error(clearingLog.d[0].Errors);
+          throw new Error(clearingLog.d[0].Errors.toString());
+        }
       }
 
       // Update payment and payment method
       if (plan && plan.userId === session?.user?.id) {
         if (plan.payment?.status !== 'PAID') {
+          const paymentMethod = await prisma.paymentMethod.create({
+            data: {
+              paymentType: isBitPayment
+                ? PaymentType.BIT
+                : PaymentType.CREDIT_CARD,
+              isBitPayment: clearingLog.d[0]?.IsBitPayment,
+              cardType: clearingLog.d[0]?.CreditTypeName,
+              last4: clearingLog.d[0]?.CreditNumber,
+              user: {
+                connect: {
+                  id: session?.user?.id,
+                },
+              },
+            },
+          });
           const updatedPayment = await prisma.payment.update({
             where: {
               id: plan.paymentId as string,
             },
             data: {
               clearingConfirmationNumber:
-                clearingLog.d[0].ClearingConfirmationNumber,
+                clearingLog.d[0]?.ClearingConfirmationNumber,
               paymentDate: new Date(),
-              docId: clearingLog.d[0].DocId,
-              isDocumentCreated: clearingLog.d[0].IsDocumentCreated,
+              docId: clearingLog.d[0]?.DocId,
+              isDocumentCreated: clearingLog.d[0]?.IsDocumentCreated,
               status: 'PAID',
-              paymentMethod: {
-                create: {
-                  isBitPayment: clearingLog.d[0].IsBitPayment,
-                  cardType: clearingLog.d[0].CreditTypeName,
-                  last4: clearingLog.d[0].CreditNumber,
-                  user: {
-                    connect: {
-                      id: session?.user?.id,
-                    },
-                  },
-                },
-              },
+              paymentMethodId: paymentMethod.id,
             },
           });
 
@@ -144,41 +201,24 @@ export default async function handler(
 
           // *** Line ***
           if (!plan.lineId) {
-            const keepGoApi = new KeepGoApi(
-              process.env.KEEPGO_BASE_URL || '',
-              process.env.KEEPGO_API_KEY || '',
-              process.env.KEEPGO_ACCESS_TOKEN || ''
-            );
-
-            // Create line
-            const newLine = await keepGoApi.createLine({
+            const { status: lineStatus, lineDetails } = await createLine({
+              planId: plan.id,
+              planFriendlyId: plan.friendlyId,
               refillMb: plan.planModel.refill.amount_mb,
               refillDays: plan.planModel.refill.amount_days,
-              bundleId: parseInt(plan.planModel.refill.bundle.externalId, 10),
-            });
-
-            // eslint-disable-next-line no-console
-            console.log({ newLine });
-
-            // Instantiate email client
-            const { Recipient, EmailParams } = MailerSend;
-
-            const mailerSend = new MailerSend({
-              api_key: process.env.MAILER_SNED_API_KEY || '',
-            });
-
-            const recipients = [
-              new Recipient(
-                plan.user.emailEmail,
-                `${plan.user.firstName} ${plan.user.lastName}`
+              bundleExternalId: parseInt(
+                plan.planModel.refill.bundle.externalId,
+                10
               ),
-            ];
+              userEmail: plan.user.emailEmail,
+              userFirstName: plan.user.firstName!,
+              userLastName: plan.user.lastName!,
+            });
 
             // If line wasn't created - send pending email and update plan status
             if (
-              !newLine ||
-              newLine instanceof Error ||
-              newLine.ack !== 'success'
+              lineStatus === LineStatus.CREATED_WITHOUT_LINE ||
+              !lineDetails
             ) {
               await prisma.plan.update({
                 where: {
@@ -189,84 +229,12 @@ export default async function handler(
                 },
               });
 
-              const bcc = [
-                new Recipient('nbgslv@gmail.com', 'נחמן בוגוסלבסקי'),
-              ];
-              const emailParams = new EmailParams()
-                .setFrom('order@simesim.co.il')
-                .setFromName('simEsim')
-                .setRecipients(recipients)
-                .setBcc(bcc)
-                .setTemplateId(
-                  process.env.EMAIL_TEMPLATE_USER_PENDING_LINE || ''
-                )
-                .setSubject('הזמנתך מאתר שים eSim')
-                .setVariables([
-                  {
-                    email: plan.user.emailEmail,
-                    substitutions: [
-                      {
-                        var: 'fullName',
-                        value: `${plan.user.firstName} ${plan.user.lastName}`,
-                      },
-                      {
-                        var: 'orderId',
-                        value: plan.friendlyId,
-                      },
-                    ],
-                  },
-                ]);
-              const emailPending = await mailerSend.send(emailParams);
-              // eslint-disable-next-line no-console
-              console.log({ emailPending });
-
               return res.status(200).json({
                 name: 'ORDER_CREATED_WITHOUT_LINE',
                 success: false,
                 message: plan.id,
               });
             }
-
-            // Get full line details and create line record
-            const newLineDetails = await keepGoApi.getLineDetails(
-              (newLine.sim_card as CreateLine)?.iccid
-            );
-
-            // eslint-disable-next-line no-console
-            console.log({ newLineDetails });
-
-            if (newLineDetails instanceof Error) {
-              throw new Error('No line details');
-            }
-
-            const qrCode = await QRCode.toDataURL(
-              (newLineDetails.sim_card as CreateLine)?.lpa_code
-            );
-
-            const newLineRecord = await prisma.line.create({
-              data: {
-                deactivationDate:
-                  (newLineDetails.sim_card as Line)?.deactivation_date || null,
-                allowedUsageKb: (newLineDetails.sim_card as Line)
-                  ?.allowed_usage_kb,
-                remainingUsageKb: (newLineDetails.sim_card as Line)
-                  ?.remaining_usage_kb,
-                remainingDays:
-                  (newLineDetails.sim_card as Line)?.remaining_days || null,
-                status: (newLineDetails.sim_card as Line)?.status,
-                autoRefillTurnedOn: (newLineDetails.sim_card as Line)
-                  ?.auto_refill_turned_on,
-                autoRefillAmountMb: (newLineDetails.sim_card as Line)?.auto_refill_amount_mb.toString(),
-                autoRefillPrice: (newLineDetails.sim_card as Line)
-                  ?.auto_refill_price,
-                autoRefillCurrency: (newLineDetails.sim_card as Line)
-                  ?.auto_refill_currency,
-                notes: (newLineDetails.sim_card as Line)?.notes,
-                iccid: (newLine.sim_card as CreateLine)?.iccid,
-                lpaCode: (newLine.sim_card as CreateLine)?.lpa_code,
-                qrCode,
-              },
-            });
 
             await prisma.plan.update({
               where: {
@@ -275,7 +243,7 @@ export default async function handler(
               data: {
                 line: {
                   connect: {
-                    id: newLineRecord.id,
+                    id: lineDetails.id,
                   },
                 },
               },
@@ -284,43 +252,6 @@ export default async function handler(
             // TODO add transactions and rollbacks
 
             // TODO: add data bundles and refills to line
-
-            // Send new order email to user
-            const emailParams = new EmailParams()
-              .setFrom('order@simesim.co.il')
-              .setFromName('simEsim')
-              .setRecipients(recipients)
-              .setTemplateId(process.env.EMAIL_TEMPLATE_USER_NEW_LINE || '')
-              .setSubject('הזמנתך מאתר שים eSim')
-              .setAttachments([
-                {
-                  content: qrCode.replace(/^data:image\/png;base64,/, ''),
-                  filename: 'qrCode.png',
-                  disposition: 'inline',
-                  id: 'qrCode',
-                },
-              ])
-              .setVariables([
-                {
-                  email: plan.user.emailEmail,
-                  substitutions: [
-                    {
-                      var: 'fullName',
-                      value: `${plan.user.firstName} ${plan.user.lastName}`,
-                    },
-                    {
-                      var: 'orderId',
-                      value: plan.friendlyId.toString(),
-                    },
-                    {
-                      var: 'amountDays',
-                      value: `${plan.planModel.refill.amount_days}`,
-                    },
-                  ],
-                },
-              ]);
-
-            await mailerSend.send(emailParams);
 
             res
               .status(200)

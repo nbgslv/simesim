@@ -1,3 +1,4 @@
+import { PaymentType } from '@prisma/client';
 import {
   ClearingType,
   CompanyClearing,
@@ -47,6 +48,7 @@ export default class Invoice4UClearing {
     sum,
     planId,
     items,
+    isBitPayment,
   }: CreatePaymentClearingParams): Promise<CreateCreditClearingRequestResponse> {
     try {
       const request = {
@@ -80,9 +82,11 @@ export default class Invoice4UClearing {
           .reduce((acc: string[], item) => [...acc, item.name], [])
           .join(' | '),
         IsGeneralClient: 'true',
-        IsBitPayment: 'false',
+        IsBitPayment: isBitPayment,
         CallBackUrl: this.callbackUrl,
-        ReturnUrl: `${this.returnUrl}/${planId}/`,
+        ReturnUrl: `${this.returnUrl}/${planId}?paymentType=${
+          isBitPayment ? PaymentType.BIT : PaymentType.CREDIT_CARD
+        }`,
         AddToken: 'false',
         AddTokenAndCharge: 'false',
         ChargeWithToken: 'false',

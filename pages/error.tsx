@@ -23,6 +23,11 @@ const Error = () => {
       } else if (router.query.error === 'Order') {
         setAlertVariant('danger');
         setAlertMessage('משהו השתבש עם קליטת ההזמנה. מציעים לבדוק עם התמיכה.');
+      } else if (router.query.error === 'Payment') {
+        setAlertVariant('danger');
+        setAlertMessage(
+          'משהו קרה לשירות התשלומים שלנו. מציעים לבדוק שוב בעוד זמן קצר.'
+        );
       } else {
         setAlertVariant('danger');
         setAlertMessage('אירעה שגיאה, נסה שנית');

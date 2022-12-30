@@ -68,13 +68,9 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
         setAlertVariant('danger');
         setAlertMessage('אירעה שגיאה, נסה שנית');
       }
-    } else if (
-      router.query.phone &&
-      router.query.paymentUrl &&
-      router.query.total
-    ) {
+    } else if (router.query.phone && router.query.orderId) {
       setCallbackUrl(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/order/payment?paymentUrl=${router.query.paymentUrl}&total=${router.query.total}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/order/payment?orderId=${router.query.orderId}`
       );
       setPhoneNumber(router.query.phone as string);
     } else if (

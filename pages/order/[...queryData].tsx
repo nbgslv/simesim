@@ -7,10 +7,11 @@ import styles from '../../styles/Transfer.module.scss';
 const Transfer = () => {
   const router = useRouter();
   const id = router.query.queryData?.[0];
+  const { paymentType } = router.query;
 
   useEffect(() => {
     if (id && window.top) {
-      window.top.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/order/complete/${id}`;
+      window.top.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/order/complete/${id}?paymentType=${paymentType}`;
     } else if (window.top) {
       window.top.location.href = `${process.env.NEXT_PUBLIC_BASE_URL}/error?error=Order`;
     }
