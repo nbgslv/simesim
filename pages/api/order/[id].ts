@@ -73,7 +73,9 @@ export default async function handler(
       });
     } else if (method === 'PUT') {
       const { id } = req.query;
-      const { paymentType } = req.body;
+      const {
+        payment: { paymentType },
+      } = req.body;
       const isBitPayment = paymentType === PaymentType.BIT;
 
       // Get plan, payment, refill, bundle, and user
@@ -149,8 +151,8 @@ export default async function handler(
                 ? PaymentType.BIT
                 : PaymentType.CREDIT_CARD,
               isBitPayment: clearingLog.d[0]?.IsBitPayment,
-              cardType: clearingLog.d[0]?.CreditTypeName,
-              last4: clearingLog.d[0]?.CreditNumber,
+              cardType: clearingLog.d[0]?.CreditTypeName || '',
+              last4: clearingLog.d[0]?.CreditNumber || '',
               user: {
                 connect: {
                   id: session?.user?.id,

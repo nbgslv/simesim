@@ -35,6 +35,13 @@ async function createLine({
   userFirstName,
   userLastName,
 }: CreateLineParams): Promise<LineDetails> {
+  if (process.env.NODE_ENV === 'development') {
+    return {
+      status: LineStatus.CREATED_WITHOUT_LINE,
+      lineDetails: null,
+    };
+  }
+
   const keepGoApi = new KeepGoApi(
     process.env.KEEPGO_BASE_URL || '',
     process.env.KEEPGO_API_KEY || '',
