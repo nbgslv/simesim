@@ -25,9 +25,9 @@ export default class Invoice4UClearing {
   private readonly apiTestUrl =
     'https://private-anon-0f36448759-invoice4uclearingapis.apiary-mock.com/Services/ApiService.svc';
 
-  private readonly returnUrl = 'https://simesim.co.il/order';
+  private readonly returnUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/order`;
 
-  private readonly callbackUrl = 'https://simesim.co.il/api/order/payment';
+  private readonly callbackUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/order/api/order/payment`;
 
   constructor(
     private readonly apiKeyToUse: string,

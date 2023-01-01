@@ -30,7 +30,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
         setCookie('phoneNumber', phoneNumber);
         setCookie(
           'simesim_callbackUrl',
-          callbackUrl || 'https://simesim.co.il'
+          callbackUrl || process.env.NEXT_PUBLIC_BASE_URL
         );
         if (!executeRecaptcha) {
           throw new Error('Recaptcha not loaded');
@@ -38,7 +38,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
         const token = await executeRecaptcha('login');
         await signIn('email', {
           email: phoneNumber,
-          callbackUrl: callbackUrl || 'https://simesim.co.il',
+          callbackUrl: callbackUrl || process.env.NEXT_PUBLIC_BASE_URL,
           recaptchaToken: token,
         });
       }

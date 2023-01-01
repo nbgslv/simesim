@@ -38,7 +38,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
     const cookiePhoneNumber = cookies.phoneNumber;
     const cookieCallbackUrl = cookies.simesim_callbackUrl;
     setPhoneNumber(cookiePhoneNumber);
-    setCallbackUrl(cookieCallbackUrl || 'https://simesim.co.il');
+    setCallbackUrl(cookieCallbackUrl || process.env.NEXT_PUBLIC_BASE_URL);
     removeCookie('simesim_callbackUrl');
     if (cookiePhoneNumber) {
       removeCookie('phoneNumber');

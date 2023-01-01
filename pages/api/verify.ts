@@ -38,7 +38,7 @@ export default async function handler(
           res.redirect(
             302,
             `/api/auth/callback/email?email=${phoneNumber}&token=${token}&callbackUrl=${encodeURI(
-              callbackUrl || 'https://simesim.co.il'
+              callbackUrl || process.env.NEXT_PUBLIC_BASE_URL
             )}`
           );
         } else {
@@ -56,7 +56,7 @@ export default async function handler(
         res.redirect(
           302,
           `/api/auth/callback/email?email=${phoneNumber}&token=${token}&callbackUrl=${encodeURI(
-            callbackUrl || 'https://simesim.co.il'
+            callbackUrl || process.env.NEXT_PUBLIC_BASE_URL
           )}`
         );
       }
