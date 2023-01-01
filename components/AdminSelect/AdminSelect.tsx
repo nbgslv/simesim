@@ -33,7 +33,6 @@ const AdminSelect = <
   isMulti,
   menuPosition = 'fixed',
 }: AdminSelectProps<IsMulti, Group>) => {
-  console.log({ options, defaultValue });
   const [selected, setSelected] = React.useState<
     AdminSelectOption | MultiValue<AdminSelectOption> | null
   >(null);

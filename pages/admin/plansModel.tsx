@@ -115,28 +115,25 @@ const PlansModel = ({
           <FontAwesomeIcon icon={solid('up-right-from-square')} />
         </Button>
       ),
-      renderEditCell: (params) => {
-        console.log({ params });
-        return (
-          <AdminSelect
-            ariaLabel="select bundle"
-            options={existingBundles.map((bundle) => ({
-              value: bundle.id,
-              label: bundle.name,
-            }))}
-            onSelect={(option) => {
-              params.api.setEditCellValue({ ...params, value: option?.value });
-            }}
-            defaultValue={existingBundles.reduce(
-              (acc, bundle) =>
-                bundle.id === params.row.refill.bundleId
-                  ? { value: bundle.id, label: bundle.name }
-                  : acc,
-              { value: '', label: '' }
-            )}
-          />
-        );
-      },
+      renderEditCell: (params) => (
+        <AdminSelect
+          ariaLabel="select bundle"
+          options={existingBundles.map((bundle) => ({
+            value: bundle.id,
+            label: bundle.name,
+          }))}
+          onSelect={(option) => {
+            params.api.setEditCellValue({ ...params, value: option?.value });
+          }}
+          defaultValue={existingBundles.reduce(
+            (acc, bundle) =>
+              bundle.id === params.row.refill.bundleId
+                ? { value: bundle.id, label: bundle.name }
+                : acc,
+            { value: '', label: '' }
+          )}
+        />
+      ),
       width: 150,
       editable: true,
     },
