@@ -115,19 +115,28 @@ const PlansModel = ({
           <FontAwesomeIcon icon={solid('up-right-from-square')} />
         </Button>
       ),
-      renderEditCell: (params) => (
-        <AdminSelect
-          ariaLabel="select bundle"
-          options={existingBundles.map((bundle) => ({
-            value: bundle.id,
-            label: bundle.name,
-          }))}
-          onSelect={(option) => {
-            params.api.setEditCellValue({ ...params, value: option?.value });
-          }}
-          defaultValue={params.row.bundleId}
-        />
-      ),
+      renderEditCell: (params) => {
+        console.log({ params });
+        return (
+          <AdminSelect
+            ariaLabel="select bundle"
+            options={existingBundles.map((bundle) => ({
+              value: bundle.id,
+              label: bundle.name,
+            }))}
+            onSelect={(option) => {
+              params.api.setEditCellValue({ ...params, value: option?.value });
+            }}
+            defaultValue={existingBundles.reduce(
+              (acc, bundle) =>
+                bundle.id === params.row.refill.bundleId
+                  ? { value: bundle.id, label: bundle.name }
+                  : acc,
+              { value: '', label: '' }
+            )}
+          />
+        );
+      },
       width: 150,
       editable: true,
     },
@@ -151,7 +160,13 @@ const PlansModel = ({
           onSelect={(option) => {
             params.api.setEditCellValue({ ...params, value: option?.value });
           }}
-          defaultValue={params.row.refillId}
+          defaultValue={existingRefills.reduce(
+            (acc, refill) =>
+              refill.id === params.row.refillId
+                ? { value: refill.id, label: refill.title }
+                : acc,
+            { value: '', label: '' }
+          )}
         />
       ),
       width: 150,

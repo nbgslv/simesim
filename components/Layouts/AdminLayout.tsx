@@ -1,4 +1,4 @@
-import React, { ReactNode, useLayoutEffect } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import Head from 'next/head';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import AdminHeader from '../AdminHeader/AdminHeader';
@@ -15,7 +15,7 @@ const AdminLayout = ({
   const { hideRecaptcha } = useHideRecaptcha();
   const { executeRecaptcha } = useGoogleReCaptcha();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (executeRecaptcha) {
       hideRecaptcha();
     }

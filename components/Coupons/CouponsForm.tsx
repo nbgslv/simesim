@@ -8,6 +8,7 @@ import { useModal } from '@ebay/nice-modal-react';
 import 'react-datepicker/dist/react-datepicker.css';
 import DatePicker from 'react-datepicker';
 import styles from './CouponsForm.module.scss';
+import AdminSelect from '../AdminSelect/AdminSelect';
 
 const schema = yup.object().shape({
   code: yup.string().required('Code is required'),
@@ -29,7 +30,12 @@ const schema = yup.object().shape({
     .number()
     .required('Max uses total is required')
     .min(-1, 'Max uses total must be greater than 0'),
-  planModel: yup.string(),
+  planModels: yup.array().of(
+    yup.object({
+      value: yup.string().required('Plan is required'),
+      label: yup.string().required('Plan is required'),
+    })
+  ),
 });
 
 const CouponsForm = ({
@@ -41,9 +47,8 @@ const CouponsForm = ({
   loading: boolean;
 }) => {
   const [chosenPlanModel, setChosenPlanModel] = React.useState<
-    | (PlanModel & Prisma.PlanModelGetPayload<{ select: { refill: true } }>)
-    | null
-  >(null);
+    (PlanModel & Prisma.PlanModelGetPayload<{ select: { refill: true } }>)[]
+  >([]);
   const { resolve, hide } = useModal('add-coupons');
   const {
     register,
@@ -64,18 +69,19 @@ const CouponsForm = ({
       validTo: null,
       maxUsesPerUser: 1,
       maxUsesTotal: -1,
-      planModel: '',
+      planModels: [],
     },
   });
   const maxUsesTotal = watch('maxUsesTotal');
-  const planModel = watch('planModel');
+  const planModel: { label: string; value: string }[] = watch('planModels');
 
   useEffect(() => {
-    if (planModel) {
+    if (planModel.length > 0) {
+      const ids = planModel.map((plan) => plan.value);
       setChosenPlanModel(
-        plansModel.find(
-          (planModelOfPlansModel) => planModelOfPlansModel.id === planModel
-        ) || null
+        plansModel.filter((planModelOfPlansModel) =>
+          ids.includes(planModelOfPlansModel.id)
+        )
       );
     }
   }, [planModel]);
@@ -189,31 +195,43 @@ const CouponsForm = ({
       </Form.Group>
       <Form.Group>
         <Form.Label>Plan Model</Form.Label>
-        <Form.Select {...register('planModel')} isInvalid={!!errors.planModel}>
-          <option value={''}>None</option>
-          {plansModel.length ? (
-            plansModel.map((planModelOfPlansModel) => (
-              <option
-                key={planModelOfPlansModel.id}
-                value={planModelOfPlansModel.id as string}
-              >
-                {planModelOfPlansModel.name}
-              </option>
-            ))
-          ) : (
-            <option value="none">No Plans</option>
+        <Controller
+          name="planModels"
+          control={control}
+          render={({ field }) => (
+            <AdminSelect
+              isSearchable
+              isMulti
+              menuPlacement="bottom"
+              menuPosition={'fixed'}
+              ariaLabel="Select Plan Model(s)"
+              options={plansModel.map((planModelOfPlansModel) => ({
+                value: planModelOfPlansModel.id,
+                label: `${planModelOfPlansModel.name}; ${
+                  planModelOfPlansModel.refill.amount_mb
+                }; ${planModelOfPlansModel.refill.amount_days || ''}`,
+              }))}
+              onSelect={(option) => field.onChange(option)}
+            />
           )}
-        </Form.Select>
-        {chosenPlanModel && (
-          <Form.Text>
-            Name: {chosenPlanModel.name}; Description:{' '}
-            {chosenPlanModel.description}; MB:{' '}
-            {chosenPlanModel.refill.amount_mb}; Days:{' '}
-            {chosenPlanModel.refill.amount_days}
-          </Form.Text>
-        )}
+        />
+        <Form.Text>
+          <ul>
+            {chosenPlanModel.length &&
+              chosenPlanModel.map((planModelOfChosenPlanModel) => (
+                <li key={planModelOfChosenPlanModel.id}>
+                  <strong>Name:</strong> {planModelOfChosenPlanModel.name};{' '}
+                  <strong>Description:</strong>{' '}
+                  {planModelOfChosenPlanModel.description}; <strong>MB:</strong>{' '}
+                  {planModelOfChosenPlanModel.refill.amount_mb};{' '}
+                  <strong>Days:</strong>{' '}
+                  {planModelOfChosenPlanModel.refill.amount_days}
+                </li>
+              ))}
+          </ul>
+        </Form.Text>
         <Form.Control.Feedback type="invalid">
-          {errors.planModel?.message}
+          {errors.planModels?.message}
         </Form.Control.Feedback>
       </Form.Group>
       <Button
@@ -228,7 +246,11 @@ const CouponsForm = ({
         onClick={handleSubmit((data) => resolve(data))}
         className={styles.submitButton}
       >
-        {loading ? <Spinner animation="border" size="sm" /> : 'Save Changes'}
+        {loading ? (
+          <Spinner animation="border" size="sm" style={{ color: '#ffffff' }} />
+        ) : (
+          'Save Changes'
+        )}
       </Button>
     </Form>
   );

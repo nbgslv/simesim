@@ -5,6 +5,7 @@ import * as yup from 'yup';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
 import { authOptions } from './auth/[...nextauth]';
+import { toFixedNumber } from '../../utils/math';
 
 export default async function handler(
   req: NextApiRequest,
@@ -91,9 +92,9 @@ export default async function handler(
         });
         if (coupon) {
           if (coupon.discountType === 'PERCENT') {
-            price -= (price * coupon.discount) / 100;
+            price = toFixedNumber(price - (price * coupon.discount) / 100, 2);
           } else if (coupon.discountType === 'AMOUNT') {
-            price -= coupon.discount;
+            price = toFixedNumber(price - coupon.discount, 2);
           }
         }
       }
