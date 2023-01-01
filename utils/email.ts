@@ -73,7 +73,7 @@ export default class Email {
     if (!this.Email) {
       throw new Error('Email is not set');
     } else {
-      const email = this.mailerSend.send(this.Email);
+      const email = await this.mailerSend.send(this.Email);
       // eslint-disable-next-line no-console
       console.log({ email });
     }
