@@ -80,7 +80,11 @@ const PaymentGate = () => {
                 className={styles.button}
               >
                 כרטיס אשראי
-                <FontAwesomeIcon icon={solid('credit-card')} className="me-2" />
+                <FontAwesomeIcon
+                  icon={solid('credit-card')}
+                  style={{ height: '1rem' }}
+                  className="me-2"
+                />
               </Button>
             </Col>
           </Row>

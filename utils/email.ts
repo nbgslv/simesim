@@ -47,7 +47,7 @@ export default class Email {
     attachments?: Attachment[],
     variables?: Variable[]
   ) {
-    const email = this.EmailParams()
+    const email = new this.EmailParams()
       .setFrom(from)
       .setFromName(fromName)
       .setRecipients(recipients)
