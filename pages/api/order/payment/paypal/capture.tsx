@@ -97,6 +97,9 @@ export default async function handler(
               userLastName: updatedPlan.user.lastName!,
             });
 
+            // eslint-disable-next-line no-console
+            console.log({ lineStatus, lineDetails });
+
             // If line wasn't created - send pending email and update plan status
             if (
               lineStatus === LineStatus.CREATED_WITHOUT_LINE ||
