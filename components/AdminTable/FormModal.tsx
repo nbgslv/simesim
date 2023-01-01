@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 import NiceModal, { useModal } from '@ebay/nice-modal-react';
 import styles from './FormModal.module.scss';
