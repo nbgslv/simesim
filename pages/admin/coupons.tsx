@@ -21,7 +21,7 @@ import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
 
 type CouponData = Coupon &
   Prisma.CouponGetPayload<{
-    select: {
+    include: {
       planModels: {
         include: {
           bundle: {
