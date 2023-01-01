@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { ChangeEvent, useEffect } from 'react';
 import { Button, Form, InputGroup, Spinner } from 'react-bootstrap';
 import { PlanModel, Prisma } from '@prisma/client';
 import { useForm, Controller } from 'react-hook-form';
@@ -30,7 +30,12 @@ const schema = yup.object().shape({
     .number()
     .required('Max uses total is required')
     .min(-1, 'Max uses total must be greater than 0'),
-  planModel: yup.string(),
+  planModels: yup.array().of(
+    yup.object({
+      value: yup.string().required('Plan is required'),
+      label: yup.string().required('Plan is required'),
+    })
+  ),
 });
 
 const CouponsForm = ({
@@ -42,9 +47,8 @@ const CouponsForm = ({
   loading: boolean;
 }) => {
   const [chosenPlanModel, setChosenPlanModel] = React.useState<
-    | (PlanModel & Prisma.PlanModelGetPayload<{ select: { refill: true } }>)
-    | null
-  >(null);
+    (PlanModel & Prisma.PlanModelGetPayload<{ select: { refill: true } }>)[]
+  >([]);
   const { resolve, hide } = useModal('add-coupons');
   const {
     register,
@@ -65,18 +69,19 @@ const CouponsForm = ({
       validTo: null,
       maxUsesPerUser: 1,
       maxUsesTotal: -1,
-      planModel: '',
+      planModels: [],
     },
   });
   const maxUsesTotal = watch('maxUsesTotal');
-  const planModel = watch('planModel');
+  const planModel: { label: string; value: string }[] = watch('planModels');
 
   useEffect(() => {
-    if (planModel) {
+    if (planModel.length > 0) {
+      const ids = planModel.map((plan) => plan.value);
       setChosenPlanModel(
-        plansModel.find(
-          (planModelOfPlansModel) => planModelOfPlansModel.id === planModel
-        ) || null
+        plansModel.filter((planModelOfPlansModel) =>
+          ids.includes(planModelOfPlansModel.id)
+        )
       );
     }
   }, [planModel]);
@@ -191,32 +196,42 @@ const CouponsForm = ({
       <Form.Group>
         <Form.Label>Plan Model</Form.Label>
         <Controller
-          name="planModel"
+          name="planModels"
           control={control}
           render={({ field }) => (
             <AdminSelect
               isSearchable
               isMulti
-              menuPosition={'absolute'}
+              menuPlacement="bottom"
+              menuPosition={'fixed'}
               ariaLabel="Select Plan Model(s)"
               options={plansModel.map((planModelOfPlansModel) => ({
                 value: planModelOfPlansModel.id,
-                label: planModelOfPlansModel.name,
+                label: `${planModelOfPlansModel.name}; ${
+                  planModelOfPlansModel.refill.amount_mb
+                }; ${planModelOfPlansModel.refill.amount_days || ''}`,
               }))}
               onSelect={(option) => field.onChange(option)}
             />
           )}
         />
-        {chosenPlanModel && (
-          <Form.Text>
-            Name: {chosenPlanModel.name}; Description:{' '}
-            {chosenPlanModel.description}; MB:{' '}
-            {chosenPlanModel.refill.amount_mb}; Days:{' '}
-            {chosenPlanModel.refill.amount_days}
-          </Form.Text>
-        )}
+        <Form.Text>
+          <ul>
+            {chosenPlanModel.length &&
+              chosenPlanModel.map((planModelOfChosenPlanModel) => (
+                <li key={planModelOfChosenPlanModel.id}>
+                  <strong>Name:</strong> {planModelOfChosenPlanModel.name};{' '}
+                  <strong>Description:</strong>{' '}
+                  {planModelOfChosenPlanModel.description}; <strong>MB:</strong>{' '}
+                  {planModelOfChosenPlanModel.refill.amount_mb};{' '}
+                  <strong>Days:</strong>{' '}
+                  {planModelOfChosenPlanModel.refill.amount_days}
+                </li>
+              ))}
+          </ul>
+        </Form.Text>
         <Form.Control.Feedback type="invalid">
-          {errors.planModel?.message}
+          {errors.planModels?.message}
         </Form.Control.Feedback>
       </Form.Group>
       <Button
@@ -231,7 +246,11 @@ const CouponsForm = ({
         onClick={handleSubmit((data) => resolve(data))}
         className={styles.submitButton}
       >
-        {loading ? <Spinner animation="border" size="sm" /> : 'Save Changes'}
+        {loading ? (
+          <Spinner animation="border" size="sm" style={{ color: '#ffffff' }} />
+        ) : (
+          'Save Changes'
+        )}
       </Button>
     </Form>
   );

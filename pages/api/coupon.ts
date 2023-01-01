@@ -58,7 +58,12 @@ export default async function handler(
                   .number()
                   .required('Max uses total is required')
                   .min(-1, 'Max uses total must be greater than 0'),
-                planModel: yup.string(),
+                planModels: yup.array().of(
+                  yup.object({
+                    value: yup.string().required('Plan model is required'),
+                    label: yup.string().required('Plan model is required'),
+                  })
+                ),
               })
               .required(),
             include: yup.object(),
@@ -66,11 +71,13 @@ export default async function handler(
           .required(),
       });
       await postSchema.validate({ input });
-      const planModel = input.data.planModel
+      const planModels = input.data.planModels.length
         ? {
-            connect: {
-              id: input.data.planModel,
-            },
+            connect: input.data.planModels.map(
+              (planModel: { value: string; label: string }) => ({
+                id: planModel.value,
+              })
+            ),
           }
         : undefined;
 
@@ -78,7 +85,7 @@ export default async function handler(
         ...input,
         data: {
           ...input.data,
-          planModel,
+          planModels,
         },
       });
       res.status(201).json({ success: true, data: newCoupon });

@@ -22,7 +22,7 @@ import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
 type CouponData = Coupon &
   Prisma.CouponGetPayload<{
     select: {
-      planModel: {
+      planModels: {
         include: {
           bundle: {
             include: {
@@ -205,7 +205,7 @@ const Coupons = ({
         'deleteMany',
         {
           select: {
-            planModel: {
+            planModels: {
               include: {
                 bundle: {
                   include: {
@@ -276,7 +276,7 @@ const Coupons = ({
         'update',
         {
           select: {
-            planModel: {
+            planModels: {
               include: {
                 bundle: {
                   include: {
@@ -297,7 +297,7 @@ const Coupons = ({
           },
           data: updatedRow,
           include: {
-            planModel: {
+            planModels: {
               include: {
                 refill: {
                   include: {
@@ -350,7 +350,7 @@ const Coupons = ({
       'create',
       {
         select: {
-          planModel: {
+          planModels: {
             include: {
               bundle: {
                 include: {
@@ -368,7 +368,7 @@ const Coupons = ({
       input: {
         data,
         include: {
-          planModel: {
+          planModels: {
             include: {
               refill: {
                 include: {
@@ -411,6 +411,9 @@ const Coupons = ({
       await modal.hide();
       modal.remove();
       return e as Error;
+    } finally {
+      await modal.hide();
+      setAddRowLoading(false);
     }
   };
 
@@ -449,7 +452,7 @@ export async function getServerSideProps(context: NextPageContext) {
       validTo: 'desc',
     },
     include: {
-      planModel: {
+      planModels: {
         include: {
           refill: {
             include: {
@@ -475,34 +478,37 @@ export async function getServerSideProps(context: NextPageContext) {
   });
   const serializedCoupons = coupons.map((coupon) => ({
     ...coupon,
-    planModel: coupon.planModel
-      ? {
-          ...coupon.planModel,
-          bundle: {
-            ...coupon.planModel.refill.bundle,
-            refills: coupon.planModel.refill.bundle.refills.map((refill) => ({
-              ...refill,
-              createdAt: format(refill.createdAt, 'dd/MM/yyyy kk:mm'),
-              updatedAt: format(refill.updatedAt, 'dd/MM/yyyy kk:mm'),
-            })),
-            createdAt: format(
-              coupon.planModel.refill.bundle.createdAt,
-              'dd/MM/yyyy kk:mm'
-            ),
-            updatedAt: format(
-              coupon.planModel.refill.bundle.updatedAt,
-              'dd/MM/yyyy kk:mm'
-            ),
-          },
-          plans: coupon.planModel.plans.map((plan) => ({
-            ...plan,
-            createdAt: format(plan.createdAt, 'dd/MM/yyyy kk:mm'),
-            updatedAt: format(plan.updatedAt, 'dd/MM/yyyy kk:mm'),
+    planModels: coupon.planModels.map((planModel) => ({
+      ...planModel,
+      refill: {
+        ...planModel.refill,
+        bundle: {
+          ...planModel.refill.bundle,
+          refills: planModel.refill.bundle.refills.map((refill) => ({
+            ...refill,
+            createdAt: format(refill.createdAt, 'dd/MM/yyyy kk:mm'),
+            updatedAt: format(refill.updatedAt, 'dd/MM/yyyy kk:mm'),
           })),
-          createdAt: format(coupon.planModel.createdAt, 'dd/MM/yyyy kk:mm'),
-          updatedAt: format(coupon.planModel.updatedAt, 'dd/MM/yyyy kk:mm'),
-        }
-      : null,
+          createdAt: format(
+            planModel.refill.bundle.createdAt,
+            'dd/MM/yyyy kk:mm'
+          ),
+          updatedAt: format(
+            planModel.refill.bundle.updatedAt,
+            'dd/MM/yyyy kk:mm'
+          ),
+        },
+        createdAt: format(planModel.refill.createdAt, 'dd/MM/yyyy kk:mm'),
+        updatedAt: format(planModel.refill.updatedAt, 'dd/MM/yyyy kk:mm'),
+      },
+      plans: planModel.plans.map((plan) => ({
+        ...plan,
+        createdAt: format(plan.createdAt, 'dd/MM/yyyy kk:mm'),
+        updatedAt: format(plan.updatedAt, 'dd/MM/yyyy kk:mm'),
+      })),
+      createdAt: format(planModel.createdAt, 'dd/MM/yyyy kk:mm'),
+      updatedAt: format(planModel.updatedAt, 'dd/MM/yyyy kk:mm'),
+    })),
     validFrom: format(coupon.validFrom, 'dd/MM/yy kk:mm'),
     validTo: format(coupon.validTo, 'dd/MM/yy kk:mm'),
     createdAt: format(coupon.createdAt, 'dd/MM/yy kk:mm'),

@@ -14,6 +14,7 @@ import { Context, useUserStore } from '../../lib/context/UserStore';
 import { Action } from '../../lib/reducer/reducer';
 import styles from './OrderModal.module.scss';
 import Input from '../Input/Input';
+import { toFixedNumber } from '../../utils/math';
 
 type BundlesSectionProps = {
   show: boolean;
@@ -61,9 +62,14 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
   useEffect(() => {
     if (couponDetails && couponDetails.discount && bundle) {
       if (couponDetails.discountType === 'PERCENT') {
-        setPrice(bundle.price - (bundle.price * couponDetails.discount) / 100);
+        setPrice(
+          toFixedNumber(
+            bundle.price - (bundle.price * couponDetails.discount) / 100,
+            2
+          )
+        );
       } else if (couponDetails.discountType === 'AMOUNT') {
-        setPrice(bundle.price - couponDetails.discount);
+        setPrice(toFixedNumber(bundle.price - couponDetails.discount, 2));
       }
     } else if (bundle) {
       setPrice(bundle.price);
@@ -181,7 +187,7 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
         method: 'POST',
         body: JSON.stringify({
           ...data,
-          price,
+          price: toFixedNumber(price, 2),
           recaptchaToken: token,
           coupon: couponDetails?.id,
           planModel: bundle?.id,
