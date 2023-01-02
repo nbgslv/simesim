@@ -48,7 +48,7 @@ const Checkout = () => {
             }
           } else {
             await router.push(
-              `${process.env.NEXT_PUBLIC_BASE_URL}/order/complete/success?status=complete&orderFriendlyId=${responseJson.message}`
+              `${process.env.NEXT_PUBLIC_BASE_URL}/order/complete/success?status=complete&orderFriendlyId=${responseJson.data.friendlyId}`
             );
           }
         } catch (error) {
