@@ -38,6 +38,7 @@ export default async function handler(
           id: orderId as string,
         },
         select: {
+          price: true,
           planModel: {
             select: {
               name: true,
@@ -65,6 +66,7 @@ export default async function handler(
       res.status(200).json({
         success: true,
         data: {
+          price: plan.price,
           planModel: {
             name: plan.planModel.name,
             description: plan.planModel.description,

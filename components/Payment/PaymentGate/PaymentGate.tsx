@@ -16,7 +16,7 @@ enum PaymentType {
 const PaymentGate = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [orderData, setOrderData] = React.useState<Prisma.PlanGetPayload<{
-    select: { planModel: { select: { name: true; description: true } } };
+    include: { planModel: { select: { name: true; description: true } } };
   }> | null>(null);
   const [{ isPending }] = usePayPalScriptReducer();
   const router = useRouter();
@@ -72,7 +72,26 @@ const PaymentGate = () => {
         <Spinner className="ms-auto me-auto" animation={'border'} />
       ) : (
         <>
-          <Row>
+          {orderData && orderData.price >= 1 && (
+            <Row>
+              <Col>
+                <Button
+                  onClick={() => handlePaymentSelect(PaymentType.BIT)}
+                  disabled={loading}
+                  className={styles.button}
+                >
+                  Bit{' '}
+                  <Image
+                    src="/Bit_logo.svg"
+                    alt="pay with bit"
+                    height={18}
+                    className={styles.bitLogo}
+                  />
+                </Button>
+              </Col>
+            </Row>
+          )}
+          <Row className={`mt-2 mb-2 ${styles.row}`}>
             <Col>
               <Button
                 onClick={() => handlePaymentSelect(PaymentType.CREDIT_CARD)}
@@ -84,23 +103,6 @@ const PaymentGate = () => {
                   icon={solid('credit-card')}
                   style={{ height: '1rem' }}
                   className="me-2"
-                />
-              </Button>
-            </Col>
-          </Row>
-          <Row className={`mt-2 mb-2 ${styles.row}`}>
-            <Col>
-              <Button
-                onClick={() => handlePaymentSelect(PaymentType.BIT)}
-                disabled={loading}
-                className={styles.button}
-              >
-                Bit{' '}
-                <Image
-                  src="/Bit_logo.svg"
-                  alt="pay with bit"
-                  height={18}
-                  className={styles.bitLogo}
                 />
               </Button>
             </Col>
