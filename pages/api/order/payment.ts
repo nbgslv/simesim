@@ -71,6 +71,9 @@ export default async function handler(
         (item) => item.Key === 'I4UClearingLogId'
       )?.Value;
 
+      // eslint-disable-next-line no-console
+      console.log({ paymentData });
+
       if (
         !paymentData ||
         (paymentData.d.Errors && paymentData.d.Errors.length) ||
