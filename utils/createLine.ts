@@ -36,6 +36,53 @@ async function createLine({
   userLastName,
 }: CreateLineParams): Promise<LineDetails> {
   if (process.env.NODE_ENV === 'development') {
+    // Send new order email to user
+    const emailService = new Email();
+
+    const recipients = [
+      emailService.setRecipient(userEmail, `${userFirstName} ${userLastName}`),
+    ];
+
+    const emailAttachments = [
+      {
+        content: `iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQAQMAAAC6caSPAAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABuklEQVR4nO3bO3KDMBSFYXlSqPQSWApLw0vzUliCSxeeKOg+hCDMJKW5/k8FSJ8r7uhhkRIhMfJVurzk0VhuyW6Gck9T3+MGgQQiT6+Dy9Irl4eQ5UZTSauUEQIJRq7SKMRTvtuPTcX8DIFEJlkubbDISy8I5FNIWm7utUou3UwJAjkHsfjL303z7eX3QCCxSJd1zm/Tnv+skSGQk5JfsZFDM+jI8UcgkFOStV62Gzz1pg4jVjy1jtxDIDGIZyzmH/0+v2YhR8UDgbwVye31L+s/Vq2l9pK2+vL7tAcCiUFqrBS0Xmpkzu9p3UYIJBSpVTHXC53pXKUqpKtOe+xS1wIQSByiJVLrxUpE66Xb509HywQIJAJ5SlMpXb0sWQeL236mBIFEIjIo6Eq4xv7XyvKnrsQ7QSBvTQZteG1Je65FMdtDCCQG2SX7gre0gwtJVwOPYwCBnJYcnFVI3svPKiw3+wUvBBKBPL0ONift12+sWr0MEEg4sjlpf7DPX/ZbnRDIWYhl8BYPBBKcTLr1k9c1bp3+z91uDwQSg1j6z0ysZWiFIj8FgcQiXfwzk9KfzdkEAolDCPnQ/AC61cSZpmB98QAAAABJRU5ErkJggg==`,
+        filename: 'qrCode.png',
+        disposition: 'inline' as 'inline',
+        id: 'qrCode',
+      },
+    ];
+    const emailVariables = [
+      {
+        email: userEmail,
+        substitutions: [
+          {
+            var: 'fullName',
+            value: `ישראל ישראלי`,
+          },
+          {
+            var: 'orderId',
+            value: '123456',
+          },
+          {
+            var: 'amountDays',
+            value: `7`,
+          },
+        ],
+      },
+    ];
+    emailService.setEmailParams(
+      'order@simesim.co.il',
+      'simEsim',
+      recipients,
+      'הזמנתך מאתר שים eSim',
+      process.env.EMAIL_TEMPLATE_USER_NEW_LINE || '',
+      undefined,
+      emailAttachments,
+      emailVariables
+    );
+
+    await emailService.send();
+
     return {
       status: LineStatus.CREATED_WITHOUT_LINE,
       lineDetails: null,
@@ -77,10 +124,9 @@ async function createLine({
       },
     });
 
-    const bcc = emailService.setRecipient(
-      'nbgslv@gmail.com',
-      'נחמן בוגוסלבסקי'
-    );
+    const bcc = [
+      emailService.setRecipient('nbgslv@gmail.com', 'נחמן בוגוסלבסקי'),
+    ];
     const emailVariables = [
       {
         email: userEmail,

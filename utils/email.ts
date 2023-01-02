@@ -74,8 +74,12 @@ export default class Email {
       throw new Error('Email is not set');
     } else {
       const email = await this.mailerSend.send(this.Email);
-      // eslint-disable-next-line no-console
-      console.log({ email });
+
+      if (email.status > 202) {
+        const emailJson = await email.json();
+        // eslint-disable-next-line no-console
+        console.log({ emailJson });
+      }
     }
   }
 }

@@ -117,7 +117,7 @@ export default async function handler(
               res.status(200).json({
                 name: 'ORDER_CREATED_WITHOUT_LINE',
                 success: false,
-                message: updatedPlan.id,
+                message: updatedPlan.friendlyId.toString(),
               });
             } else {
               await prisma.plan.update({

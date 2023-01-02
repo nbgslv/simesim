@@ -147,7 +147,7 @@ const PaymentGate = () => {
                     resJson.name === 'ORDER_CREATED_WITHOUT_LINE'
                   ) {
                     await router.push(
-                      `/order/complete/success?status=pending&orderFriendlyId=${resJson.data.friendlyId}`
+                      `/order/complete/success?status=pending&orderFriendlyId=${resJson.message}`
                     );
                   } else {
                     await router.push('/error?error=Order');

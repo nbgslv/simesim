@@ -234,7 +234,7 @@ export default async function handler(
               return res.status(200).json({
                 name: 'ORDER_CREATED_WITHOUT_LINE',
                 success: false,
-                message: plan.id,
+                message: plan.friendlyId.toString(),
               });
             }
 
