@@ -108,10 +108,9 @@ async function createLine({
   // Instantiate email client
   const emailService = new Email();
 
-  const recipients = emailService.setRecipient(
-    userEmail,
-    `${userFirstName} ${userLastName}`
-  );
+  const recipients = [
+    emailService.setRecipient(userEmail, `${userFirstName} ${userLastName}`),
+  ];
 
   // If line wasn't created - send pending email and update plan status
   if (!newLine || newLine instanceof Error || newLine.ack !== 'success') {
