@@ -192,12 +192,15 @@ export default async function handler(
                   increment: 1,
                 },
                 users: {
-                  connect: {
-                    couponId_userId: {
-                      couponId: plan.payment.couponId,
-                      userId: plan.userId,
+                  create: [
+                    {
+                      user: {
+                        connect: {
+                          id: plan.userId,
+                        },
+                      },
                     },
-                  },
+                  ],
                 },
               },
             });

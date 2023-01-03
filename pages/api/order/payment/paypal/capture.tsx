@@ -80,9 +80,36 @@ export default async function handler(
                     },
                   },
                 },
+                payment: true,
                 user: true,
               },
             });
+
+            // Handle coupon, if exists
+            if (updatedPlan.payment?.couponId) {
+              await prisma.coupon.update({
+                where: {
+                  id: updatedPlan.payment.couponId,
+                },
+                data: {
+                  uses: {
+                    increment: 1,
+                  },
+                  users: {
+                    create: [
+                      {
+                        user: {
+                          connect: {
+                            id: updatedPlan.userId,
+                          },
+                        },
+                      },
+                    ],
+                  },
+                },
+              });
+            }
+
             const { status: lineStatus, lineDetails } = await createLine({
               planId: updatedPlan.id,
               planFriendlyId: updatedPlan.friendlyId,
