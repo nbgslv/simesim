@@ -39,7 +39,7 @@ export default async function handler(
         throw new Error('Plan not found');
       }
       paypal.configure({
-        mode: process.env.NODE_ENV === 'production' ? 'live' : 'sandbox',
+        mode: process.env.CUSTOM_ENV === 'production' ? 'live' : 'sandbox',
         client_id: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
         client_secret: process.env.PAYPAL_CLIENT_SECRET!,
       });
