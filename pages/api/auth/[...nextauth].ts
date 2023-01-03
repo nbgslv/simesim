@@ -14,7 +14,10 @@ const twilioApi = new TwilioApi(
 
 const useSecureCookies = process.env.NEXTAUTH_URL?.startsWith('https://');
 const cookiePrefix = useSecureCookies ? '__Secure-' : '';
-const hostName = new URL(process.env.NEXTAUTH_URL || '').hostname;
+const hostName = new URL(process.env.NEXTAUTH_URL || '').hostname.replace(
+  'www.',
+  ''
+);
 
 export const authOptions = (
   req: NextApiRequest,
