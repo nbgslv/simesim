@@ -12,6 +12,10 @@ const twilioApi = new TwilioApi(
   process.env.TWILIO_VERIFY_SID!
 );
 
+const useSecureCookies = process.env.NEXTAUTH_URL?.startsWith('https://');
+const cookiePrefix = useSecureCookies ? '__Secure-' : '';
+const hostName = new URL(process.env.NEXTAUTH_URL || '').hostname;
+
 export const authOptions = (
   req: NextApiRequest,
   res: NextApiResponse
@@ -87,6 +91,18 @@ export const authOptions = (
       normalizeIdentifier: (identifier) => identifier,
     }),
   ],
+  cookies: {
+    sessionToken: {
+      name: `${cookiePrefix}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        domain: hostName === 'localhost' ? hostName : `.${hostName}`,
+        secure: useSecureCookies,
+      },
+    },
+  },
   session: {
     strategy: 'jwt',
   },
