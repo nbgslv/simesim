@@ -29,7 +29,7 @@ export default async function handler(
       }
       const { orderId, paymentId, payerId } = req.body;
       paypal.configure({
-        mode: 'sandbox',
+        mode: process.env.NODE_ENV === 'production' ? 'live' : 'sandbox',
         client_id: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
         client_secret: process.env.PAYPAL_CLIENT_SECRET!,
       });
@@ -80,9 +80,36 @@ export default async function handler(
                     },
                   },
                 },
+                payment: true,
                 user: true,
               },
             });
+
+            // Handle coupon, if exists
+            if (updatedPlan.payment?.couponId) {
+              await prisma.coupon.update({
+                where: {
+                  id: updatedPlan.payment.couponId,
+                },
+                data: {
+                  uses: {
+                    increment: 1,
+                  },
+                  users: {
+                    create: [
+                      {
+                        user: {
+                          connect: {
+                            id: updatedPlan.userId,
+                          },
+                        },
+                      },
+                    ],
+                  },
+                },
+              });
+            }
+
             const { status: lineStatus, lineDetails } = await createLine({
               planId: updatedPlan.id,
               planFriendlyId: updatedPlan.friendlyId,
