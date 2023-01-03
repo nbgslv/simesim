@@ -29,7 +29,7 @@ export default async function handler(
       }
       const { orderId, paymentId, payerId } = req.body;
       paypal.configure({
-        mode: 'sandbox',
+        mode: process.env.NODE_ENV === 'production' ? 'live' : 'sandbox',
         client_id: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
         client_secret: process.env.PAYPAL_CLIENT_SECRET!,
       });
