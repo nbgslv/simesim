@@ -37,6 +37,11 @@ const Header = ({ hideJumbotron = false }: { hideJumbotron?: boolean }) => {
         className={`d-flex flex-column ${styles.cover}`}
         style={{ height: hideJumbotron ? '100%' : '100vh' }}
       >
+        <div className={styles.promo}>
+          <div className={styles.textPromo}>
+            לזמן מוגבל! 20% הנחה. השתמשו בקופון <u>NEW20</u>
+          </div>
+        </div>
         <CustomNavbar
           background={navbarBackground}
           height={navbarHeight}
