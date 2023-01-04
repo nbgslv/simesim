@@ -34,6 +34,11 @@
     outline: none;
     border-radius: 100%;
     margin-left: 0.2rem;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     :global path {
       color: $text-color;
