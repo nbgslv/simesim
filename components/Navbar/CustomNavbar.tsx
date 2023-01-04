@@ -46,6 +46,7 @@ function CustomNavbar({
       ) as unknown) as HTMLCollectionOf<HTMLElement>;
       if (background) {
         navbarRef.current.classList.add('bg-light');
+        navbarRef.current.classList.remove(styles.withPromo);
         if (Array.isArray(navLinks) && navLinks.length) {
           navLinks.forEach((link: HTMLElement) => {
             link.classList.add(styles.navLinkTextDark);
@@ -60,6 +61,7 @@ function CustomNavbar({
         }
       } else {
         navbarRef.current.classList.remove('bg-light');
+        navbarRef.current.classList.add(styles.withPromo);
         if (Array.isArray(navLinks) && navLinks.length) {
           navLinks.forEach((link: HTMLElement) => {
             link.classList.add(styles.navLinkTextLight);
