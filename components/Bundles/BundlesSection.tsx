@@ -48,9 +48,11 @@ const BundlesSection = ({
       if (country !== selectedCountry) {
         setSelectedBundle(null);
         setFilteredBundles(
-          bundlesList.filter((planModel) =>
-            planModel.refill.bundle.coverage.includes(country.name as string)
-          )
+          bundlesList
+            .filter((planModel) =>
+              planModel.refill.bundle.coverage.includes(country.name as string)
+            )
+            .sort((a, b) => a.price - b.price)
         );
       }
     } else {
