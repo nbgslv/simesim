@@ -1,39 +1,10 @@
 @import 'styles/variables';
 
-.arrowButtonRight {
-  position: absolute;
-  top: 50%;
-  right: -10px;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
+.mainCarousel {
+  height: 80%;
 
-.arrowButtonRight svg {
-  fill: $background-color;
-}
-
-.arrowButtonLeft {
-  position: absolute;
-  top: 50%;
-  left: -10px;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.arrowButtonLeft svg {
-  fill: $background-color;
-}
-
-.bundleCardWrapper {
-
+  :global .carousel-inner {
+    height: 100%;
+    overflow: visible;
+  }
 }
