@@ -42,9 +42,15 @@ h6 {
   --bs-accordion-active-bg: #4502c6;
   --bs-accordion-btn-bg: #4502c6;
   --bs-accordion-btn-color: #f5f5f5;
+
+  & button {
+    text-align: right;
+  }
 }
 
 .accordion-button::after {
+  margin-right: auto !important;
+  margin-left: 0 !important;
   color: #ffffff;
   background-image: url("/plus.svg");
 }
