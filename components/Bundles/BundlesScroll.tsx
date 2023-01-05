@@ -1,60 +1,18 @@
 import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { PlanModel } from '@prisma/client';
+import { Carousel } from 'react-bootstrap';
 import BundleCard from './BundleCard';
-import LeftArrow from '../../public/left-arrow.svg';
-import RightArrow from '../../public/right-arrow.svg';
 import styles from './BundlesScroll.module.scss';
 
 const BundlesScroll = ({
   bundlesList,
   setBundle,
-  resetBundle,
 }: {
   bundlesList: PlanModel[];
   setBundle: (id: string | null) => void;
-  resetBundle: () => void;
 }) => {
-  const [currentBundle, setCurrentBundle] = React.useState<number>(0);
-  const [direction, setDirection] = React.useState<number>(0);
-  const isDragging = React.useRef<boolean>(false);
-  const variants = {
-    enter: (slideDirection: number) => ({
-      x: slideDirection > 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-    },
-    exit: (slideDirection: number) => ({
-      zIndex: 0,
-      x: slideDirection < 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-  };
-
-  const paginate = (newDirection: number) => {
-    resetBundle();
-    if (
-      currentBundle + newDirection < bundlesList.length &&
-      currentBundle + newDirection >= 0
-    ) {
-      setCurrentBundle(currentBundle + newDirection);
-      setDirection(newDirection);
-    } else if (currentBundle + newDirection === bundlesList.length) {
-      setCurrentBundle(0);
-      setDirection(0);
-    } else if (currentBundle + newDirection === -1) {
-      setCurrentBundle(bundlesList.length - 1);
-      setDirection(0);
-    }
-  };
-
   const handleBundleSelect = (id: string | null) => {
     setBundle(id);
-    setDirection(0);
   };
 
   if (bundlesList.length === 0)
@@ -72,72 +30,18 @@ const BundlesScroll = ({
     );
 
   return (
-    <div className="w-100 position-relative" style={{ height: '82%' }}>
-      {bundlesList.length > 1 ? (
-        <>
-          <button
-            disabled={bundlesList.length === 1}
-            type="button"
-            className={styles.arrowButtonRight}
-            onClick={() => paginate(1)}
-          >
-            <RightArrow />
-          </button>
-          <AnimatePresence initial={false} custom={direction}>
-            <motion.div
-              key={currentBundle}
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{
-                x: { type: 'spring', stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
-              }}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={1}
-              onDragStart={() => {
-                isDragging.current = true;
-              }}
-              onDragEnd={(e, { offset }) => {
-                if (offset.x < 0) {
-                  paginate(1);
-                } else if (offset.x > 0) {
-                  paginate(-1);
-                }
-                setTimeout(() => {
-                  isDragging.current = false;
-                }, 500);
-              }}
-              style={{
-                position: 'absolute',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                height: '100%',
-              }}
-            >
-              <BundleCard
-                bundle={bundlesList[currentBundle]}
-                setBundle={(id) => {
-                  if (!isDragging.current) handleBundleSelect(id);
-                }}
-              />
-            </motion.div>
-          </AnimatePresence>
-          <button
-            type="button"
-            className={styles.arrowButtonLeft}
-            onClick={() => paginate(-1)}
-          >
-            <LeftArrow />
-          </button>
-        </>
-      ) : (
-        <BundleCard bundle={bundlesList[currentBundle]} setBundle={setBundle} />
-      )}
-    </div>
+    <Carousel interval={null} className={styles.mainCarousel}>
+      {bundlesList.map((bundle) => (
+        <Carousel.Item key={bundle.id}>
+          <BundleCard
+            bundle={bundle}
+            setBundle={(id) => {
+              handleBundleSelect(id);
+            }}
+          />
+        </Carousel.Item>
+      ))}
+    </Carousel>
   );
 };
 

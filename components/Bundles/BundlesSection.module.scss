@@ -3,6 +3,7 @@
 .bundlesSection {
   background-color: $primary-color;
   height: 100vh;
+  overflow: hidden;
 
   @media (max-width: map-get($grid-breakpoints, 'md')) {
     height: 118vh !important;
