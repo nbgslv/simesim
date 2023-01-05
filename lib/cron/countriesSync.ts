@@ -29,8 +29,9 @@ const syncCountries = async () => {
             `https://translation.googleapis.com/language/translate/v2?q=${country}&target=he&key=${process.env.GOOGLE_API_KEY}`
           );
           const countryInfoJson = await countryInfo.json();
-          const translatedCountry =
-            countryInfoJson.data.translations[0].translatedText;
+          const translatedCountry = countryInfoJson.data.translations[0].translatedText
+            .replace(/[\u0591-\u05C4]/g, '')
+            .replace('&#39;', "'");
           return {
             name: country,
             translation: translatedCountry,

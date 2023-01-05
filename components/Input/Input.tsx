@@ -54,6 +54,7 @@ const InputInner = <T extends FieldValues>(
       aria-controls="autocomplete-list"
       aria-expanded="true"
       role="combobox"
+      data-clarity-unmask="true"
     />
     <div className={`d-flex position-absolute ${styles.inputEnd}`}>
       {cancelButton && (
