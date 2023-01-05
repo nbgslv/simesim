@@ -8,6 +8,12 @@
   width: 15rem;
   margin-left: auto;
   margin-right: auto;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    margin-top: 2.7rem;
+    height: 13rem;
+    width: 13rem;
+  }
 }
 
 .bundleCardMain {
@@ -16,6 +22,11 @@
   width: 15rem;
   height: 15rem;
   cursor: pointer;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    height: 13rem;
+    width: 13rem;
+  }
 }
 
 .cardBody {
