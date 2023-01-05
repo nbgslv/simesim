@@ -66,7 +66,7 @@ const InputInner = <T extends FieldValues>(
           }}
           onClick={() => handleCancel && handleCancel()}
         >
-          <FontAwesomeIcon icon={solid('x')} />
+          <FontAwesomeIcon icon={solid('x')} style={{ color: '#000' }} />
         </motion.button>
       )}
       {error && (

@@ -48,9 +48,11 @@ const BundlesSection = ({
       if (country !== selectedCountry) {
         setSelectedBundle(null);
         setFilteredBundles(
-          bundlesList.filter((planModel) =>
-            planModel.refill.bundle.coverage.includes(country.name as string)
-          )
+          bundlesList
+            .filter((planModel) =>
+              planModel.refill.bundle.coverage.includes(country.name as string)
+            )
+            .sort((a, b) => a.price - b.price)
         );
       }
     } else {
@@ -67,11 +69,6 @@ const BundlesSection = ({
     } else {
       setCurrentStep(1);
     }
-  };
-
-  const handleBundleReset = () => {
-    setSelectedBundle(null);
-    setCurrentStep(1);
   };
 
   const handleOrderModalClose = () => {
@@ -112,7 +109,6 @@ const BundlesSection = ({
                   <BundlesScroll
                     bundlesList={filteredBundles}
                     setBundle={handleBundleSelect}
-                    resetBundle={handleBundleReset}
                   />
                 </div>
               </div>

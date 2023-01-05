@@ -1,25 +1,32 @@
 @import 'styles/variables';
 
 .bundleCardContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   color: $background-color;
-  position: absolute;
-  top: 50%;
-  right: 50%;
-  transform: translateX(50%) translateY(-50%) !important;
-  width: 17rem;
   border-radius: 50%;
   cursor: pointer;
+  height: 15rem;
+  width: 15rem;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    margin-top: 2.7rem;
+    height: 13rem;
+    width: 13rem;
+  }
 }
 
 .bundleCardMain {
   background-color: map-get($theme-colors, 'orange');
   border-radius: 25rem;
-  width: 17rem;
-  height: 17rem;
+  width: 15rem;
+  height: 15rem;
   cursor: pointer;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    height: 13rem;
+    width: 13rem;
+  }
 }
 
 .cardBody {
@@ -39,6 +46,7 @@
   color: $text-color;
   font-size: 1.3rem;
   font-weight: 700;
+  text-align: center;
 }
 
 .bundleCardText {
