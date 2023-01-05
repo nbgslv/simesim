@@ -71,11 +71,6 @@ const BundlesSection = ({
     }
   };
 
-  const handleBundleReset = () => {
-    setSelectedBundle(null);
-    setCurrentStep(1);
-  };
-
   const handleOrderModalClose = () => {
     setOrderModalOpen(false);
     setCurrentStep(1);
@@ -114,7 +109,6 @@ const BundlesSection = ({
                   <BundlesScroll
                     bundlesList={filteredBundles}
                     setBundle={handleBundleSelect}
-                    resetBundle={handleBundleReset}
                   />
                 </div>
               </div>
