@@ -223,9 +223,7 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
       title={'הטלפון שלי תומך ב-eSim?'}
       className={styles.main}
     >
-      <Row
-        className={`h-100 w-100 d-flex align-items-center ${styles.mainRow}`}
-      >
+      <Row className={`w-100 d-flex align-items-center ${styles.mainRow}`}>
         <Col
           className={`d-flex flex-column h-100 ${
             selectedBrand ? 'justify-content-start' : 'justify-content-center'
