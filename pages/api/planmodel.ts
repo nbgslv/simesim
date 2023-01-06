@@ -46,7 +46,7 @@ export default async function handler(
                 description: yup.string(),
                 price: yup.number().required('Price is required'),
                 vat: yup.boolean(),
-                couponsIds: yup.string(),
+                couponsIds: yup.array().of(yup.string()),
               })
               .required(),
             include: yup.object(),
@@ -55,8 +55,12 @@ export default async function handler(
       });
       await postSchema.validate({ input });
       const couponsRecord =
-        input.data.couponsIds !== 'none'
-          ? { connect: input.data.couponsIds }
+        input.data.couponsIds && input.data.couponsIds.length > 0
+          ? {
+              connect: input.data.couponsIds.map((couponId: string) => ({
+                id: couponId,
+              })),
+            }
           : undefined;
       delete input.data.couponsIds;
       const planModel = await prisma.planModel.create({
@@ -98,7 +102,7 @@ export default async function handler(
                 description: yup.string(),
                 price: yup.number(),
                 vat: yup.boolean(),
-                couponsIds: yup.string(),
+                couponsIds: yup.array().of(yup.string()),
               })
               .required(),
             include: yup.object(),
