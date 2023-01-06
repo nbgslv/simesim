@@ -84,7 +84,7 @@ const Footer = () => (
                 {text.phoneNumber}
               </Nav.Link>
             </div>
-            <div className="d-flex justify-content-start mt-1">
+            <div className={`d-flex justify-content-start mt-1 ${styles.logo}`}>
               <Nav.Link
                 href="https://www.facebook.com/profile.php?id=100088126987688"
                 target="_blank"
@@ -98,6 +98,91 @@ const Footer = () => (
               </Nav.Link>
             </div>
           </div>
+        </Col>
+      </Row>
+      <Row className={styles.badges}>
+        {/* <Col md={1} className="text-center"> */}
+        {/*  <table */}
+        {/*    width="135" */}
+        {/*    border={0} */}
+        {/*    cellPadding="2" */}
+        {/*    cellSpacing="0" */}
+        {/*    title="Click to Verify - This site chose DigiCert SSL for secure e-commerce and confidential communications." */}
+        {/*  > */}
+        {/*    <tr> */}
+        {/*      <td width="135" align="center" valign="top"> */}
+        {/*        <Script */}
+        {/*          type="text/javascript" */}
+        {/*          src="https://seal.websecurity.norton.com/getseal?host_name=www.simesim.co.il&amp;size=M&amp;use_flash=NO&amp;use_transparent=Yes&amp;lang=en" */}
+        {/*        /> */}
+        {/*        <br /> */}
+        {/*        <a */}
+        {/*          href="https://www.digicert.com/what-is-ssl-tls-https/" */}
+        {/*          target="_blank" */}
+        {/*          style={{ */}
+        {/*            color: '#ffffff', */}
+        {/*            textDecoration: 'none', */}
+        {/*            font: 'bold 10px verdana,sans-serif', */}
+        {/*            textAlign: 'center', */}
+        {/*            margin: '0px', */}
+        {/*            padding: '0px', */}
+        {/*          }} */}
+        {/*          rel="noreferrer" */}
+        {/*        > */}
+        {/*          {' '} */}
+        {/*          How SSL Secures You */}
+        {/*        </a> */}
+        {/*      </td> */}
+        {/*    </tr> */}
+        {/*  </table> */}
+        {/* </Col> */}
+        <Col md={1}>
+          <Image
+            alt="Provides grow credit card solutions"
+            src={'/grow-logo.svg'}
+            width={85}
+            height={40}
+          />
+        </Col>
+        <Col md={1}>
+          <Image
+            alt="Allows payment with BIT"
+            src={'/Bit_logo.svg'}
+            width={40}
+            height={40}
+          />
+        </Col>
+        <Col md={1}>
+          <Image
+            alt="Allows payment with paypal"
+            src={'/paypal.png'}
+            width={63.125}
+            height={40}
+          />
+        </Col>
+        <Col md={1}>
+          <Image
+            alt="Accepts Visa credit cards"
+            src={'/visa.png'}
+            width={63.125}
+            height={40}
+          />
+        </Col>
+        <Col md={1}>
+          <Image
+            alt="Accepts Mastercard credit cards"
+            src={'/mastercard.png'}
+            width={63.125}
+            height={40}
+          />
+        </Col>
+        <Col md={1}>
+          <Image
+            alt="Protected by PCI standard"
+            src={'/pci-dss.png'}
+            width={40}
+            height={40}
+          />
         </Col>
       </Row>
       <Row className="text-center">

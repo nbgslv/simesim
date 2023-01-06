@@ -10,6 +10,7 @@
 }
 
 .mainRow {
+  height: 89%;
   @media (max-width: map-get($grid-breakpoints, 'md')) {
     flex-direction: column !important;
   }
@@ -77,6 +78,7 @@
   position: absolute;
   bottom: 5rem;
   right: 0;
+  line-height: .7 !important;
 
   @media (max-width: map-get($grid-breakpoints, 'md')) {
     position: unset;

@@ -45,8 +45,19 @@
 }
 
 .logo {
-  @media (max-width: map-get($grid-breakpoints, 'sm')) {
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
     justify-content: center !important;
     margin: .5rem 0;
+  }
+}
+
+.badges {
+  height: 65px;
+  align-items: center;
+  text-align: center;
+  margin-top: 1.5rem;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    height: 100%;
   }
 }
