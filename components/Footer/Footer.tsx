@@ -88,12 +88,23 @@ const Footer = () => (
               <Nav.Link
                 href="https://www.facebook.com/profile.php?id=100088126987688"
                 target="_blank"
-                className="p-0"
+                className="p-0 ms-2"
                 aria-label="Facebook"
               >
                 <FontAwesomeIcon
                   icon={brands('facebook')}
                   aria-label="Facebook"
+                />
+              </Nav.Link>
+              <Nav.Link
+                href="https://www.instagram.com/simesim.co.il/"
+                target="_blank"
+                className="p-0"
+                aria-label="Instagram"
+              >
+                <FontAwesomeIcon
+                  icon={brands('instagram')}
+                  aria-label="Instagram"
                 />
               </Nav.Link>
             </div>

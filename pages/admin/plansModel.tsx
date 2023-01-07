@@ -218,8 +218,15 @@ const PlansModel = ({
       ),
       renderEditCell: (params) => (
         <AdminSelect<true>
+          isMulti
           ariaLabel="select coupons"
           options={existingCoupons.map((coupon) => ({
+            value: coupon.id,
+            label: `${coupon.code} - ${coupon.discount}${
+              coupon.discountType === 'PERCENT' ? '%' : '\u20AA'
+            }`,
+          }))}
+          value={params.row.coupons.map((coupon: Coupon) => ({
             value: coupon.id,
             label: `${coupon.code} - ${coupon.discount}${
               coupon.discountType === 'PERCENT' ? '%' : '\u20AA'
@@ -245,7 +252,10 @@ const PlansModel = ({
   ];
 
   const addRow = async (
-    data: PlanModel
+    data: PlanModel & {
+      couponsIds?: string[];
+      coupons: { connect: { id: string }[] };
+    }
   ): Promise<{ id: GridRowId; columnToFocus: undefined } | Error> => {
     setAddPlanModelLoading(true);
     const newPlanModel = await adminApi.callApi<
@@ -279,6 +289,7 @@ const PlansModel = ({
               },
             },
           },
+          coupons: true,
         },
       },
     });
@@ -307,7 +318,12 @@ const PlansModel = ({
   > => {
     try {
       const addData = await NiceModal.show('add-plansmodel');
-      return await addRow(addData as PlanModelData);
+      return await addRow(
+        addData as PlanModelData & {
+          couponsIds?: string[];
+          coupons: { connect: { id: string }[] };
+        }
+      );
     } catch (e) {
       modal.reject(e);
       return e as Error;
@@ -411,6 +427,7 @@ export async function getServerSideProps(context: NextPageContext) {
           },
         },
       },
+      coupons: true,
     },
     orderBy: {
       updatedAt: 'desc',
@@ -452,6 +469,13 @@ export async function getServerSideProps(context: NextPageContext) {
         updatedAt: format(planModel.refill.bundle.updatedAt, 'dd/MM/yy kk:mm'),
       },
     },
+    coupons: planModel.coupons.map((coupon) => ({
+      ...coupon,
+      validFrom: format(coupon.validFrom, 'dd/MM/yy kk:mm'),
+      validTo: format(coupon.validTo, 'dd/MM/yy kk:mm'),
+      createdAt: format(coupon.createdAt, 'dd/MM/yy kk:mm'),
+      updatedAt: format(coupon.updatedAt, 'dd/MM/yy kk:mm'),
+    })),
     createdAt: format(planModel.createdAt, 'dd/MM/yy kk:mm'),
     updatedAt: format(planModel.updatedAt, 'dd/MM/yy kk:mm'),
   }));

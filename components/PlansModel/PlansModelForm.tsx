@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { Button, Form, InputGroup, Spinner } from 'react-bootstrap';
 import { Bundle, Refill, Coupon } from '@prisma/client';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useModal } from '@ebay/nice-modal-react';
 import styles from './PlansModelForm.module.scss';
+import AdminSelect from '../AdminSelect/AdminSelect';
 
 type PlansModelFormProps = {
   bundles: Bundle[];
@@ -22,10 +23,15 @@ const schema = yup.object().shape({
   description: yup.string(),
   price: yup.number().required('Price is required'),
   vat: yup.boolean(),
-  couponsIds: yup.string(),
+  couponsIds: yup.array().of(yup.string()),
 });
 
-const PlansModelForm = ({ bundles, refills, coupons, loading }: PlansModelFormProps) => {
+const PlansModelForm = ({
+  bundles,
+  refills,
+  coupons,
+  loading,
+}: PlansModelFormProps) => {
   const [filteredRefills, setFilteredRefills] = React.useState<Refill[]>(
     refills
   );
@@ -34,8 +40,9 @@ const PlansModelForm = ({ bundles, refills, coupons, loading }: PlansModelFormPr
   const { resolve, hide } = useModal('add-plansmodel');
   const {
     register,
+    control,
     watch,
-      setValue,
+    setValue,
     formState: { errors },
     handleSubmit,
   } = useForm({
@@ -48,7 +55,7 @@ const PlansModelForm = ({ bundles, refills, coupons, loading }: PlansModelFormPr
       description: '',
       price: '',
       vat: false,
-      couponsIds: 'none',
+      couponsIds: [],
     },
   });
   const selectedRefill = watch('refillId');
@@ -56,25 +63,31 @@ const PlansModelForm = ({ bundles, refills, coupons, loading }: PlansModelFormPr
   useEffect(() => {
     if (bundles.length > 0 && !chosenBundle) {
       setChosenBundle(bundles[0]);
-      const tempRefills = refills.filter((refill) => refill.bundleId === bundles[0].id)
+      const tempRefills = refills.filter(
+        (refill) => refill.bundleId === bundles[0].id
+      );
       setFilteredRefills(tempRefills);
       setChosenRefill(tempRefills[0]);
       setValue('refillId', tempRefills[0].id);
     }
-  }, [bundles])
+  }, [bundles]);
 
   useEffect(() => {
-    const tempRefills = refills.filter((refill) => refill.bundleId === chosenBundle?.id)
+    const tempRefills = refills.filter(
+      (refill) => refill.bundleId === chosenBundle?.id
+    );
     if (tempRefills.length > 0) {
-        setFilteredRefills(tempRefills);
-        setChosenRefill(tempRefills[0]);
-        setValue('refillId', tempRefills[0].id);
+      setFilteredRefills(tempRefills);
+      setChosenRefill(tempRefills[0]);
+      setValue('refillId', tempRefills[0].id);
     }
   }, [chosenBundle]);
 
   useEffect(() => {
     if (selectedRefill !== 'none' && selectedRefill !== chosenRefill?.id) {
-      const refill = filteredRefills.find((filteredRefill) => filteredRefill.id === selectedRefill);
+      const refill = filteredRefills.find(
+        (filteredRefill) => filteredRefill.id === selectedRefill
+      );
       setChosenRefill(refill || null);
     }
   }, [selectedRefill]);
@@ -83,7 +96,13 @@ const PlansModelForm = ({ bundles, refills, coupons, loading }: PlansModelFormPr
     <Form>
       <Form.Group>
         <Form.Label>Bundle</Form.Label>
-        <Form.Select onChange={(e) => setChosenBundle(bundles.find((bundle) => bundle.id === e.target.value) || null)}>
+        <Form.Select
+          onChange={(e) =>
+            setChosenBundle(
+              bundles.find((bundle) => bundle.id === e.target.value) || null
+            )
+          }
+        >
           {bundles.length ? (
             bundles.map((bundle) => (
               <option key={bundle.id} value={bundle.id as string}>
@@ -177,20 +196,36 @@ const PlansModelForm = ({ bundles, refills, coupons, loading }: PlansModelFormPr
       </Form.Group>
       <Form.Group>
         <Form.Label>Coupons</Form.Label>
-        <Form.Select
-          {...register('couponsIds')}
-          isInvalid={!!errors.couponsIds}
-        >
-          {coupons.length ? (
-            coupons.map((coupon) => (
-              <option key={coupon.id} value={coupon.id as string}>{`${
-                coupon.discount
-              }${coupon.discountType === 'PERCENT' ? '%' : 'ש"ח'}`}</option>
-            ))
-          ) : (
-            <option value="none">No Coupons</option>
+        <Controller
+          name="couponsIds"
+          control={control}
+          render={({ field }) => (
+            <AdminSelect
+              ariaLabel="Coupons"
+              options={coupons.map((coupon) => ({
+                value: coupon.id,
+                label: `${coupon.code} - ${coupon.discount}${
+                  coupon.discountType === 'PERCENT' ? '%' : '\u20AA'
+                }`,
+              }))}
+              isMulti
+              onSelect={(options) => {
+                field.onChange(options.map((option) => option.value));
+              }}
+              value={field.value.map((id) => {
+                const coupon = coupons.find(
+                  (couponOfCoupons) => couponOfCoupons.id === id
+                );
+                return {
+                  value: id,
+                  label: `${coupon?.code || ''} - ${coupon?.discount || ''}${
+                    (coupon?.discountType === 'PERCENT' ? '%' : '\u20AA') ?? ''
+                  }`,
+                };
+              })}
+            />
           )}
-        </Form.Select>
+        />
         <Form.Control.Feedback type="invalid">
           {errors.couponsIds?.message}
         </Form.Control.Feedback>
@@ -198,7 +233,8 @@ const PlansModelForm = ({ bundles, refills, coupons, loading }: PlansModelFormPr
       <Button
         variant="secondary"
         onClick={() => hide()}
-        className={`${styles.closeButton} me-2`}
+        className={`
+                }${styles.closeButton} me-2`}
       >
         Close
       </Button>
@@ -213,7 +249,6 @@ const PlansModelForm = ({ bundles, refills, coupons, loading }: PlansModelFormPr
         ) : (
           'Save Changes'
         )}
-
       </Button>
     </Form>
   );
