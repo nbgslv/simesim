@@ -11,6 +11,7 @@ const BundlesScroll = ({
   bundlesList: PlanModel[];
   setBundle: (id: string | null) => void;
 }) => {
+  const [activeSlide, setActiveSlide] = React.useState(bundlesList.length - 1);
   const handleBundleSelect = (id: string | null) => {
     setBundle(id);
   };
@@ -29,8 +30,17 @@ const BundlesScroll = ({
       </div>
     );
 
+  const handleSlide = (index: number) => {
+    setActiveSlide(index);
+  };
+
   return (
-    <Carousel interval={null} className={styles.mainCarousel}>
+    <Carousel
+      interval={null}
+      activeIndex={activeSlide}
+      onSelect={handleSlide}
+      className={styles.mainCarousel}
+    >
       {bundlesList.map((bundle) => (
         <Carousel.Item key={bundle.id}>
           <BundleCard
