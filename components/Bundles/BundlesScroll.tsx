@@ -40,6 +40,7 @@ const BundlesScroll = ({
       activeIndex={activeSlide}
       onSelect={handleSlide}
       className={styles.mainCarousel}
+      wrap={false}
     >
       {bundlesList.map((bundle) => (
         <Carousel.Item key={bundle.id}>
