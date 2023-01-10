@@ -34,9 +34,11 @@ type SearchAutocompleteProps<T> = {
   ListBoxComponent?: ElementType;
   searchFields?: Partial<keyof Item<T>>[];
   ariaLabeledby?: string;
+  ariaControls?: string;
 };
 
 type DefaultListBoxComponentProps = {
+  id?: string;
   children: ReactNode | ReactNode[];
 };
 
@@ -59,6 +61,7 @@ const SearchAutocompleteInner = <T extends { id: string }>(
     ListBoxComponent,
     searchFields = [],
     ariaLabeledby,
+    ariaControls,
   }: SearchAutocompleteProps<T>,
   ref: ForwardedRef<any>
 ) => {
@@ -87,6 +90,7 @@ const SearchAutocompleteInner = <T extends { id: string }>(
   }, [searchInstance, items]);
 
   const DefaultListBoxComponent: FC<DefaultListBoxComponentProps> = ({
+    id,
     children,
   }) => {
     const variants = {
@@ -110,7 +114,7 @@ const SearchAutocompleteInner = <T extends { id: string }>(
         <div
           className={styles.listBoxContainer}
           role="listbox"
-          id="autocomplete-listbox"
+          id={id}
           aria-label={placeholder}
           aria-busy="true"
         >
@@ -214,7 +218,7 @@ const SearchAutocompleteInner = <T extends { id: string }>(
           value={itemSelected ? itemSelected.displayValue : query}
           onChange={handleChange}
           ariaLabeledby={ariaLabeledby}
-          ariaControls="autocomplete-listbox"
+          ariaControls={ariaControls}
           ariaRole="combobox"
           ariaExpanded={filteredItems.length > 0}
           ariaAutocomplete="list"
@@ -258,7 +262,7 @@ const SearchAutocompleteInner = <T extends { id: string }>(
             })}
           </ListBoxComponent>
         ) : (
-          <DefaultListBoxComponent>
+          <DefaultListBoxComponent id={ariaControls}>
             {filteredItems.map((item, i) => {
               const ItemComponentToUse = ItemComponent || DefaultItemComponent;
               if (maxResults && i < maxResults)

@@ -129,6 +129,7 @@ const CountrySearch = ({
         placeholder="לאן טסים?"
         searchFields={['name', 'translation']}
         ariaLabeledby={ariaLabeledby}
+        ariaControls="country-search"
       />
       {itemSelected ? (
         <div

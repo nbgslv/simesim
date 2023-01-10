@@ -266,6 +266,7 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
                   ref={phoneSearchRef}
                   ListBoxComponent={ListBox}
                   ItemComponent={ListBoxItem}
+                  ariaControls="autocomplete-listbox-check-phone"
                 />
               </motion.div>
             )}
