@@ -55,7 +55,9 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="#">{text.header.navbar.accessibility}</Nav.Link>
+              <Nav.Link href="/a11y">
+                {text.header.navbar.accessibility}
+              </Nav.Link>
             </Nav.Item>
           </Nav>
         </Col>
