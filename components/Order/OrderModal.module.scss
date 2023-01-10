@@ -72,11 +72,11 @@
 }
 
 .submitButton {
-  color: $background-color !important;
+  color: #ffffff !important;
 }
 
 .couponButton {
-  color: map-get($theme-colors, 'success') !important;
+  color: #587B29 !important;
 
   @media (max-width: map-get($grid-breakpoints, 'md')) {
     margin-top: 1rem;

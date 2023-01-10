@@ -280,6 +280,8 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
                   <Input
                     {...field}
                     placeholder="שם פרטי"
+                    aria-placeholder="first name"
+                    aria-label="first name"
                     autocomplete="given-name"
                     focusedBorderColor="#FFC107"
                     ref={field.ref}
@@ -302,6 +304,8 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
                     {...field}
                     placeholder="שם משפחה"
                     autocomplete="family-name"
+                    aria-placeholder="last name"
+                    aria-label="last name"
                     focusedBorderColor="#FFC107"
                     ref={field.ref}
                     value={field.value}
@@ -323,6 +327,8 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
                     {...field}
                     placeholder="טלפון נייד"
                     autocomplete="tel"
+                    aria-placeholder="mobile phone"
+                    aria-label="mobile phone"
                     focusedBorderColor="#FFC107"
                     ref={field.ref}
                     value={field.value}
@@ -347,6 +353,8 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
                     {...field}
                     placeholder={'דוא"ל'}
                     autocomplete="email"
+                    aria-placeholder="email"
+                    aria-label="email"
                     focusedBorderColor="#FFC107"
                     ref={field.ref}
                     value={field.value}
@@ -366,6 +374,8 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
               <Input
                 placeholder={'קופון'}
                 focusedBorderColor="#FFC107"
+                aria-placeholder="coupon code"
+                aria-label="coupon code"
                 value={coupon}
                 onChange={(e) => setCoupon(e.target.value)}
                 error={couponError}

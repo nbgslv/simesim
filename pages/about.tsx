@@ -12,7 +12,7 @@ const About = () => (
     hideJumbotron
   >
     <div className={styles.wrapper}>
-      <Container className={styles.container}>
+      <Container className={styles.container} tabIndex={0}>
         <h1 className="text-center p-2">עלינו</h1>
         <p className="mt-4">
           שים eSim שמה לעצמה למטרה לספק חויית שירות איכותית וטובה, ולספק מבחר של

@@ -40,7 +40,7 @@ type DefaultListBoxComponentProps = {
   children: ReactNode | ReactNode[];
 };
 
-type DefaultCountrySearchItemProps<T> = {
+export type DefaultCountrySearchItemProps<T> = {
   item: Item<T>;
   selectItem: (item: Item<T>) => void;
   selectedItem: T | null;
@@ -111,6 +111,8 @@ const SearchAutocompleteInner = <T extends { id: string }>(
           className={styles.listBoxContainer}
           role="listbox"
           id="autocomplete-listbox"
+          aria-label={placeholder}
+          aria-busy="true"
         >
           <motion.div
             layout="position"
@@ -119,6 +121,7 @@ const SearchAutocompleteInner = <T extends { id: string }>(
             exit="initial"
             variants={variants}
             className={`${styles.listBox}`}
+            tabIndex={0}
           >
             {children}
           </motion.div>
@@ -144,6 +147,12 @@ const SearchAutocompleteInner = <T extends { id: string }>(
         role="option"
         onClick={() => selectItem(item)}
         key={item.id}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            selectItem(item);
+          }
+        }}
       >
         {item.displayValue}
       </motion.div>
@@ -205,6 +214,10 @@ const SearchAutocompleteInner = <T extends { id: string }>(
           value={itemSelected ? itemSelected.displayValue : query}
           onChange={handleChange}
           ariaLabeledby={ariaLabeledby}
+          ariaControls="autocomplete-listbox"
+          ariaRole="combobox"
+          ariaExpanded={filteredItems.length > 0}
+          ariaAutocomplete="list"
         />
         <button
           type="button"

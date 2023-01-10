@@ -86,12 +86,14 @@ const ChangeDetailsForm = ({ user }: { user: Partial<User> }) => {
   return (
     <Form className={styles.main}>
       <Form.Group as={Row}>
-        <Form.Label column sm="3">
+        <Form.Label column id="first-name-label" for="first-name" sm="3">
           שם פרטי
         </Form.Label>
         <Col>
           <Form.Control
             {...register('firstName')}
+            id="first-name"
+            aria-label="first name"
             type="text"
             placeholder="שם פרטי"
             isInvalid={!!errors.firstName}
@@ -102,12 +104,14 @@ const ChangeDetailsForm = ({ user }: { user: Partial<User> }) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className="mt-2">
-        <Form.Label column sm="3">
+        <Form.Label column id="last-name-label" for="last-name" sm="3">
           שם משפחה
         </Form.Label>
         <Col>
           <Form.Control
             {...register('lastName')}
+            id="last-name"
+            aria-label="last name"
             type="text"
             placeholder="שם משפחה"
             isInvalid={!!errors.lastName}
@@ -118,12 +122,14 @@ const ChangeDetailsForm = ({ user }: { user: Partial<User> }) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className="mt-2">
-        <Form.Label column sm="3">
+        <Form.Label column id="phone-label" for="phone" sm="3">
           טלפון
         </Form.Label>
         <Col>
           <Form.Control
             {...register('email')}
+            id="phone"
+            aria-label="email"
             type="text"
             placeholder="טלפון"
             isInvalid={!!errors.email}
@@ -134,12 +140,15 @@ const ChangeDetailsForm = ({ user }: { user: Partial<User> }) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className="mt-2">
-        <Form.Label column sm="3">
+        <Form.Label column id="email-label" for="email" sm="3">
           דוא&quot;ל
         </Form.Label>
         <Col>
           <Form.Control
             {...register('emailEmail')}
+            id="email"
+            aria-labelledby="email-label"
+            aria-label="email"
             type="text"
             placeholder={'דוא"ל'}
             isInvalid={!!errors.emailEmail}

@@ -99,7 +99,7 @@ const Contact = () => {
         >
           <Col>
             <Row className="mb-3">
-              <Col>{text.contact.description}</Col>
+              <Col tabIndex={0}>{text.contact.description}</Col>
             </Row>
             <Row
               className={`${styles.containerRow} w-100 h-100 align-items-center`}
@@ -158,21 +158,22 @@ const Contact = () => {
                     <Row className="d-flex flex-column">
                       <Form as={Col}>
                         <Form.Group>
-                          <Form.Label id="name-label">
+                          <Form.Label id="name-label" for="name">
                             {text.contact.name}
                           </Form.Label>
                           <Controller
-                            arial-labeledby="name-label"
                             name="name"
                             control={control}
                             render={({ field, fieldState }) => (
                               <Input
+                                id={field.name}
                                 autocomplete="given-name"
                                 focusedBorderColor="#4502C6"
                                 ref={field.ref}
                                 value={field.value}
                                 onChange={field.onChange}
                                 error={fieldState.error}
+                                aria-label="name"
                               />
                             )}
                           />
@@ -183,7 +184,6 @@ const Contact = () => {
                           </Form.Label>
                           <Controller
                             name="phone"
-                            aria-labelledby="phone-label"
                             control={control}
                             render={({ field, fieldState }) => (
                               <Input
@@ -193,6 +193,7 @@ const Contact = () => {
                                 value={field.value}
                                 onChange={field.onChange}
                                 error={fieldState.error}
+                                aria-label="phone"
                               />
                             )}
                           />
@@ -202,7 +203,6 @@ const Contact = () => {
                             {text.contact.email}
                           </Form.Label>
                           <Controller
-                            aria-labelledby="email-label"
                             name="email"
                             control={control}
                             render={({ field, fieldState }) => (
@@ -213,6 +213,7 @@ const Contact = () => {
                                 value={field.value}
                                 onChange={field.onChange}
                                 error={fieldState.error}
+                                aria-label="email"
                               />
                             )}
                           />
@@ -222,11 +223,11 @@ const Contact = () => {
                             {text.contact.message}
                           </Form.Label>
                           <Form.Control
-                            aria-labelledby="message-label"
                             {...register('message')}
                             as="textarea"
                             className={styles.textArea}
                             isInvalid={!!errors.message}
+                            aria-label="message"
                           />
                           <Form.Control.Feedback type="invalid">
                             {errors.message?.message}

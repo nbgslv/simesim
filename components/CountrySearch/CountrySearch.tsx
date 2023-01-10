@@ -41,6 +41,12 @@ const CountrySearchItem = ({
     aria-selected={selectedItem?.id === item.id}
     key={item.id}
     className={`${styles.item} d-flex`}
+    tabIndex={0}
+    onKeyDown={(e) => {
+      if (e.key === 'Enter') {
+        selectItem(item);
+      }
+    }}
   >
     <div
       style={{

@@ -10,7 +10,7 @@ const Info = () => (
     hideJumbotron
   >
     <div className={styles.wrapper}>
-      <Container className={styles.container}>
+      <Container className={styles.container} tabIndex={0}>
         <h1 className="text-center p-2">מה זה eSim?</h1>
         <div className="mt-3">
           <p>

@@ -21,6 +21,11 @@ type InputProps<T extends FieldValues> = {
   cancelButton?: boolean;
   handleCancel?: () => void;
   ariaLabeledby?: string;
+  ariaControls?: string;
+  ariaRole?: string;
+  ariaExpanded?: boolean;
+  ariaAutocomplete?: 'list' | 'none' | 'inline' | 'both';
+  id?: string;
 };
 
 const InputInner = <T extends FieldValues>(
@@ -34,6 +39,11 @@ const InputInner = <T extends FieldValues>(
     cancelButton,
     handleCancel,
     ariaLabeledby,
+    ariaControls,
+    ariaRole,
+    ariaExpanded,
+    ariaAutocomplete,
+    id,
     ...props
   }: InputProps<T>,
   ref?: ForwardedRef<any>
@@ -41,6 +51,7 @@ const InputInner = <T extends FieldValues>(
   <div className={styles.inputWrapper}>
     <motion.input
       {...props}
+      id={id}
       readOnly={readonly}
       whileFocus={{ borderColor: focusedBorderColor }}
       ref={ref}
@@ -50,11 +61,10 @@ const InputInner = <T extends FieldValues>(
       value={value}
       onChange={onChange}
       aria-labelledby={ariaLabeledby}
-      aria-autocomplete="list"
-      aria-controls="autocomplete-list"
-      aria-expanded="true"
-      role="combobox"
-      data-clarity-unmask="true"
+      aria-autocomplete={ariaAutocomplete}
+      aria-controls={ariaControls}
+      aria-expanded={ariaExpanded}
+      role={ariaRole}
     />
     <div className={`d-flex position-absolute ${styles.inputEnd}`}>
       {cancelButton && (

@@ -4,7 +4,7 @@ import { Row, Col } from 'react-bootstrap';
 import Lottie from 'react-lottie';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMediaQuery } from 'react-responsive';
-import Section from '../Section/Section';
+import SectionComponent from '../Section/Section';
 import CountrySearch, { ExtendedCountry } from '../CountrySearch/CountrySearch';
 import styles from './BundlesSection.module.scss';
 import * as travelImageData from '../../public/travel.json';
@@ -79,7 +79,7 @@ const BundlesSection = ({
 
   return (
     <AnimatePresence>
-      <Section id="bundles-section" className={styles.bundlesSection}>
+      <SectionComponent id="bundles-section" className={styles.bundlesSection}>
         <Row
           className={`d-flex justify-content-between align-items-center p-3 ${styles.row}`}
         >
@@ -113,18 +113,6 @@ const BundlesSection = ({
                 </div>
               </div>
             ) : null}
-            {/* {currentStep >= 2 ? ( */}
-            {/*  <> */}
-            {/*    <Button */}
-            {/*      variant="primary" */}
-            {/*      size="lg" */}
-            {/*      className={`${styles.orderButton} w-100`} */}
-            {/*      onClick={() => setOrderModalOpen(true)} */}
-            {/*    > */}
-            {/*      3. מזמינים */}
-            {/*    </Button> */}
-            {/*  </> */}
-            {/* ) : null} */}
             <OrderModal
               show={orderModalOpen}
               onHide={handleOrderModalClose}
@@ -147,7 +135,7 @@ const BundlesSection = ({
             </Col>
           )}
         </Row>
-      </Section>
+      </SectionComponent>
     </AnimatePresence>
   );
 };

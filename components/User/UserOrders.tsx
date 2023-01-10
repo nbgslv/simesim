@@ -55,21 +55,57 @@ const UserOrders = ({
     {
       field: 'planName',
       headerName: 'התכנית',
+      renderHeader: () => (
+        <div
+          role="columnheader"
+          aria-label="plan name"
+          className={styles.headerCell}
+        >
+          התכנית
+        </div>
+      ),
     },
     {
       field: 'price',
       headerName: 'מחיר',
       valueFormatter: ({ value }: { value: string }) => `${value}₪`,
+      renderHeader: () => (
+        <div
+          role="columnheader"
+          aria-label="plan price"
+          className={styles.headerCell}
+        >
+          מחיר
+        </div>
+      ),
     },
     {
       field: 'status',
       headerName: 'סטטוס',
+      renderHeader: () => (
+        <div
+          role="columnheader"
+          aria-label="plan status"
+          className={styles.headerCell}
+        >
+          סטטוס
+        </div>
+      ),
     },
     {
       field: 'allowedUsageKb',
       headerName: 'נפח החבילה',
       valueFormatter: ({ value }: { value: string }) =>
         `${Math.floor(parseInt(value, 10) / 1000000)}GB`,
+      renderHeader: () => (
+        <div
+          role="columnheader"
+          aria-label="plan allowed usage"
+          className={styles.headerCell}
+        >
+          נפח החבילה
+        </div>
+      ),
     },
     {
       field: 'remainingUsageKb',
@@ -81,12 +117,31 @@ const UserOrders = ({
     {
       field: 'remainingDays',
       headerName: 'ימים שנותרו',
+      renderHeader: () => (
+        <div
+          role="columnheader"
+          aria-label="plan remaining days"
+          className={styles.headerCell}
+        >
+          ימים שנותרו
+        </div>
+      ),
     },
     {
       field: 'qrCode',
       headerName: 'קוד QR',
+      renderHeader: () => (
+        <div
+          role="columnheader"
+          aria-label="activation qr code"
+          className={styles.headerCell}
+        >
+          קוד QR
+        </div>
+      ),
       renderCell: (params: GridCellParams) => (
         <Button
+          tabIndex={params.tabIndex}
           variant="outline-primary"
           className={styles.button}
           disabled={!params.row.line.qrCode}
@@ -99,8 +154,18 @@ const UserOrders = ({
     {
       field: 'payment',
       headerName: 'פרטי תשלום',
+      renderHeader: () => (
+        <div
+          role="columnheader"
+          aria-label="payment details"
+          className={styles.headerCell}
+        >
+          פרטי תשלום
+        </div>
+      ),
       renderCell: (params: GridCellParams) => (
         <Button
+          tabIndex={params.tabIndex}
           variant="outline-primary"
           className={styles.button}
           onClick={() =>
@@ -152,6 +217,7 @@ const UserOrders = ({
           },
         }}
         pageSize={10}
+        aria-label="my orders"
       />
       <PaymentDetailsModal
         show={!!chosenRowPayment}

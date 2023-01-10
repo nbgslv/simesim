@@ -7,9 +7,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMediaQuery } from 'react-responsive';
 import styles from './CheckPhoneSection.module.scss';
 import SearchAutocomplete, {
+  DefaultCountrySearchItemProps,
   Item,
 } from '../SearchAutocomplete/SearchAutocomplete';
-import Section from '../Section/Section';
+import SectionComponent from '../Section/Section';
 
 type Brand = {
   exceptions: string[];
@@ -81,6 +82,9 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
             variants={variants}
             role="listbox"
             className={`${styles.listBox}`}
+            id="autocomplete-listbox-check-phone"
+            aria-label="phone brand"
+            aria-busy="true"
           >
             {children}
           </motion.div>
@@ -92,16 +96,24 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   const ListBoxItem = ({
     item,
     selectItem,
-  }: {
-    item: Item<PhoneListItem>;
-    selectItem: (item: Item<PhoneListItem>) => void;
-  }) => (
+    selectedItem,
+    index,
+  }: DefaultCountrySearchItemProps<Item<PhoneListItem>>) => (
     <motion.div
+      key={item.id}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       role="option"
+      aria-posinset={index + 1}
+      aria-selected={selectedItem?.id === item.id}
       className={`${styles.listBoxItem}`}
       onClick={() => selectItem(item)}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+          selectItem(item);
+        }
+      }}
     >
       {item.displayValue}
     </motion.div>
@@ -171,7 +183,7 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
       return (
         <div className="h-100 w-100 d-flex flex-column justify-content-center">
           <div className="d-flex flex-column justify-content-center">
-            <div className={styles.resultsContainer}>
+            <div className={styles.resultsContainer} tabIndex={0}>
               מכשיר מדגם זה תומך ב-eSim!
             </div>
           </div>
@@ -218,7 +230,7 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   };
 
   return (
-    <Section
+    <SectionComponent
       id="check-phone-section"
       title={'הטלפון שלי תומך ב-eSim?'}
       className={styles.main}
@@ -241,6 +253,7 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
                 ListBoxComponent={ListBox}
                 ItemComponent={ListBoxItem}
                 items={phonesBrands}
+                ariaControls="autocomplete-listbox-check-phone"
               />
             </div>
             {selectedBrand && (
@@ -267,7 +280,7 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
               {getResultText()}
             </motion.div>
           )}
-          <div className={styles.disclaimer}>
+          <div className={styles.disclaimer} tabIndex={0}>
             <small style={{ fontSize: '0.7rem' }}>
               שימו לב: רשימת המכשירים התומכים בטכנולוגיית eSim מסופקת על ידי צד
               ג&apos;. מומלץ לקרוא את{' '}
@@ -294,7 +307,7 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
           </Col>
         )}
       </Row>
-    </Section>
+    </SectionComponent>
   );
 };
 

@@ -18,7 +18,7 @@ const Section = ({
   sectionRef,
 }: SectionProps) => (
   <section className={className} ref={sectionRef} id={id || title}>
-    <Container as="section" className={styles.section} id={id}>
+    <Container className={styles.section}>
       {title && (
         <h1 className={`${styles.sectionTitle} text-center mb-4`}>{title}</h1>
       )}
