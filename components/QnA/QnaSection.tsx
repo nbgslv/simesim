@@ -3,11 +3,11 @@ import { Accordion } from 'react-bootstrap';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import styles from './QnaSection.module.scss';
-import Section from '../Section/Section';
+import SectionComponent from '../Section/Section';
 import text from '../../lib/content/text.json';
 
 const QnaSection = () => (
-  <Section
+  <SectionComponent
     id={'qna-section'}
     title={'שאלות ותשובות'}
     className={styles.qnaSection}
@@ -46,7 +46,7 @@ const QnaSection = () => (
         priority
       />
     </motion.div>
-  </Section>
+  </SectionComponent>
 );
 
 export default QnaSection;

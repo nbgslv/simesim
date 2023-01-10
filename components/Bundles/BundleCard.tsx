@@ -49,6 +49,7 @@ const BundleCard = ({
         <Card
           className={styles.bundleCardMain}
           onClick={() => handlePlanModelSelect(bundle.id)}
+          tabIndex={0}
         >
           <Card.Body className={styles.cardBody}>
             <Card.Title className={styles.bundleCardTitle}>

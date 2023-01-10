@@ -10,7 +10,7 @@ const Guide = () => (
     hideJumbotron
   >
     <div className={styles.wrapper}>
-      <Container className={styles.container}>
+      <Container className={styles.container} tabIndex={0}>
         <h1 className="text-center p-2">הדרכה בנושאים שונים</h1>
         <div className="mt-4">
           <h2 className="mb-2">

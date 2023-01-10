@@ -43,14 +43,14 @@
 }
 
 .bundleCardTitle {
-  color: $text-color;
+  color: $text-color !important;
   font-size: 1.3rem;
   font-weight: 700;
   text-align: center;
 }
 
 .bundleCardText {
-  color: $text-color;
+  color: $text-color !important;
   font-size: 0.9rem;
 }
 

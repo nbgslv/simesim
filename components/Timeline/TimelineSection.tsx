@@ -6,7 +6,7 @@ import Timeline from './Timeline';
 import TimelineItem from './TimelineItem';
 import text from '../../lib/content/text.json';
 import styles from './TimelineSection.module.scss';
-import Section from '../Section/Section';
+import SectionComponent from '../Section/Section';
 
 const TimelineSection = () => {
   const [animateArray, setAnimateArray] = React.useState<boolean[]>([
@@ -35,7 +35,7 @@ const TimelineSection = () => {
   };
 
   return (
-    <Section
+    <SectionComponent
       title={text.home.timelineSectionTitle}
       id="timeline-section"
       className={styles.timelineSection}
@@ -75,7 +75,7 @@ const TimelineSection = () => {
           </div>
         </TimelineItem>
       </Timeline>
-    </Section>
+    </SectionComponent>
   );
 };
 

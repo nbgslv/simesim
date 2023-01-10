@@ -34,13 +34,15 @@ type SearchAutocompleteProps<T> = {
   ListBoxComponent?: ElementType;
   searchFields?: Partial<keyof Item<T>>[];
   ariaLabeledby?: string;
+  ariaControls?: string;
 };
 
 type DefaultListBoxComponentProps = {
+  id?: string;
   children: ReactNode | ReactNode[];
 };
 
-type DefaultCountrySearchItemProps<T> = {
+export type DefaultCountrySearchItemProps<T> = {
   item: Item<T>;
   selectItem: (item: Item<T>) => void;
   selectedItem: T | null;
@@ -59,6 +61,7 @@ const SearchAutocompleteInner = <T extends { id: string }>(
     ListBoxComponent,
     searchFields = [],
     ariaLabeledby,
+    ariaControls,
   }: SearchAutocompleteProps<T>,
   ref: ForwardedRef<any>
 ) => {
@@ -87,6 +90,7 @@ const SearchAutocompleteInner = <T extends { id: string }>(
   }, [searchInstance, items]);
 
   const DefaultListBoxComponent: FC<DefaultListBoxComponentProps> = ({
+    id,
     children,
   }) => {
     const variants = {
@@ -110,7 +114,9 @@ const SearchAutocompleteInner = <T extends { id: string }>(
         <div
           className={styles.listBoxContainer}
           role="listbox"
-          id="autocomplete-listbox"
+          id={id}
+          aria-label={placeholder}
+          aria-busy="true"
         >
           <motion.div
             layout="position"
@@ -119,6 +125,7 @@ const SearchAutocompleteInner = <T extends { id: string }>(
             exit="initial"
             variants={variants}
             className={`${styles.listBox}`}
+            tabIndex={0}
           >
             {children}
           </motion.div>
@@ -144,6 +151,12 @@ const SearchAutocompleteInner = <T extends { id: string }>(
         role="option"
         onClick={() => selectItem(item)}
         key={item.id}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            selectItem(item);
+          }
+        }}
       >
         {item.displayValue}
       </motion.div>
@@ -205,6 +218,10 @@ const SearchAutocompleteInner = <T extends { id: string }>(
           value={itemSelected ? itemSelected.displayValue : query}
           onChange={handleChange}
           ariaLabeledby={ariaLabeledby}
+          ariaControls={ariaControls}
+          ariaRole="combobox"
+          ariaExpanded={filteredItems.length > 0}
+          ariaAutocomplete="list"
         />
         <button
           type="button"
@@ -245,7 +262,7 @@ const SearchAutocompleteInner = <T extends { id: string }>(
             })}
           </ListBoxComponent>
         ) : (
-          <DefaultListBoxComponent>
+          <DefaultListBoxComponent id={ariaControls}>
             {filteredItems.map((item, i) => {
               const ItemComponentToUse = ItemComponent || DefaultItemComponent;
               if (maxResults && i < maxResults)
