@@ -5,6 +5,7 @@ export { default } from 'next-auth/middleware';
 export function middleware(req: NextRequest) {
   const allowedOrigins = [
     'http://localhost:3000',
+    'http://localhost:8080',
     'https://www.simesim.co.il',
     'https://simesim.co.il',
     'https://simesim-jjlvc.ondigitalocean.app',
