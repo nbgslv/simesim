@@ -22,6 +22,22 @@ const nextConfig = {
   sentry: {
     hideSourceMaps: true,
   },
+  async rewrites() {
+    if (process.env.NODE_ENV === "production") {
+      return [
+        {
+          source: "/api/:path*",
+          destination: `${process.env.NEXT_PUBLIC_BASE_URL}/api/:path*`,
+        },
+        {
+          source: "/:path*",
+          destination: `${process.env.NEXT_PUBLIC_BASE_URL}/:path*`,
+        }
+      ];
+    } else {
+      return [];
+    }
+  },
   webpack(config) {
     config.experiments = config.experiments || {};
     config.experiments.topLevelAwait = true;
