@@ -26,10 +26,6 @@ const nextConfig = {
     if (process.env.NODE_ENV === "production") {
       return [
         {
-          source: "/api/:path*",
-          destination: `${process.env.NEXT_PUBLIC_BASE_URL}/api/:path*`,
-        },
-        {
           source: "/:path*",
           destination: `${process.env.NEXT_PUBLIC_BASE_URL}/:path*`,
         }
