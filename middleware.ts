@@ -11,8 +11,11 @@ export function middleware(req: NextRequest) {
   ];
 
   const response = NextResponse.next();
-  const { origin } = req.nextUrl;
-  if (allowedOrigins.includes(origin)) {
+  const { origin, pathname } = req.nextUrl;
+  if (
+    (pathname.startsWith('/api') || pathname.startsWith('/login')) &&
+    allowedOrigins.includes(origin)
+  ) {
     response.headers.set('Access-Control-Allow-Origin', origin);
   }
 
@@ -20,5 +23,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/user/:path*', '/api/:path*'],
+  matcher: ['/admin/:path*', '/user/:path*', '/api/:path*', '/login'],
 };
