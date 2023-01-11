@@ -13,13 +13,6 @@ export function middleware(req: NextRequest) {
 
   const response = NextResponse.next();
   const { origin, pathname } = req.nextUrl;
-  // eslint-disable-next-line no-console
-  console.log({
-    origin,
-    pathname,
-    fullData: req.nextUrl,
-    includes: allowedOrigins.includes(origin),
-  });
   if (
     (pathname.startsWith('/api') || pathname.startsWith('/login')) &&
     allowedOrigins.includes(origin)
