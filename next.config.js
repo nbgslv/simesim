@@ -22,17 +22,18 @@ const nextConfig = {
   sentry: {
     hideSourceMaps: true,
   },
-  async rewrites() {
-    if (process.env.NODE_ENV === "production") {
-      return [
-        {
-          source: "(https:\\/\\/(?!(w{1,3}\\.))(simesim\\.co\\.il))/:path*",
-          destination: `${process.env.NEXT_PUBLIC_BASE_URL}/:path*`,
-        }
-      ];
-    } else {
-      return [];
-    }
+  async headers() {
+    return [
+      {
+        // matching all API routes
+        source: "/api/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+          { key: "Access-Control-Allow-Origin", value: process.env.NEXT_PUBLIC_BASE_URL },
+          { key: "Access-Control-Allow-Methods", value: "GET,OPTIONS,DELETE,POST,PUT" },
+        ]
+      }
+    ]
   },
   webpack(config) {
     config.experiments = config.experiments || {};
