@@ -26,7 +26,7 @@ const nextConfig = {
     if (process.env.NODE_ENV === "production") {
       return [
         {
-          source: "/:path*",
+          source: "(https:\\/\\/(?!(w{1,3}\\.))(simesim\\.co\\.il))/:path*",
           destination: `${process.env.NEXT_PUBLIC_BASE_URL}/:path*`,
         }
       ];
