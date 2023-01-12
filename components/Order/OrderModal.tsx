@@ -225,41 +225,27 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
         </Modal.Header>
         <Modal.Body>
           <Row className={styles.orderModalRow}>
-            <Col className={styles.omFieldTitle} lg={3}>
-              פרטי החבילה
-            </Col>
             <Col className="d-flex justify-content-between">
-              <div className="d-flex">
-                <div className={styles.bundleText}>{bundle?.name} -</div>
-                <div className={styles.bundleText}>{bundle?.description}</div>
+              <div className={styles.bundleData}>
+                <div className={styles.bundleTextPrice}>
+                  {Math.floor((bundle?.refill.amount_mb || 0) / 1024)} ג&quot;ב
+                </div>
+                <div className={styles.bundleTextPrice}>
+                  ל-{amountDays} ימים
+                </div>
               </div>
               <div
                 className={`${styles.bundleTextPrice} ${
                   couponDetails ? styles.couponSuccess : ''
                 }`}
               >
-                סה&quot;כ: {price}
-                {'\u20AA'}
+                סה&quot;כ: {'\u20AA'}
+                {price}
               </div>
             </Col>
           </Row>
           <Row className={styles.orderModalRow}>
-            <Col className={styles.omFieldTitle} lg={3}>
-              לאן טסים
-            </Col>
-            <Col className={styles.countryText}>{country}</Col>
-          </Row>
-          <Row className={styles.orderModalRow}>
-            <Col className={styles.omFieldTitle} lg={3}>
-              תוקף החבילה
-            </Col>
-            <Col className={styles.dateInput}>
-              <div className={styles.amountDaysText}>
-                {amountDays !== 0
-                  ? `החבילה תהיה תקפה מרגע הפעלתה ולמשך ${amountDays} ימים`
-                  : `החבילה תהיה תקפה מרגע הפעלתה ועד שנה לאחר מכן`}
-              </div>
-            </Col>
+            <Col className={styles.bundleTextDestination}>טסים ל{country}</Col>
           </Row>
           {state.user.id && (
             <Row className={styles.orderModalRow}>

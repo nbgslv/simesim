@@ -61,6 +61,7 @@ export async function getStaticProps() {
         select: {
           id: true,
           amount_days: true,
+          amount_mb: true,
           bundle: {
             select: {
               id: true,
