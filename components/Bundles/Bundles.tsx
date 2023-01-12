@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { PlanModel, Prisma } from '@prisma/client';
+import { Col, Row } from 'react-bootstrap';
 import BundleCard from './BundleCard';
 import styles from './Bundles.module.scss';
 
@@ -154,45 +155,53 @@ const Bundles = ({
 
   return (
     <div>
-      <div className="d-flex justify-content-center align-items-center">
+      <Row className="d-flex justify-content-center align-items-center">
         {volumeOptions.length
           ? volumeOptions
               .sort((a, b) => a.option - b.option)
               .map((volumeOption) => (
-                <BundleCard
+                <Col
+                  className="d-flex justify-content-center align-items-center"
                   key={volumeOption.option}
-                  text={`${Math.floor(volumeOption.option / 1024)} ג"ב`}
-                  value={volumeOption.option.toString()}
-                  selected={
-                    volumeOption.option.toString() === selectedBundleVolume
-                  }
-                  onSelect={(value) => setSelectedBundleVolume(value)}
-                  disabled={volumeOption.disabled}
-                />
+                >
+                  <BundleCard
+                    text={`${Math.floor(volumeOption.option / 1024)} ג"ב`}
+                    value={volumeOption.option.toString()}
+                    selected={
+                      volumeOption.option.toString() === selectedBundleVolume
+                    }
+                    onSelect={(value) => setSelectedBundleVolume(value)}
+                    disabled={volumeOption.disabled}
+                  />
+                </Col>
               ))
           : null}
-      </div>
-      <div className="mt-4">
+      </Row>
+      <div className="mt-4 mb-4">
         <div className="text-center mb-2">לכמה זמן?</div>
-        <div className="d-flex justify-content-center align-items-center">
+        <Row className="d-flex justify-content-center align-items-center">
           {daysOptions.length
             ? daysOptions
                 .sort((a, b) => a.option - b.option)
                 .map((daysOption) => (
-                  <BundleCard
+                  <Col
+                    className="d-flex justify-content-center align-items-center"
                     key={daysOption.option}
-                    text={`${daysOption.option?.toString() || '365'} ימים`}
-                    value={daysOption.option?.toString() || '365'}
-                    selected={
-                      (daysOption.option?.toString() || '365') ===
-                      selectedBundleDays
-                    }
-                    onSelect={(value) => setSelectedBundleDays(value)}
-                    disabled={daysOption.disabled}
-                  />
+                  >
+                    <BundleCard
+                      text={`${daysOption.option?.toString() || '365'} ימים`}
+                      value={daysOption.option?.toString() || '365'}
+                      selected={
+                        (daysOption.option?.toString() || '365') ===
+                        selectedBundleDays
+                      }
+                      onSelect={(value) => setSelectedBundleDays(value)}
+                      disabled={daysOption.disabled}
+                    />
+                  </Col>
                 ))
             : null}
-        </div>
+        </Row>
       </div>
       {selectedBundle ? (
         <div className={styles.price}>
@@ -200,7 +209,6 @@ const Bundles = ({
           {bundlesList.find((bundle) => bundle.id === selectedBundle)?.price}
         </div>
       ) : null}
-      <div></div>
     </div>
   );
 };
