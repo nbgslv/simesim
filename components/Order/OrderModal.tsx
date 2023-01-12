@@ -373,7 +373,7 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
             <Col>{getCouponStatus()}</Col>
           </Row>
         </Modal.Body>
-        <Modal.Footer className="d-flex justify-content-between">
+        <Modal.Footer className={styles.modalFooter}>
           <div>
             <Controller
               name="terms"
@@ -410,7 +410,7 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
                   style={{ color: '#ffffff' }}
                 />
               ) : (
-                <>המשך</>
+                <>לבחירת אמצעי תשלום</>
               )}
             </Button>
           </div>

@@ -22,12 +22,22 @@
   }
 
   @media (max-width: map-get($grid-breakpoints, 'md')) {
-    margin-top: 2.7rem;
-    height: 13rem;
-    width: 13rem;
+    margin: 0.5rem;
+    width: 4rem;
+    height: 4rem;
+
+    :global * {
+      font-size: 0.9rem !important;
+    }
   }
 }
 
 .selected {
   outline: #000000 solid 4px !important;
+}
+
+.cardCol {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

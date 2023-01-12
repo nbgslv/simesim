@@ -144,3 +144,12 @@
     color: map-get($theme-colors, 'danger');
   }
 }
+
+.modalFooter {
+  display: flex;
+  justify-content: space-between;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+      justify-content: center;
+  }
+}
