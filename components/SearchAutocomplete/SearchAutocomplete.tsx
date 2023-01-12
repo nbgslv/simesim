@@ -207,6 +207,7 @@ const SearchAutocompleteInner = <T extends { id: string }>(
       onSelect(null);
       onCancel();
     },
+    mainInputRef,
   }));
 
   return (
