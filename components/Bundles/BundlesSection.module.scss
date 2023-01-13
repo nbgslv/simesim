@@ -6,7 +6,7 @@
   overflow: hidden;
 
   @media (max-width: map-get($grid-breakpoints, 'md')) {
-    height: 118vh !important;
+    height: 100% !important;
   }
 }
 
@@ -32,4 +32,22 @@
   border-radius: 0.5rem;
   text-align: center;
   vertical-align: center;
+}
+
+.orderButton {
+  width: 60vw;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+      font-size: 0.8rem !important;
+      width: 50vw !important;
+  }
+}
+
+.cancelButton {
+  width: 20vw;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    font-size: 0.8rem !important;
+    width: 30vw !important;
+  }
 }

@@ -1,72 +1,39 @@
-import React, { useEffect } from 'react';
-import { Card } from 'react-bootstrap';
-import { PlanModel } from '@prisma/client';
-import { motion, useAnimationControls } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import styles from './BundleCard.module.scss';
 
 const BundleCard = ({
-  bundle,
-  setBundle,
+  text,
+  value,
+  selected,
+  onSelect,
+  disabled,
 }: {
-  bundle: PlanModel | undefined;
-  setBundle: (planModelId: string | null) => void;
-}) => {
-  const controls = useAnimationControls();
-
-  const variants = {
-    start: {
-      scale: [1, 1.1, 1],
-      transition: {
-        discountType: 'spring',
-        duration: 3,
-        repeat: Infinity,
-      },
-    },
-  };
-
-  useEffect(() => {
-    if (bundle) {
-      controls.start('start');
+  text: string;
+  value: string;
+  selected: boolean;
+  onSelect: (value: string) => void;
+  disabled: boolean;
+}) => (
+  <motion.button
+    whileHover={
+      !disabled
+        ? {
+            scale: 1.1,
+            boxShadow: '0px 3px 15px 5px rgba(0,0,0,0.25)',
+          }
+        : {}
     }
-  }, []);
-
-  const handlePlanModelSelect = (id: string) => {
-    setBundle(id);
-    controls.stop();
-  };
-
-  if (!bundle) return null;
-
-  return (
-    <motion.div
-      whileHover={{
-        scale: 1.1,
-        boxShadow: '0px 3px 15px 5px rgba(0,0,0,0.25)',
-      }}
-      className={styles.bundleCardContainer}
-    >
-      <motion.div animate={controls} variants={variants}>
-        <Card
-          className={styles.bundleCardMain}
-          onClick={() => handlePlanModelSelect(bundle.id)}
-          tabIndex={0}
-        >
-          <Card.Body className={styles.cardBody}>
-            <Card.Title className={styles.bundleCardTitle}>
-              {bundle.name}
-            </Card.Title>
-            <Card.Text className={styles.bundleCardText}>
-              {bundle.description}
-            </Card.Text>
-            <Card.Text className={styles.bundleCardText}>
-              {bundle.price}
-              {'\u20AA'}
-            </Card.Text>
-          </Card.Body>
-        </Card>
-      </motion.div>
-    </motion.div>
-  );
-};
+    className={`${styles.bundleCardContainer}${
+      selected ? ` ${styles.selected}` : ''
+    }`}
+    onClick={() => onSelect(value)}
+    disabled={disabled}
+  >
+    <div>
+      <div>{text}</div>
+    </div>
+  </motion.button>
+);
 
 export default BundleCard;
