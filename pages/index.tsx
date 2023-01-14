@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Country, PlanModel, Prisma } from '@prisma/client';
-import { useCookies } from 'react-cookie';
+import { useRouter } from 'next/router';
 import TimelineSection from '../components/Timeline/TimelineSection';
 import prisma from '../lib/prisma';
 import KeepGoApi from '../utils/api/services/keepGo/api';
@@ -26,7 +26,14 @@ export default function Home({
   bundlesList,
   phonesList,
 }: HomeProps): JSX.Element {
-  const [cookie] = useCookies(['bucket-marketing']);
+  const [bucket, setBucket] = React.useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.mvt && router.query.mvt === 'b') {
+      setBucket('b');
+    }
+  }, [router.query.mvt]);
 
   return (
     <MainLayout
@@ -35,7 +42,7 @@ export default function Home({
     >
       <TimelineSection />
       <BundlesSection
-        bucket={cookie['bucket-marketing'] || null}
+        bucket={bucket}
         countriesList={countriesList}
         bundlesList={bundlesList}
       />
