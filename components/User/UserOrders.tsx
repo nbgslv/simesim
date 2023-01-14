@@ -26,7 +26,7 @@ const UserOrders = ({
       plans.map((plan) => ({
         ...plan,
         planName: plan.planModel?.name,
-        status: plan.line?.status,
+        status: plan.status,
         allowedUsageKb: plan.line?.allowedUsageKb,
         remainingUsageKb: plan.line?.remainingUsageKb,
         remainingDays: plan.line?.remainingDays,
@@ -64,11 +64,12 @@ const UserOrders = ({
           התכנית
         </div>
       ),
+      width: 200,
     },
     {
       field: 'price',
       headerName: 'מחיר',
-      valueFormatter: ({ value }: { value: string }) => `${value}₪`,
+      valueFormatter: ({ value }: { value: string }) => `₪${value}`,
       renderHeader: () => (
         <div
           role="columnheader"
@@ -82,6 +83,20 @@ const UserOrders = ({
     {
       field: 'status',
       headerName: 'סטטוס',
+      valueFormatter: ({ value }: { value: string }) => {
+        switch (value) {
+          case 'ACTIVE':
+            return 'פעילה';
+          case 'CANCELLED':
+            return 'בוטלה';
+          case 'PENDING':
+            return 'ממתינה לאישור';
+          case 'EXPIRED':
+            return 'פג תוקף';
+          default:
+            return value;
+        }
+      },
       renderHeader: () => (
         <div
           role="columnheader"
@@ -96,7 +111,9 @@ const UserOrders = ({
       field: 'allowedUsageKb',
       headerName: 'נפח החבילה',
       valueFormatter: ({ value }: { value: string }) =>
-        `${Math.floor(parseInt(value, 10) / 1000000)}GB`,
+        `${
+          value ? `${Math.floor(parseInt(value, 10) / 1000000)}GB` : 'לא ידוע'
+        }`,
       renderHeader: () => (
         <div
           role="columnheader"
@@ -111,12 +128,16 @@ const UserOrders = ({
       field: 'remainingUsageKb',
       headerName: 'נפח שנותר',
       valueFormatter: ({ value }: { value: string }) =>
-        `${Math.floor(parseInt(value, 10) / 1000000)}GB`,
+        `${
+          value ? `${Math.floor(parseInt(value, 10) / 1000000)}GB` : 'לא ידוע'
+        }`,
       // TODO show progress bar
     },
     {
       field: 'remainingDays',
       headerName: 'ימים שנותרו',
+      valueFormatter: ({ value }: { value: string }) =>
+        `${value ? `${value} ימים` : 'לא ידוע'}`,
       renderHeader: () => (
         <div
           role="columnheader"
