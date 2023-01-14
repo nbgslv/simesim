@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import lookup from 'country-code-lookup';
@@ -73,116 +80,123 @@ const CountrySearchItem = ({
   </div>
 );
 
-const CountrySearch = ({
-  countriesList,
-  onSelect,
-  ariaLabeledby,
-}: CountrySearchProps) => {
-  const [itemSelected, setItemSelected] = useState<ExtendedCountry | null>(
-    null
-  );
-  const [items, setItems] = useState<ExtendedCountry[]>([]);
-  const [countryMapError, setCountryMapError] = useState<boolean>(false);
-  const [countryFlagError, setCountryFlagError] = useState<boolean>(false);
-  const [countryMapLoading, setCountryMapLoading] = useState<boolean>(false);
+const CountrySearch = forwardRef(
+  ({ countriesList, onSelect, ariaLabeledby }: CountrySearchProps, ref) => {
+    const [itemSelected, setItemSelected] = useState<ExtendedCountry | null>(
+      null
+    );
+    const [items, setItems] = useState<ExtendedCountry[]>([]);
+    const [countryMapError, setCountryMapError] = useState<boolean>(false);
+    const [countryFlagError, setCountryFlagError] = useState<boolean>(false);
+    const [countryMapLoading, setCountryMapLoading] = useState<boolean>(false);
+    const autocompleteRef = useRef<any>();
 
-  useEffect(() => {
-    const itemsArr: ExtendedCountry[] = countriesList.map((value) => ({
-      name: value.name,
-      translation: value.translation,
-      displayValue: `${value.translation} (${value.name})`,
-      iso2: lookup.byCountry(value.name!)?.iso2,
-      id: value.name,
+    useEffect(() => {
+      const itemsArr: ExtendedCountry[] = countriesList.map((value) => ({
+        name: value.name,
+        translation: value.translation,
+        displayValue: `${value.translation} (${value.name})`,
+        iso2: lookup.byCountry(value.name!)?.iso2,
+        id: value.name,
+      }));
+      setItems(itemsArr);
+    }, [countriesList]);
+
+    const handleSelect = (item: ExtendedCountry) => {
+      setItemSelected(item);
+      onSelect(item);
+      setCountryMapLoading(true);
+    };
+
+    const handleCancel = () => {
+      setItemSelected(null);
+      onSelect(null);
+      setCountryMapError(false);
+      setCountryFlagError(false);
+    };
+
+    useImperativeHandle(ref, () => ({
+      handleCancel,
+      autocompleteRef,
     }));
-    setItems(itemsArr);
-  }, [countriesList]);
 
-  const handleSelect = (item: ExtendedCountry) => {
-    setItemSelected(item);
-    onSelect(item);
-    setCountryMapLoading(true);
-  };
+    const getRandomTextPhrase = () =>
+      text.countrySearch.phrases[
+        Math.floor(Math.random() * text.countrySearch.phrases.length)
+      ];
 
-  const handleCancel = () => {
-    setItemSelected(null);
-    onSelect(null);
-    setCountryMapError(false);
-    setCountryFlagError(false);
-  };
+    const cachedTextPhrased = useMemo(() => getRandomTextPhrase(), [
+      itemSelected,
+    ]);
 
-  const getRandomTextPhrase = () =>
-    text.countrySearch.phrases[
-      Math.floor(Math.random() * text.countrySearch.phrases.length)
-    ];
-
-  const cachedTextPhrased = useMemo(() => getRandomTextPhrase(), [
-    itemSelected,
-  ]);
-
-  return (
-    <>
-      <SearchAutocomplete
-        onSelect={handleSelect}
-        onCancel={handleCancel}
-        items={items}
-        ItemComponent={CountrySearchItem}
-        placeholder="לאן טסים?"
-        searchFields={['name', 'translation']}
-        ariaLabeledby={ariaLabeledby}
-        ariaControls="country-search"
-      />
-      {itemSelected ? (
-        <div
-          className={`${styles.selectionContainer} d-flex flex-column w-100 align-items-center text-center p-2`}
-        >
-          <div className="mt-1 mb-3">
-            <h4>
-              {itemSelected.displayValue}? {cachedTextPhrased}
-            </h4>
-          </div>
+    return (
+      <>
+        <SearchAutocomplete
+          onSelect={handleSelect}
+          onCancel={handleCancel}
+          items={items}
+          ItemComponent={CountrySearchItem}
+          placeholder="לאן טסים?"
+          searchFields={['name', 'translation']}
+          ariaLabeledby={ariaLabeledby}
+          ariaControls="country-search"
+          ref={autocompleteRef}
+        />
+        {itemSelected ? (
           <div
-            className={`${styles.selectionMedia} d-flex justify-content-between w-100`}
+            className={`${styles.selectionContainer} d-flex flex-column w-100 align-items-center text-center p-2`}
           >
-            <div
-              className={`position-relative ${
-                countryFlagError ? 'w-100' : 'w-50'
-              } ${countryMapError ? 'd-none' : ''} h-100`}
-            >
-              {countryMapLoading && <LoadingRings />}
-              <Image
-                src={`https://mapsvg.com/static/maps/geo-calibrated/${itemSelected.name
-                  ?.toLowerCase()
-                  .replace(' ', '-')}.svg`}
-                placeholder="blur"
-                blurDataURL={blurDataPlaceholder}
-                layout="fill"
-                className={styles.countryMapImage}
-                objectFit="contain"
-                onLoadingComplete={() => setCountryMapLoading(false)}
-                onError={() => setCountryMapError(true)}
-                alt={`Map of ${itemSelected.name}`}
-              />
+            <div className="mt-1 mb-3">
+              <h4>
+                {itemSelected.displayValue}? {cachedTextPhrased}
+              </h4>
             </div>
-            <motion.div
-              className={`position-relative ${
-                countryMapError ? 'w-100' : 'w-50'
-              } ${countryFlagError ? 'd-none' : ''} h-100`}
-              layout
+            <div
+              className={`${styles.selectionMedia} d-flex justify-content-between w-100`}
             >
-              <Image
-                src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${itemSelected.iso2?.toUpperCase()}.svg`}
-                placeholder="blur"
-                blurDataURL={blurDataPlaceholder}
-                layout="fill"
-                alt={itemSelected.displayValue}
-                onError={() => setCountryFlagError(true)}
-              />
-            </motion.div>
+              <div
+                className={`position-relative ${
+                  countryFlagError ? 'w-100' : 'w-50'
+                } ${countryMapError ? 'd-none' : ''} h-100`}
+              >
+                {countryMapLoading && <LoadingRings />}
+                <Image
+                  src={`https://mapsvg.com/static/maps/geo-calibrated/${itemSelected.name
+                    ?.toLowerCase()
+                    .replace(' ', '-')}.svg`}
+                  placeholder="blur"
+                  blurDataURL={blurDataPlaceholder}
+                  layout="fill"
+                  className={styles.countryMapImage}
+                  objectFit="contain"
+                  onLoadingComplete={() => setCountryMapLoading(false)}
+                  onError={() => setCountryMapError(true)}
+                  alt={`Map of ${itemSelected.name}`}
+                />
+              </div>
+              <motion.div
+                className={`position-relative ${
+                  countryMapError ? 'w-100' : 'w-50'
+                } ${countryFlagError ? 'd-none' : ''} h-100`}
+                layout
+              >
+                <Image
+                  src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${itemSelected.iso2?.toUpperCase()}.svg`}
+                  placeholder="blur"
+                  blurDataURL={blurDataPlaceholder}
+                  layout="fill"
+                  alt={itemSelected.displayValue}
+                  onError={() => setCountryFlagError(true)}
+                />
+              </motion.div>
+            </div>
           </div>
-        </div>
-      ) : null}
-    </>
-  );
-};
+        ) : null}
+      </>
+    );
+  }
+);
+
+CountrySearch.displayName = 'CountrySearch';
 
 export default CountrySearch;

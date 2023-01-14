@@ -37,22 +37,30 @@
   margin-top: 0;
 }
 
-.bundleText {
-  margin-left: 1rem;
-  font-weight: 200;
-  font-size: 0.81rem;
+.bundleTextPrice {
+  text-align: center;
+  margin: 0.5rem 1rem;
+  font-size: 1.4rem;
+  font-weight: 800;
 }
 
-.bundleTextPrice {
-  margin-left: 1rem;
+.bundleTextDestination {
+  font-size: 1.4rem;
   font-weight: 800;
+}
 
-  :global * {
-    color: $text-color !important;
+.bundleData {
+  display: flex;
+  background-color: map-get($theme-colors, 'orange');
+  border-radius: 6px;
+
+  :global div {
+    color: #ffffff !important;
   }
 }
 
 .countryText {
+  margin: auto 0;
   font-weight: 200;
   font-size: 0.81rem;
 }
@@ -134,5 +142,14 @@
 
   :global path {
     color: map-get($theme-colors, 'danger');
+  }
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: space-between;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+      justify-content: center;
   }
 }

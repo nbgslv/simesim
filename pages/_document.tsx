@@ -39,6 +39,10 @@ export default function Document() {
           rel="stylesheet"
         />
         <Script
+          strategy="beforeInteractive"
+          src={`https://www.googleoptimize.com/optimize.js?id=${process.env.GA_OPTIMIZE_ID}`}
+        />
+        <Script
           id="meta-pixel"
           dangerouslySetInnerHTML={{
             __html: `
@@ -56,7 +60,9 @@ export default function Document() {
           }}
         />
         <noscript>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            alt=""
             height="1"
             width="1"
             style={{ display: 'none' }}

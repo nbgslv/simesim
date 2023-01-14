@@ -1,0 +1,70 @@
+@import 'styles/variables';
+
+.bundleCardContainer {
+  color: $background-color;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 15rem;
+  width: 15rem;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    margin-top: 2.7rem;
+    height: 13rem;
+    width: 13rem;
+  }
+}
+
+.bundleCardMain {
+  background-color: map-get($theme-colors, 'orange');
+  border-radius: 25rem;
+  width: 15rem;
+  height: 15rem;
+  cursor: pointer;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    height: 13rem;
+    width: 13rem;
+  }
+}
+
+.cardBody {
+  direction: rtl;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+
+  :global * {
+    color: $background-color !important;
+  }
+}
+
+.bundleCardTitle {
+  color: $text-color !important;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.bundleCardText {
+  color: $text-color !important;
+  font-size: 0.9rem;
+}
+
+.bundleCardListItem {
+  background-color: $background-color;
+  font-size: 0.875rem;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $secondary-color;
+  }
+}
+
+.bundleCardListItemActive {
+  background-color: $secondary-color;
+}

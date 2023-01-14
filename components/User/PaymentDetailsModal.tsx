@@ -66,38 +66,42 @@ const PaymentDetailsModal = ({
             <Col>סטטוס</Col>
             <Col>{paymentStatus}</Col>
           </Row>
-          <Row>
-            <Col>תאריך תשלום</Col>
-            <Col>{(payment.paymentDate as unknown) as string}</Col>
-          </Row>
-          <Row>
-            <Col>פרטי אמצעי תשלום</Col>
-            {payment.paymentMethod ? (
-              <Col>
-                <Row>
-                  <Col colspan={2} dir="ltr">
-                    ****-****-****-{payment.paymentMethod.last4}
+          {payment.status === 'PAID' && (
+            <>
+              <Row>
+                <Col>תאריך תשלום</Col>
+                <Col>{(payment.paymentDate as unknown) as string}</Col>
+              </Row>
+              <Row>
+                <Col>פרטי אמצעי תשלום</Col>
+                {payment.paymentMethod ? (
+                  <Col>
+                    <Row>
+                      <Col colspan={2} dir="ltr">
+                        ****-****-****-{payment.paymentMethod.last4}
+                      </Col>
+                    </Row>
                   </Col>
-                </Row>
-              </Col>
-            ) : (
-              <Col>טרם התקבל תשלום</Col>
-            )}
-          </Row>
-          <Row>
-            <Col>
-              <Button
-                className="w-100 mt-2"
-                variant="primary"
-                href={`https://newview.invoice4u.co.il/Views/PDF.aspx?docid=${
-                  payment.docId as string
-                }`}
-                disabled={!payment.isDocumentCreated}
-              >
-                קבלה
-              </Button>
-            </Col>
-          </Row>
+                ) : (
+                  <Col>טרם התקבל תשלום</Col>
+                )}
+              </Row>
+              <Row>
+                <Col>
+                  <Button
+                    className="w-100 mt-2"
+                    variant="primary"
+                    href={`https://newview.invoice4u.co.il/Views/PDF.aspx?docid=${
+                      payment.docId as string
+                    }`}
+                    disabled={!payment.isDocumentCreated}
+                  >
+                    קבלה
+                  </Button>
+                </Col>
+              </Row>
+            </>
+          )}
         </Container>
       </Modal.Body>
     </Modal>

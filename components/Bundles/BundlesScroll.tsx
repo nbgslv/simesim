@@ -1,8 +1,8 @@
 import React from 'react';
 import { PlanModel } from '@prisma/client';
 import { Carousel } from 'react-bootstrap';
-import BundleCard from './BundleCard';
 import styles from './BundlesScroll.module.scss';
+import BundleCardOriginal from './BundleCardOriginal';
 
 const BundlesScroll = ({
   bundlesList,
@@ -44,7 +44,7 @@ const BundlesScroll = ({
     >
       {bundlesList.map((bundle) => (
         <Carousel.Item key={bundle.id}>
-          <BundleCard
+          <BundleCardOriginal
             bundle={bundle}
             setBundle={(id) => {
               handleBundleSelect(id);

@@ -1,6 +1,6 @@
 import { Country, PlanModel, Prisma } from '@prisma/client';
-import React, { useEffect, useState } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import React, { useEffect, useRef, useState } from 'react';
+import { Row, Col, Button } from 'react-bootstrap';
 import Lottie from 'react-lottie';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMediaQuery } from 'react-responsive';
@@ -8,10 +8,12 @@ import SectionComponent from '../Section/Section';
 import CountrySearch, { ExtendedCountry } from '../CountrySearch/CountrySearch';
 import styles from './BundlesSection.module.scss';
 import * as travelImageData from '../../public/travel.json';
-import BundlesScroll from './BundlesScroll';
 import OrderModal from '../Order/OrderModal';
+import Bundles from './Bundles';
+import BundlesScroll from './BundlesScroll';
 
 type BundlesSectionProps = {
+  bucket: string | null;
   countriesList: Country[];
   bundlesList: (PlanModel &
     Prisma.PlanModelGetPayload<{
@@ -20,6 +22,7 @@ type BundlesSectionProps = {
 };
 
 const BundlesSection = ({
+  bucket,
   countriesList,
   bundlesList,
 }: BundlesSectionProps) => {
@@ -28,18 +31,26 @@ const BundlesSection = ({
     setSelectedCountry,
   ] = useState<ExtendedCountry | null>(null);
   const [selectedBundle, setSelectedBundle] = useState<string | null>(null);
-  const [filteredBundles, setFilteredBundles] = useState<PlanModel[]>([]);
+  const [filteredBundles, setFilteredBundles] = useState<
+    (PlanModel &
+      Prisma.PlanModelGetPayload<{
+        include: { refill: { include: { bundle: true } } };
+      }>)[]
+  >([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
   const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
+  const countrySearchRef = useRef<any>();
 
   useEffect(() => {
-    if (currentStep === 2) {
-      setOrderModalOpen(true);
-    } else {
-      setOrderModalOpen(false);
+    if (bucket !== 'b') {
+      if (currentStep === 2) {
+        setOrderModalOpen(true);
+      } else {
+        setOrderModalOpen(false);
+      }
     }
-  }, [currentStep]);
+  }, [currentStep, bucket]);
 
   const handleCountrySelect = (country: ExtendedCountry | null) => {
     setSelectedCountry(country);
@@ -74,7 +85,6 @@ const BundlesSection = ({
   const handleOrderModalClose = () => {
     setOrderModalOpen(false);
     setCurrentStep(1);
-    setSelectedBundle(null);
   };
 
   return (
@@ -93,6 +103,7 @@ const BundlesSection = ({
                 </div>
                 <div className="h-100 p-2">
                   <CountrySearch
+                    ref={countrySearchRef}
                     ariaLabeledby="flight-destination"
                     countriesList={countriesList}
                     onSelect={handleCountrySelect}
@@ -106,11 +117,48 @@ const BundlesSection = ({
                   <h3>2. בוחרים חבילת דאטה</h3>
                 </div>
                 <div className="h-100">
-                  <BundlesScroll
-                    bundlesList={filteredBundles}
-                    setBundle={handleBundleSelect}
-                  />
+                  {bucket === 'b' ? (
+                    <Bundles
+                      bundlesList={filteredBundles}
+                      onChange={handleBundleSelect}
+                    />
+                  ) : (
+                    <BundlesScroll
+                      bundlesList={filteredBundles}
+                      setBundle={handleBundleSelect}
+                    />
+                  )}
                 </div>
+              </div>
+            ) : null}
+            {bucket === 'b' && currentStep >= 1 ? (
+              <div className="d-flex justify-content-between">
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className={`${styles.orderButton}`}
+                  onClick={() => setOrderModalOpen(true)}
+                  disabled={!selectedBundle}
+                >
+                  3. מזמינים
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  className={`${styles.cancelButton}`}
+                  onClick={() => {
+                    countrySearchRef.current?.handleCancel();
+                    countrySearchRef.current?.autocompleteRef.current?.mainInputRef.current?.scrollIntoView(
+                      {
+                        behavior: 'smooth',
+                        block: 'center',
+                        inline: 'center',
+                      }
+                    );
+                  }}
+                >
+                  בא לי מדינה אחרת
+                </Button>
               </div>
             ) : null}
             <OrderModal
