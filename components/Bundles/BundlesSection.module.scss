@@ -4,8 +4,9 @@
   background-color: $primary-color;
   height: 100vh;
   overflow: hidden;
+  padding-top: 0 !important;
 
-  @media (max-width: map-get($grid-breakpoints, 'md')) {
+  @media (max-width: map-get($grid-breakpoints, 'lg')) {
     height: 100% !important;
   }
 }
@@ -37,16 +38,26 @@
 .orderButton {
   width: 60vw;
 
-  @media (max-width: map-get($grid-breakpoints, 'md')) {
+  @media (max-width: map-get($grid-breakpoints, 'lg')) {
       font-size: 0.8rem !important;
-      width: 50vw !important;
+      width: 40vw !important;
+  }
+
+  @media (max-width: map-get($grid-breakpoints, 'sm')) {
+    font-size: 0.8rem !important;
+    width: 50vw !important;
   }
 }
 
 .cancelButton {
   width: 20vw;
 
-  @media (max-width: map-get($grid-breakpoints, 'md')) {
+  @media (max-width: map-get($grid-breakpoints, 'lg')) {
+    font-size: 0.8rem !important;
+    width: 20vw !important;
+  }
+
+  @media (max-width: map-get($grid-breakpoints, 'sm')) {
     font-size: 0.8rem !important;
     width: 30vw !important;
   }

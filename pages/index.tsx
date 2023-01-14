@@ -1,5 +1,6 @@
 import React from 'react';
 import { Country, PlanModel, Prisma } from '@prisma/client';
+import { useCookies } from 'react-cookie';
 import TimelineSection from '../components/Timeline/TimelineSection';
 import prisma from '../lib/prisma';
 import KeepGoApi from '../utils/api/services/keepGo/api';
@@ -25,13 +26,19 @@ export default function Home({
   bundlesList,
   phonesList,
 }: HomeProps): JSX.Element {
+  const [cookie] = useCookies(['bucket-marketing']);
+
   return (
     <MainLayout
       title="שים eSim"
       metaDescription={'שים eSim חבילות גלישה זולות לחו"ל בלי להחליף כרטיס sim'}
     >
       <TimelineSection />
-      <BundlesSection countriesList={countriesList} bundlesList={bundlesList} />
+      <BundlesSection
+        bucket={cookie['bucket-marketing'] || null}
+        countriesList={countriesList}
+        bundlesList={bundlesList}
+      />
       <QnaSection />
       <CheckPhoneSection phonesList={phonesList} />
     </MainLayout>
