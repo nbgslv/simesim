@@ -1,26 +1,18 @@
-import React from 'react';
-import { Button } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Button, Row } from 'react-bootstrap';
+import ReactQuill from 'react-quill';
 import dynamic from 'next/dynamic';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminOffcanvas from '../../components/Offcanvas/AdminOffcanvas';
+import AddBlogPost from '../../components/Offcanvas/Blog/AddBlogPost';
 
-const DynamicEditor = dynamic(
-  () =>
-    import('../../components/Blog/Editor/Editor').then((mod) => mod.default),
-  { ssr: false }
-);
 const Blog = () => {
-  const [showAddPost, setShowAddPost] = React.useState(false);
+  const [showAddPost, setShowAddPost] = useState(false);
+
   return (
     <AdminLayout title="Blog">
       <Button onClick={() => setShowAddPost(true)}>Add Post</Button>
-      <AdminOffcanvas
-        show={showAddPost}
-        title="Add Post"
-        onHide={() => setShowAddPost(false)}
-      >
-        <DynamicEditor />
-      </AdminOffcanvas>
+      <AddBlogPost show={showAddPost} />
     </AdminLayout>
   );
 };

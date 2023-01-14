@@ -60,6 +60,7 @@
     "react-hook-form": "^7.38.0",
     "react-lottie": "^1.2.3",
     "react-otp-input": "^2.4.0",
+    "react-quill": "^2.0.0",
     "react-responsive": "^9.0.2",
     "react-select": "^5.7.0",
     "react-svg-pan-zoom": "^3.11.0",
