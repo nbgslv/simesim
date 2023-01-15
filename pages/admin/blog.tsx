@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Row } from 'react-bootstrap';
-import ReactQuill from 'react-quill';
-import dynamic from 'next/dynamic';
+import React, { useState } from 'react';
+import { Button } from 'react-bootstrap';
 import AdminLayout from '../../components/Layouts/AdminLayout';
-import AdminOffcanvas from '../../components/Offcanvas/AdminOffcanvas';
 import AddBlogPost from '../../components/Offcanvas/Blog/AddBlogPost';
 
 const Blog = () => {
@@ -12,7 +9,7 @@ const Blog = () => {
   return (
     <AdminLayout title="Blog">
       <Button onClick={() => setShowAddPost(true)}>Add Post</Button>
-      <AddBlogPost show={showAddPost} />
+      <AddBlogPost show={showAddPost} onHide={() => setShowAddPost(false)} />
     </AdminLayout>
   );
 };

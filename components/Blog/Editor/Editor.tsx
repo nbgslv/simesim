@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import dynamic from 'next/dynamic';
 
-const Editor = () => {
+const Editor = ({ onChange }: { onChange: (data: string) => void }) => {
   const [postContent, setPostContent] = useState<string>('');
 
   useEffect(() => {
-    console.log(postContent);
+    onChange(postContent);
   }, [postContent]);
 
   const modules = {

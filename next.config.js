@@ -66,6 +66,4 @@ const sentryWebpackPluginOptions = {
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
-const withTM = require("next-transpile-modules")(["verbum"]);
-
-module.exports = withSentryConfig(withTM(nextConfig), sentryWebpackPluginOptions);
+module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);
