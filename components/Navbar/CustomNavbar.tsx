@@ -3,6 +3,7 @@ import { Container, Nav, NavDropdown, Navbar } from 'react-bootstrap';
 import Image from 'next/image';
 import { getSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import logoImageWhiteText from '../../public/logoWhite.png';
 import logoImageBlackText from '../../public/logo.png';
 import styles from './CustomNavbar.module.scss';
@@ -22,6 +23,7 @@ function CustomNavbar({
   const [loggedIn, setLoggedIn] = React.useState<boolean>(false);
   const { dispatch } = useUserStore() as Context<Action>;
   const navbarRef: RefObject<HTMLElement> = useRef(null);
+  const router = useRouter();
 
   useEffect(() => {
     (async () => {
@@ -85,37 +87,35 @@ function CustomNavbar({
       className={styles.navbar}
       fixed={hideJumbotron ? undefined : 'top'}
       ref={navbarRef}
+      collapseOnSelect
     >
       <Container>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav defaultActiveKey="/">
+          <Nav activeKey={router.pathname} defaultActiveKey="/">
             <Link href="/" passHref>
-              <Nav.Link className="d-none" eventKey="/">
-                בית
-              </Nav.Link>
+              <Nav.Link className="d-none">בית</Nav.Link>
             </Link>
             <Link href="/#bundles-section" passHref>
-              <Nav.Link eventKey="bundles-section">
-                {text.header.navbar.order}
-              </Nav.Link>
+              <Nav.Link>{text.header.navbar.order}</Nav.Link>
             </Link>
             <Link href="/info" passHref>
-              <Nav.Link eventKey="info">{text.header.navbar.info}</Nav.Link>
+              <Nav.Link>{text.header.navbar.info}</Nav.Link>
             </Link>
             <Link href="/guide" passHref>
-              <Nav.Link eventKey="guide">{text.header.navbar.guide}</Nav.Link>
+              <Nav.Link>{text.header.navbar.guide}</Nav.Link>
             </Link>
             <Link href="/about" passHref>
-              <Nav.Link eventKey="about">{text.header.navbar.about}</Nav.Link>
+              <Nav.Link>{text.header.navbar.about}</Nav.Link>
             </Link>
             <Link href="/contact" passHref>
-              <Nav.Link eventKey="contact">
-                {text.header.navbar.contact}
-              </Nav.Link>
+              <Nav.Link>{text.header.navbar.contact}</Nav.Link>
             </Link>
           </Nav>
-          <Nav className={`me-auto ${styles.login}`}>
+          <Nav
+            activeKey={router.pathname}
+            className={`me-auto ${styles.login}`}
+          >
             {loggedIn ? (
               <NavDropdown
                 title="אזור אישי"
@@ -135,7 +135,7 @@ function CustomNavbar({
               </NavDropdown>
             ) : (
               <Link href="/login" passHref>
-                <Nav.Link eventKey="login">{text.header.navbar.login}</Nav.Link>
+                <Nav.Link>{text.header.navbar.login}</Nav.Link>
               </Link>
             )}
           </Nav>
@@ -150,7 +150,7 @@ function CustomNavbar({
               src={background ? logoImageBlackText : logoImageWhiteText}
               alt="Logo image"
               layout="fixed"
-              width={65}
+              width={background ? 53.4 : 65}
               height={32}
             />
           </Navbar.Brand>
