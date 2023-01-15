@@ -61,3 +61,18 @@
     height: 100%;
   }
 }
+
+.recaptchaTerms {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  direction: ltr;
+
+  :global a {
+    color: #fff;
+
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}

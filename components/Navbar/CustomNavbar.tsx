@@ -150,7 +150,7 @@ function CustomNavbar({
               src={background ? logoImageBlackText : logoImageWhiteText}
               alt="Logo image"
               layout="fixed"
-              width={65}
+              width={background ? 53.4 : 65}
               height={32}
             />
           </Navbar.Brand>
