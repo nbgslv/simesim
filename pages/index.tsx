@@ -40,12 +40,12 @@ export default function Home({
       title="שים eSim"
       metaDescription={'שים eSim חבילות גלישה זולות לחו"ל בלי להחליף כרטיס sim'}
     >
-      <TimelineSection />
       <BundlesSection
         bucket={bucket}
         countriesList={countriesList}
         bundlesList={bundlesList}
       />
+      <TimelineSection />
       <QnaSection />
       <CheckPhoneSection phonesList={phonesList} />
     </MainLayout>
