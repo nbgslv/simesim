@@ -16,7 +16,10 @@ export type DataType<T> = {
   editable?: boolean;
   options?: { value: string; label: string }[];
   RenderData?: (data: NonNullable<T[keyof T]>) => ReactNode;
-  renderEditComponent?: (value: NonNullable<T[keyof T]>) => ReactNode;
+  renderEditComponent?: (
+    value: NonNullable<T[keyof T]>,
+    onChange?: (data: NonNullable<T[keyof T]>) => void
+  ) => ReactNode;
 };
 
 export type SectionType<T> = {
@@ -43,7 +46,7 @@ const Section = <T extends object>({
 
   const sanitizeName = (name: string) => camelCase(name.replace(/\s+/g, ''));
 
-  const { register, getValues } = useForm({
+  const { register, getValues, setValue } = useForm({
     mode: 'onBlur',
     reValidateMode: 'onChange',
     defaultValues: sections.reduce(
@@ -183,7 +186,14 @@ const Section = <T extends object>({
                   <Col lg={6} className={styles.leftData}>
                     {/* eslint-disable-next-line no-nested-ternary */}
                     {editData === section.id && data.editable
-                      ? data.renderEditComponent?.(data.value) ??
+                      ? data.renderEditComponent?.(
+                          data.value,
+                          (dataOfEditable) =>
+                            setValue(
+                              sanitizeName(data.title) as never,
+                              dataOfEditable as never
+                            )
+                        ) ??
                         (() => {
                           switch (data.type) {
                             case 'text':

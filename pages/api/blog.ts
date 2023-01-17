@@ -74,6 +74,7 @@ export default async function handler(
               Bucket: 'simesim-staging',
               Key: fileName,
               Body: fs.readFileSync(file.path),
+              ACL: 'public-read',
             };
             const data = await s3.send(new PutObjectCommand(bucketParams));
             if (data.$metadata.httpStatusCode === 200) {

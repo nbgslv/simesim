@@ -50,7 +50,7 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ['mapsvg.com', 'purecatamphetamine.github.io'],
+    domains: ['mapsvg.com', 'purecatamphetamine.github.io', 'simesim-staging.fra1.digitaloceanspaces.com'],
   },
 };
 

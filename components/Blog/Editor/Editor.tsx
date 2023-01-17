@@ -2,8 +2,18 @@ import React, { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-const Editor = ({ onChange }: { onChange: (data: string) => void }) => {
+const Editor = ({
+  onChange,
+  value,
+}: {
+  onChange: (data: string) => void;
+  value?: string;
+}) => {
   const [postContent, setPostContent] = useState<string>('');
+
+  useEffect(() => {
+    if (value && !postContent) setPostContent(value);
+  }, [value]);
 
   useEffect(() => {
     onChange(postContent);
