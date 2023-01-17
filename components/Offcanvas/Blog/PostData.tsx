@@ -1,7 +1,10 @@
 import React, { ReactNode } from 'react';
+import Image from 'next/image';
 import { Post } from '@prisma/client';
-import { Spinner } from 'react-bootstrap';
+import { Button, Spinner } from 'react-bootstrap';
 import dynamic from 'next/dynamic';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import AdminApi from '../../../utils/api/services/adminApi';
 import Section, { SectionType } from '../Section';
 
@@ -17,10 +20,11 @@ const PostData = ({
   post: Post | null;
   onDataChange?: (data: Post | null) => void;
 }) => {
+  const [postData, setPostData] = React.useState<Post | null>(post);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [adminApi] = React.useState<AdminApi>(new AdminApi());
 
-  if (!post) return null;
+  if (!post || !postData) return null;
 
   const data: SectionType<PostDataType>[] = [
     {
@@ -29,24 +33,24 @@ const PostData = ({
       data: [
         {
           title: 'ID',
-          value: post.id,
+          value: postData.id,
           type: 'text',
         },
         {
           title: 'Title',
-          value: post.title,
+          value: postData.title,
           type: 'text',
           editable: true,
         },
         {
           title: 'Slug',
-          value: post.slug,
+          value: postData.slug,
           type: 'text',
           editable: true,
         },
         {
           title: 'Content',
-          value: post.content,
+          value: postData.content,
           type: 'text',
           editable: true,
           RenderData: (postContent) => (
@@ -65,13 +69,38 @@ const PostData = ({
             ) as ReactNode,
         },
         {
+          title: 'Cover Image',
+          value: postData.coverImage,
+          type: 'text',
+          RenderData: (coverImage) => (
+            <div className="d-flex flex-column align-items-center">
+              <Image
+                src={`${process.env.NEXT_PUBLIC_DO_SPACE_URL}/${coverImage}`}
+                alt={postData.title}
+                width={100}
+                height={100}
+              />
+              <Button
+                className="mt-2"
+                href={`${process.env.NEXT_PUBLIC_DO_SPACE_URL}/${coverImage}`}
+                target="_blank"
+              >
+                <FontAwesomeIcon
+                  icon={solid('up-right-from-square')}
+                  style={{ color: '#fff' }}
+                />
+              </Button>
+            </div>
+          ),
+        },
+        {
           title: 'Created At',
-          value: post.createdAt,
+          value: postData.createdAt,
           type: 'date',
         },
         {
           title: 'Updated At',
-          value: post.updatedAt,
+          value: postData.updatedAt,
           type: 'date',
         },
       ],
@@ -90,6 +119,7 @@ const PostData = ({
           data: updatedPost,
         },
       });
+      setPostData(updatedPostRecord);
       onDataChange?.(updatedPostRecord);
     } catch (error) {
       console.error(error);

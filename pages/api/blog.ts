@@ -1,8 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Inquiry, Prisma } from '@prisma/client';
+import { Inquiry, Post, Prisma } from '@prisma/client';
 import * as yup from 'yup';
 import { unstable_getServerSession } from 'next-auth';
-import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
+  PutObjectCommand,
+  S3,
+} from '@aws-sdk/client-s3';
 import * as fs from 'fs';
 
 import formidable, {
@@ -13,9 +18,21 @@ import formidable, {
 } from 'formidable-serverless';
 import cuid from 'cuid';
 import { format } from 'date-fns';
+import { Readable } from 'stream';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
 import { authOptions } from './auth/[...nextauth]';
+import { Input } from '../../utils/api/services/adminApi';
+import { deleteSchema } from '../../utils/api/validation';
+
+async function buffer(readable: Readable) {
+  const chunks = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const chunk of readable) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks);
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -58,7 +75,20 @@ export default async function handler(
                 .string()
                 .matches(/[a-zA-Z-_]/g)
                 .required('Slug is required'),
-              coverImage: yup.mixed().required('Cover image is required'),
+              coverImage: yup
+                .mixed()
+                .test('required', 'Cover image is required', (value) => {
+                  if (value) {
+                    return value[0];
+                  }
+                  return false;
+                })
+                .test('filesNumber', 'Only one file', (value) => {
+                  if (value) {
+                    return value.length === 1;
+                  }
+                  return false;
+                }),
               content: yup.string().required('Content is required'),
             });
             await postSchema.validate({
@@ -101,6 +131,134 @@ export default async function handler(
           }
         }
       );
+    } else if (method === 'PUT') {
+      if (!session || session.user.role !== 'ADMIN') {
+        res.status(401).json({
+          name: 'UNAUTHORIZED',
+          success: false,
+          message: 'Unauthorized',
+        });
+        return;
+      }
+      const buf = await buffer(req);
+      const rawBody = buf.toString('utf8');
+      const body = JSON.parse(rawBody);
+      const { input }: { input: Input<Post, 'update'> } = body;
+      const putSchema = yup.object({
+        input: yup
+          .object({
+            where: yup
+              .object({
+                id: yup.string().required(),
+              })
+              .required(),
+            data: yup
+              .object({
+                title: yup.string(),
+                slug: yup
+                  .string()
+                  .optional()
+                  .matches(/[a-zA-Z-_]/g),
+                coverImage: yup
+                  .mixed()
+                  .optional()
+                  .test(
+                    'filesNumber',
+                    'Only one file',
+                    (value?: Array<File> | string) => {
+                      if (value) {
+                        if (typeof value === 'string') {
+                          return true;
+                        }
+                        if (Array.isArray(value)) {
+                          return value.length === 1;
+                        }
+                      }
+                      return true;
+                    }
+                  ),
+                content: yup.string(),
+              })
+              .required(),
+            include: yup.object(),
+          })
+          .required(),
+      });
+      // TODO add replace file option
+      await putSchema.validate({ input });
+      const update: Post = await prisma.post.update(({
+        ...input,
+      } as unknown) as Prisma.PostUpdateArgs);
+      res.status(200).json({ success: true, data: update });
+    } else if (method === 'DELETE') {
+      const s3 = new S3({
+        forcePathStyle: false, // Configures to use subdomain/virtual calling format.
+        endpoint: process.env.DO_SPACE_ENDPOINT,
+        region: 'fra1',
+        credentials: {
+          accessKeyId: process.env.DO_SPACE_KEY as string,
+          secretAccessKey: process.env.DO_SPACE_SECRET as string,
+        },
+      });
+      if (!session || session.user.role !== 'ADMIN') {
+        res.status(401).json({
+          name: 'UNAUTHORIZED',
+          success: false,
+          message: 'Unauthorized',
+        });
+        return;
+      }
+      const buf = await buffer(req);
+      const rawBody = buf.toString('utf8');
+      const body = JSON.parse(rawBody);
+      const { action, input } = body;
+      await deleteSchema.validate({ action, input });
+      if (action === 'deleteMany') {
+        const posts = await prisma.post.findMany({
+          where: {
+            id: {
+              in: input.where.id.in,
+            },
+          },
+        });
+        const deleteKeys = posts.map((post) => ({
+          Key: post.coverImage,
+        }));
+        const deleteParams = {
+          Bucket: 'simesim-staging',
+          Delete: {
+            Objects: deleteKeys,
+          },
+        };
+        const data = await s3.send(new DeleteObjectsCommand(deleteParams));
+        if (data.$metadata.httpStatusCode === 200) {
+          const deleteMany: Prisma.BatchPayload = await prisma.post.deleteMany({
+            ...input,
+          });
+          res.status(200).json({ success: true, data: deleteMany });
+        } else {
+          throw new Error('Error deleting files');
+        }
+      } else if (action === 'delete') {
+        const post = await prisma.post.findUnique({
+          where: {
+            id: input.where.id,
+          },
+        });
+        const bucketParams = {
+          Bucket: 'simesim-staging',
+          Key: post?.coverImage,
+        };
+        const data = await s3.send(new DeleteObjectCommand(bucketParams));
+        if (data.$metadata.httpStatusCode === 204) {
+          const deleteOne: Post = await prisma.post.delete({
+            ...input,
+          });
+          res.status(200).json({ success: true, data: deleteOne });
+        } else {
+          throw new Error('Error deleting file');
+        }
+      }
     } else {
       res.status(405).json({
         name: 'METHOD_NOT_ALLOWED',

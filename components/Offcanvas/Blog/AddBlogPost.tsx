@@ -13,7 +13,20 @@ const schema = yup.object().shape({
     .string()
     .matches(/[a-zA-Z-_]/g)
     .required('Slug is required'),
-  coverImage: yup.mixed().required('Cover image is required'),
+  coverImage: yup
+    .mixed()
+    .test('required', 'Cover image is required', (value) => {
+      if (value) {
+        return value[0];
+      }
+      return false;
+    })
+    .test('filesNumber', 'Only one file', (value) => {
+      if (value) {
+        return value.length === 1;
+      }
+      return false;
+    }),
   content: yup.string().required('Content is required'),
 });
 
