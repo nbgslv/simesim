@@ -42,7 +42,7 @@ const Blog = ({ posts }: BlogProps) => {
     setChangeShowLoading(id);
     const post = postsRows.find((postOfPosts) => postOfPosts.id === id);
     if (post) {
-      await adminApi.callApi<Post, 'update'>({
+      const updatedPost = await adminApi.callApi<Post, 'update'>({
         method: 'PUT',
         action: AdminApiAction.update,
         model: 'Post',
@@ -57,12 +57,7 @@ const Blog = ({ posts }: BlogProps) => {
       });
       setPostsRows((prev) =>
         prev.map((postOfPrevPosts) =>
-          postOfPrevPosts.id === id
-            ? {
-                ...post,
-                show: !post.show,
-              }
-            : post
+          postOfPrevPosts.id === updatedPost.id ? updatedPost : postOfPrevPosts
         )
       );
     }
@@ -100,6 +95,7 @@ const Blog = ({ posts }: BlogProps) => {
           src={`${process.env.NEXT_PUBLIC_DO_SPACE_URL}/${params.value}`}
           width={80}
           height={50}
+          quality={20}
         />
       ),
     },

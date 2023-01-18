@@ -81,6 +81,7 @@ const PostData = ({
                 alt={postData.title}
                 width={100}
                 height={100}
+                quality={40}
               />
               <Button
                 className="mt-2"
