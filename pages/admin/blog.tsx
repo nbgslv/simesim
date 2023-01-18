@@ -43,7 +43,7 @@ const Blog = ({ posts }: BlogProps) => {
     const post = postsRows.find((postOfPosts) => postOfPosts.id === id);
     if (post) {
       await adminApi.callApi<Post, 'update'>({
-        method: 'DELETE',
+        method: 'PUT',
         action: AdminApiAction.update,
         model: 'Post',
         input: {
