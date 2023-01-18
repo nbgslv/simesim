@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Country, PlanModel, Prisma } from '@prisma/client';
+import { useRouter } from 'next/router';
 import TimelineSection from '../components/Timeline/TimelineSection';
 import prisma from '../lib/prisma';
 import KeepGoApi from '../utils/api/services/keepGo/api';
@@ -25,13 +26,26 @@ export default function Home({
   bundlesList,
   phonesList,
 }: HomeProps): JSX.Element {
+  const [bucket, setBucket] = React.useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.mvt && router.query.mvt === 'b') {
+      setBucket('b');
+    }
+  }, [router.query.mvt]);
+
   return (
     <MainLayout
       title="שים eSim"
       metaDescription={'שים eSim חבילות גלישה זולות לחו"ל בלי להחליף כרטיס sim'}
     >
+      <BundlesSection
+        bucket={bucket}
+        countriesList={countriesList}
+        bundlesList={bundlesList}
+      />
       <TimelineSection />
-      <BundlesSection countriesList={countriesList} bundlesList={bundlesList} />
       <QnaSection />
       <CheckPhoneSection phonesList={phonesList} />
     </MainLayout>
