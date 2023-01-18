@@ -22,6 +22,7 @@ import { verifyAdmin } from '../../utils/auth';
 import AddBlogPost from '../../components/Offcanvas/Blog/AddBlogPost';
 import AdminOffcanvas from '../../components/Offcanvas/AdminOffcanvas';
 import PostData from '../../components/Offcanvas/Blog/PostData';
+import AdminTableSwitch from '../../components/AdminTable/AdminTableSwitch';
 
 type PostsAsAdminTableData = (GridValidRowModel & Post)[];
 
@@ -32,9 +33,41 @@ type BlogProps = {
 const Blog = ({ posts }: BlogProps) => {
   const [postsRows, setPostsRows] = useState<PostsAsAdminTableData>(posts);
   const [addRowLoading, setAddRowLoading] = useState<boolean>(false);
+  const [changeShowLoading, setChangeShowLoading] = useState<GridRowId>('');
   const [postData, setPostData] = useState<Post | null>(null);
   const [adminApi] = useState(new AdminApi());
   const modal = useModal('add-posts');
+
+  const handleShowToggle = async (checked: boolean, id: GridRowId) => {
+    setChangeShowLoading(id);
+    const post = postsRows.find((postOfPosts) => postOfPosts.id === id);
+    if (post) {
+      await adminApi.callApi<Post, 'update'>({
+        method: 'DELETE',
+        action: AdminApiAction.update,
+        model: 'Post',
+        input: {
+          where: {
+            id: id as string,
+          },
+          data: {
+            show: checked,
+          },
+        },
+      });
+      setPostsRows((prev) =>
+        prev.map((postOfPrevPosts) =>
+          postOfPrevPosts.id === id
+            ? {
+                ...post,
+                show: !post.show,
+              }
+            : post
+        )
+      );
+    }
+    setChangeShowLoading('');
+  };
 
   const columns: GridColumns = [
     {
@@ -69,6 +102,23 @@ const Blog = ({ posts }: BlogProps) => {
           height={50}
         />
       ),
+    },
+    {
+      field: 'show',
+      headerName: 'Show',
+      renderCell: (params: any) => (
+        <AdminTableSwitch
+          checked={params.value}
+          onChange={handleShowToggle}
+          rowId={params.id}
+          row={params.row}
+          loading={changeShowLoading}
+        />
+      ),
+    },
+    {
+      field: 'views',
+      headerName: 'Views',
     },
     {
       field: 'createdAt',
@@ -158,7 +208,6 @@ const Blog = ({ posts }: BlogProps) => {
         columns={columns}
         addRow={showModal}
         deleteRows={handleDeleteRows}
-        // processRowUpdate={handleRowUpdate}
         deleteRow={handleDeleteRow}
         rowActions={['delete']}
       />

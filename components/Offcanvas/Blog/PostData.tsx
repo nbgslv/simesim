@@ -24,6 +24,8 @@ const PostData = ({
   const [loading, setLoading] = React.useState<boolean>(false);
   const [adminApi] = React.useState<AdminApi>(new AdminApi());
 
+  // TODO add change cover image
+
   if (!post || !postData) return null;
 
   const data: SectionType<PostDataType>[] = [
@@ -92,6 +94,17 @@ const PostData = ({
               </Button>
             </div>
           ),
+        },
+        {
+          title: 'Show',
+          value: postData.show,
+          type: 'boolean',
+          editable: true,
+        },
+        {
+          title: 'Views',
+          value: postData.views,
+          type: 'number',
         },
         {
           title: 'Created At',

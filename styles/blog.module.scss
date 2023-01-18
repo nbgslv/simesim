@@ -1,0 +1,13 @@
+@import "styles/variables";
+
+.main {
+  background-color: $background-color;
+  min-height: $page-height;
+  height: 100%;
+  padding: 2rem;
+
+  :global * {
+    color: $text-color;
+    text-align: center;
+  }
+}
