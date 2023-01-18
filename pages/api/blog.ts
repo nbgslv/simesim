@@ -92,7 +92,7 @@ export default async function handler(
             });
             await postSchema.validate({
               ...fields,
-              coverImage: files,
+              coverImage: files.coverImage,
             });
 
             const file = files.coverImage as formidable.File;
