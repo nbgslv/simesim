@@ -1,0 +1,39 @@
+@import "styles/variables";
+
+.main {
+  background-color: $background-color;
+  min-height: $page-height;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+
+  :global * {
+    color: $text-color;
+    text-align: center;
+  }
+}
+
+.title {
+  margin-bottom: 1.5rem;
+}
+
+.date {
+  text-align: left !important;
+  color: $text-muted !important;
+  font-size: 0.7rem;
+}
+
+.coverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  margin: 1.5rem 0;
+}
+
+.content {
+  :global * {
+    text-align: right !important;
+  }
+}

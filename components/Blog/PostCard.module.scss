@@ -1,0 +1,28 @@
+@import "styles/variables";
+
+.main {
+  background-color: map-get($theme-colors, 'orange');
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  @include shadow;
+
+  :global * {
+    color: #ffffff !important;
+  }
+}
+
+.title {
+  margin-bottom: 1.5rem;
+
+  &:hover {
+    color: map-get($theme-colors, 'primary') !important;
+  }
+}
+
+.coverImage {
+    width: 100%;
+    height: 10rem;
+    object-fit: cover;
+}

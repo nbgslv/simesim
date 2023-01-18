@@ -14,6 +14,7 @@ import {
   Coupon,
   Inquiry,
   ApiKey,
+  Post,
 } from '@prisma/client';
 import { camelCase } from 'lodash';
 
@@ -221,6 +222,19 @@ type MapPrismaTypes<
       deleteMany: Prisma.ApiKeyDeleteManyArgs;
       upsert: Prisma.ApiKeyUpsertArgs;
     }
+  ],
+  [
+    Post,
+    {
+      findFirst: Prisma.PostFindFirstArgs;
+      findMany: Prisma.PostFindManyArgs;
+      create: Prisma.PostCreateArgs;
+      update: Prisma.PostUpdateArgs;
+      updateMany: Prisma.PostUpdateManyArgs;
+      delete: Prisma.PostDeleteArgs;
+      deleteMany: Prisma.PostDeleteManyArgs;
+      upsert: Prisma.PostUpsertArgs;
+    }
   ]
 ];
 
@@ -280,6 +294,7 @@ export default class AdminApi {
     payment: '/payment',
     line: '/line',
     apiKey: '/auth/api/genkey',
+    post: '/blog',
   };
 
   callApi = async <
