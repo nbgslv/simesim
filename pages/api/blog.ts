@@ -77,14 +77,13 @@ export default async function handler(
                 .required('Slug is required'),
               coverImage: yup
                 .mixed()
-                .test(
-                  'required',
-                  'Cover image is required',
-                  (value) => typeof value === 'string' || Array.isArray(value)
-                )
+                .required('Cover image is required')
                 .test('filesNumber', 'Only one file', (value) => {
                   if (value) {
-                    return value.length === 1;
+                    if (Array.isArray(value)) {
+                      return value.length === 1;
+                    }
+                    return true;
                   }
                   return false;
                 }),
