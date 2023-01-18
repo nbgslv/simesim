@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import Image from 'next/image';
 import { Post } from '@prisma/client';
 import { Button, Spinner } from 'react-bootstrap';
 import dynamic from 'next/dynamic';
@@ -76,13 +75,6 @@ const PostData = ({
           type: 'text',
           RenderData: (coverImage) => (
             <div className="d-flex flex-column align-items-center">
-              <Image
-                src={`${process.env.NEXT_PUBLIC_DO_SPACE_URL}/${coverImage}`}
-                alt={postData.title}
-                width={100}
-                height={100}
-                quality={40}
-              />
               <Button
                 className="mt-2"
                 href={`${process.env.NEXT_PUBLIC_DO_SPACE_URL}/${coverImage}`}

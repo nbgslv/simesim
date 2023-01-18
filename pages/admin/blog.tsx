@@ -1,7 +1,6 @@
 import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Image from 'next/image';
 import {
   GridCellParams,
   GridColumns,
@@ -90,13 +89,12 @@ const Blog = ({ posts }: BlogProps) => {
       field: 'coverImage',
       headerName: 'Cover',
       renderCell: (params: GridCellParams) => (
-        <Image
-          alt="Cover Image"
-          src={`${process.env.NEXT_PUBLIC_DO_SPACE_URL}/${params.value}`}
-          width={80}
-          height={50}
-          quality={20}
-        />
+        <Button
+          href={`${process.env.NEXT_PUBLIC_DO_SPACE_URL}/${params.value}`}
+          target="_blank"
+        >
+          <FontAwesomeIcon icon={solid('up-right-from-square')} />
+        </Button>
       ),
     },
     {
