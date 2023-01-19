@@ -79,10 +79,13 @@ export const getStaticProps: GetStaticProps<
   {
     post: Omit<
       Post,
-      'id' | 'updatedAt' | 'createdAt' | 'show' | 'views'
+      'id' | 'updatedAt' | 'createdAt' | 'show' | 'views' | 'description'
     > | null;
     morePosts:
-      | Omit<Post, 'id' | 'updatedAt' | 'createdAt' | 'show' | 'views'>[]
+      | Omit<
+          Post,
+          'id' | 'updatedAt' | 'createdAt' | 'show' | 'views' | 'content'
+        >[]
       | null;
   },
   { slug: string }
@@ -125,7 +128,7 @@ export const getStaticProps: GetStaticProps<
     select: {
       slug: true,
       title: true,
-      content: true,
+      description: true,
       coverImage: true,
       createdAt: true,
     },

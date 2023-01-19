@@ -32,7 +32,7 @@ export const getStaticProps = async () => {
     select: {
       slug: true,
       title: true,
-      content: true,
+      description: true,
       coverImage: true,
       createdAt: true,
     },

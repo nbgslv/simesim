@@ -19,6 +19,7 @@ import formidable, {
 import cuid from 'cuid';
 import { format } from 'date-fns';
 import { Readable } from 'stream';
+import sanitizeHtml from 'sanitize-html';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
 import { authOptions } from './auth/[...nextauth]';
@@ -113,10 +114,19 @@ export default async function handler(
                 /<img/g,
                 '<img style="max-width: 100%; height: auto;"'
               );
+
+              // Create blog description
+
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = sanitizeHtml(fields.content);
+              const text = tempDiv.textContent || tempDiv.innerText || '';
+              const description = text.split(' ').slice(0, 10).join(' ');
+
               const newPost = await prisma.post.create({
                 data: {
                   title: fields.title,
                   slug: fields.slug,
+                  description,
                   content,
                   coverImage: fileName,
                 },
