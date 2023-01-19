@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import styles from './Editor.module.scss';
 
 const Editor = ({
   onChange,
@@ -39,12 +40,14 @@ const Editor = ({
   };
 
   return (
-    <ReactQuill
-      theme="snow"
-      value={postContent}
-      modules={modules}
-      onChange={setPostContent}
-    />
+    <div className={styles.main}>
+      <ReactQuill
+        theme="snow"
+        value={postContent}
+        modules={modules}
+        onChange={setPostContent}
+      />
+    </div>
   );
 };
 
