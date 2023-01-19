@@ -14,7 +14,7 @@ const PostCard = ({ post }: { post: Post }) => {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = sanitizeHtml(post.content);
     const text = tempDiv.textContent || tempDiv.innerText || '';
-    setDescription(text.split(' ').slice(0, 20).join(' '));
+    setDescription(text.split(' ').slice(0, 10).join(' '));
   }, [post.content]);
 
   return (
@@ -32,7 +32,7 @@ const PostCard = ({ post }: { post: Post }) => {
         />
         <Card.Body>
           <Card.Title className={styles.title}>{post.title}</Card.Title>
-          <Card.Text>{description}...</Card.Text>
+          <Card.Text className={styles.description}>{description}...</Card.Text>
         </Card.Body>
       </Card>
     </motion.div>

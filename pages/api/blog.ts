@@ -107,11 +107,17 @@ export default async function handler(
             const data = await s3.send(new PutObjectCommand(bucketParams));
             if (data.$metadata.httpStatusCode === 200) {
               // If no error - create new post record
+
+              // Add style tag to img tags
+              const content = fields.content.replace(
+                /<img/g,
+                '<img style="max-width: 100%; height: auto;"'
+              );
               const newPost = await prisma.post.create({
                 data: {
                   title: fields.title,
                   slug: fields.slug,
-                  content: fields.content,
+                  content,
                   coverImage: fileName,
                 },
               });

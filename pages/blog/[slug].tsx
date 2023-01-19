@@ -3,7 +3,6 @@ import { format } from 'date-fns';
 import { GetStaticProps } from 'next';
 import { Post } from '@prisma/client';
 import { Col, Container, Row } from 'react-bootstrap';
-import Image from 'next/image';
 import sanitizeHtml from 'sanitize-html';
 import prisma from '../../lib/prisma';
 import MainLayout from '../../components/Layouts/MainLayout';
@@ -37,13 +36,13 @@ const Slug = ({
             {(post.createdAt as unknown) as string}
           </Col>
         </Row>
-        <Row>
+        <Row className="mb-3 mt-3">
           <Col className={styles.coverImage}>
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               alt={post.title}
               src={`${process.env.NEXT_PUBLIC_DO_SPACE_URL}/${post.coverImage}`}
-              width="100%"
-              height="100%"
+              className={styles.coverImage}
             />
           </Col>
         </Row>
@@ -51,7 +50,16 @@ const Slug = ({
           <Col>
             <div
               className={styles.content}
-              dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
+              dangerouslySetInnerHTML={{
+                __html: sanitizeHtml(post.content, {
+                  allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+                    'img',
+                  ]),
+                  allowedSchemes: sanitizeHtml.defaults.allowedSchemes.concat([
+                    'data',
+                  ]),
+                }),
+              }}
             />
           </Col>
         </Row>
@@ -80,9 +88,6 @@ export const getStaticProps: GetStaticProps<
   { slug: string }
 > = async (context) => {
   const { slug } = context.params!;
-  if (typeof slug !== 'string') {
-    return { props: { post: null, morePosts: null } };
-  }
   const post = await prisma.post.findUnique({
     where: {
       slug,
@@ -124,6 +129,7 @@ export const getStaticProps: GetStaticProps<
       coverImage: true,
       createdAt: true,
     },
+    take: 3,
   });
 
   if (!post) {

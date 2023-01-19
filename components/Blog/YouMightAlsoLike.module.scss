@@ -1,7 +1,21 @@
 @import "styles/variables";
 
 .container {
-  padding: 2rem;
+  padding: 1.5rem;
   cursor: pointer;
+  background-color: map-get($theme-colors, 'orange');
+  border-radius: 6px;
+  scale: 1;
   @include shadow;
+
+  :global * {
+    color: #ffffff;
+  }
+}
+
+.coverImage {
+  margin-bottom: 2rem;
+  width: 10rem;
+  height: 80%;
+  object-fit: cover;
 }

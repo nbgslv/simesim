@@ -10,11 +10,11 @@ import styles from '../../styles/blog.module.scss';
 const Index = ({ posts }: { posts: Post[] }) => (
   <MainLayout title="בלוג" hideJumbotron>
     <div className={styles.main}>
-      <h1 className="mb-2">הבלוג</h1>
+      <h1 className="mb-5">הבלוג</h1>
       <Container>
         <Row>
           {posts.map((post) => (
-            <Col md={3} key={post.id}>
+            <Col md={3} key={post.id} className="mb-5">
               <PostCard post={post} />
             </Col>
           ))}
@@ -26,9 +26,9 @@ const Index = ({ posts }: { posts: Post[] }) => (
 
 export const getStaticProps = async () => {
   const posts = await prisma.post.findMany({
-    // where: {
-    //   show: true,
-    // },
+    where: {
+      show: true,
+    },
     select: {
       slug: true,
       title: true,
