@@ -55,6 +55,9 @@ const Slug = ({
                   allowedTags: sanitizeHtml.defaults.allowedTags.concat([
                     'img',
                   ]),
+                  allowedAttributes: {
+                    img: ['src', 'style'],
+                  },
                   allowedSchemes: sanitizeHtml.defaults.allowedSchemes.concat([
                     'data',
                   ]),

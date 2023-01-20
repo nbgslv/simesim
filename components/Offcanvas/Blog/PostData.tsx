@@ -56,6 +56,10 @@ const PostData = ({
           editable: true,
           RenderData: (postContent) => (
             <div
+              style={{
+                direction: 'rtl',
+                textAlign: 'right',
+              }}
               dangerouslySetInnerHTML={{ __html: postContent as string }}
             ></div>
           ),

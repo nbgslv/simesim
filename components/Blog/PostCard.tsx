@@ -1,21 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Card } from 'react-bootstrap';
-import sanitizeHtml from 'sanitize-html';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { Post } from '@prisma/client';
 import styles from './PostCard.module.scss';
 
 const PostCard = ({ post }: { post: Post }) => {
-  const [description, setDescription] = React.useState('');
   const router = useRouter();
-
-  useEffect(() => {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = sanitizeHtml(post.content);
-    const text = tempDiv.textContent || tempDiv.innerText || '';
-    setDescription(text.split(' ').slice(0, 10).join(' '));
-  }, [post.content]);
 
   return (
     <motion.div
@@ -32,7 +23,9 @@ const PostCard = ({ post }: { post: Post }) => {
         />
         <Card.Body>
           <Card.Title className={styles.title}>{post.title}</Card.Title>
-          <Card.Text className={styles.description}>{description}...</Card.Text>
+          <Card.Text className={styles.description}>
+            {post.description}...
+          </Card.Text>
         </Card.Body>
       </Card>
     </motion.div>

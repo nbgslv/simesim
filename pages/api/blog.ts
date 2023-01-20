@@ -20,6 +20,7 @@ import cuid from 'cuid';
 import { format } from 'date-fns';
 import { Readable } from 'stream';
 import sanitizeHtml from 'sanitize-html';
+import DOMParser from 'dom-parser';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
 import { authOptions } from './auth/[...nextauth]';
@@ -112,21 +113,36 @@ export default async function handler(
               // Add style tag to img tags
               const content = fields.content.replace(
                 /<img/g,
-                '<img style="max-width: 100%; height: auto;"'
+                '<img style="max-width: 100%; width: 100%; height: auto;"'
               );
 
               // Create blog description
 
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = sanitizeHtml(fields.content);
-              const text = tempDiv.textContent || tempDiv.innerText || '';
-              const description = text.split(' ').slice(0, 10).join(' ');
+              const tempDom = new DOMParser();
+              const tempDoc = tempDom.parseFromString(content);
+              const description =
+                tempDoc && tempDoc.getElementsByTagName('p')?.length
+                  ? sanitizeHtml(
+                      // @ts-ignore
+                      tempDoc
+                        .getElementsByTagName('p')
+                        .map((p) => p.innerHTML)
+                        .join(' '),
+                      {
+                        allowedTags: [],
+                        allowedAttributes: {},
+                      }
+                    )
+                      .split(' ')
+                      .slice(0, 10)
+                      .join(' ')
+                  : null;
 
               const newPost = await prisma.post.create({
                 data: {
                   title: fields.title,
                   slug: fields.slug,
-                  description,
+                  description: description ?? undefined,
                   content,
                   coverImage: fileName,
                 },
