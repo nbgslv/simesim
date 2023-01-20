@@ -39,6 +39,9 @@ const Footer = () => (
             <Nav.Item>
               <Nav.Link href="/guide">{text.header.navbar.guide}</Nav.Link>
             </Nav.Item>
+            <Nav.Item>
+              <Nav.Link href="/blog">{text.header.navbar.blog}</Nav.Link>
+            </Nav.Item>
           </Nav>
         </Col>
         <Col>

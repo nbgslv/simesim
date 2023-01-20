@@ -13,6 +13,7 @@ import { format } from 'date-fns';
 import { NextPageContext } from 'next';
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
+import { Tooltip } from '@mui/material';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import FormModal from '../../components/AdminTable/FormModal';
 import AdminLayout from '../../components/Layouts/AdminLayout';
@@ -23,6 +24,7 @@ import AddBlogPost from '../../components/Offcanvas/Blog/AddBlogPost';
 import AdminOffcanvas from '../../components/Offcanvas/AdminOffcanvas';
 import PostData from '../../components/Offcanvas/Blog/PostData';
 import AdminTableSwitch from '../../components/AdminTable/AdminTableSwitch';
+import styles from '../../styles/bundles.module.scss';
 
 type PostsAsAdminTableData = (GridValidRowModel & Post)[];
 
@@ -78,6 +80,15 @@ const Blog = ({ posts }: BlogProps) => {
       headerName: 'Slug',
     },
     {
+      field: 'description',
+      headerName: 'Description',
+      renderCell: (params) => (
+        <Tooltip title={params.value}>
+          <span className={styles.tooltip}>{params.value}</span>
+        </Tooltip>
+      ),
+    },
+    {
       field: 'content',
       headerName: 'Content',
       renderCell: (params: GridCellParams) => (
@@ -87,7 +98,7 @@ const Blog = ({ posts }: BlogProps) => {
       ),
     },
     {
-      field: 'coverImage',
+      field: 'thumbnail',
       headerName: 'Cover',
       renderCell: (params: GridCellParams) => (
         <Image
@@ -153,6 +164,7 @@ const Blog = ({ posts }: BlogProps) => {
     body.append('title', data.title);
     body.append('slug', data.slug);
     body.append('content', data.content);
+    body.append('description', data.description);
     body.append('coverImage', data.coverImage[0]);
     const newPost = await fetch('/api/blog', {
       method: 'POST',
@@ -228,6 +240,17 @@ export async function getServerSideProps(context: NextPageContext) {
   const posts = await prisma.post.findMany({
     orderBy: {
       createdAt: 'desc',
+    },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      thumbnail: true,
+      description: true,
+      show: true,
+      views: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
   const serializedPosts = posts.map((post) => ({

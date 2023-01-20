@@ -173,8 +173,8 @@ const Section = <T extends object>({
           </div>
           <Divider sx={{ borderColor: 'rgba(0, 0, 0, 0.6)' }} />
           {section.data.map((data) => (
-            <>
-              <div className="data-container" key={data.title}>
+            <React.Fragment key={data.title}>
+              <div className="data-container">
                 <Row
                   style={{
                     height: data.type === 'textarea' ? '5rem' : 'inherit',
@@ -252,7 +252,7 @@ const Section = <T extends object>({
                 </Row>
               </div>
               {i !== sections.length - 1 && <Divider />}
-            </>
+            </React.Fragment>
           ))}
         </div>
       ))}

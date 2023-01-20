@@ -27,6 +27,7 @@ const schema = yup.object().shape({
       }
       return false;
     }),
+  description: yup.string().required('Description is required'),
   content: yup.string().required('Content is required'),
 });
 
@@ -47,6 +48,7 @@ const AddBlogPost = ({ loading }: { loading: boolean }) => {
     resolver: yupResolver(schema),
     defaultValues: {
       title: '',
+      description: '',
       content: '',
       slug: '',
       coverImage: '',
@@ -82,6 +84,17 @@ const AddBlogPost = ({ loading }: { loading: boolean }) => {
         <Form.Control type="file" {...register('coverImage')} />
         <Form.Control.Feedback type="invalid">
           {errors.coverImage?.message}
+        </Form.Control.Feedback>
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>Description</Form.Label>
+        <Form.Control
+          {...register('description')}
+          type="textarea"
+          isInvalid={!!errors.description}
+        />
+        <Form.Control.Feedback type="invalid">
+          {errors.description?.message}
         </Form.Control.Feedback>
       </Form.Group>
       <Row>

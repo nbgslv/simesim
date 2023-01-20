@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 import { Post } from '@prisma/client';
 import { Button, Spinner } from 'react-bootstrap';
 import dynamic from 'next/dynamic';
@@ -19,11 +19,36 @@ const PostData = ({
   post: Post | null;
   onDataChange?: (data: Post | null) => void;
 }) => {
-  const [postData, setPostData] = React.useState<Post | null>(post);
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const [postData, setPostData] = React.useState<Post | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(true);
   const [adminApi] = React.useState<AdminApi>(new AdminApi());
 
   // TODO add change cover image
+
+  useEffect(
+    () => () => {
+      setPostData(null);
+    },
+    []
+  );
+
+  useEffect(() => {
+    (async () => {
+      try {
+        if (!postData) {
+          const postContentFromApi = await fetch(`/api/blog/${post?.id}`);
+          if (postContentFromApi.ok) {
+            const content = await postContentFromApi.json();
+            setPostData(content.data);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [post]);
 
   if (!post || !postData) return null;
 
@@ -50,17 +75,22 @@ const PostData = ({
           editable: true,
         },
         {
+          title: 'Description',
+          value: postData.description,
+          type: 'textarea',
+        },
+        {
           title: 'Content',
           value: postData.content,
           type: 'text',
           editable: true,
-          RenderData: (postContent) => (
+          RenderData: (postContentFromApi) => (
             <div
               style={{
                 direction: 'rtl',
                 textAlign: 'right',
               }}
-              dangerouslySetInnerHTML={{ __html: postContent as string }}
+              dangerouslySetInnerHTML={{ __html: postContentFromApi as string }}
             ></div>
           ),
           renderEditComponent: (value, onChange) =>

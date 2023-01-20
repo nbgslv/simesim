@@ -1,15 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Inquiry, Post, Prisma } from '@prisma/client';
+import { Post, Prisma } from '@prisma/client';
 import * as yup from 'yup';
 import { unstable_getServerSession } from 'next-auth';
-import {
-  DeleteObjectCommand,
-  DeleteObjectsCommand,
-  PutObjectCommand,
-  S3,
-} from '@aws-sdk/client-s3';
+import { DeleteObjectsCommand, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import * as fs from 'fs';
-
 import formidable, {
   Fields,
   Files,
@@ -21,6 +15,7 @@ import { format } from 'date-fns';
 import { Readable } from 'stream';
 import sanitizeHtml from 'sanitize-html';
 import DOMParser from 'dom-parser';
+import imageThumbnail from 'image-thumbnail';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
 import { authOptions } from './auth/[...nextauth]';
@@ -38,7 +33,11 @@ async function buffer(readable: Readable) {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<Partial<Inquiry> | Prisma.BatchPayload>>
+  res: NextApiResponse<
+    ApiResponse<
+      Partial<Post> | { posts: Post[]; total: number } | Prisma.BatchPayload
+    >
+  >
 ) {
   try {
     const session = await unstable_getServerSession(
@@ -47,7 +46,34 @@ export default async function handler(
       authOptions(req as NextApiRequest, res as NextApiResponse)
     );
     const { method } = req;
-    if (method === 'POST') {
+    if (method === 'GET') {
+      const { limit, cursor, order, direction } = req.query;
+      const posts = await prisma.post.findMany({
+        where: {
+          show: true,
+        },
+        take: parseInt(limit as string, 10),
+        skip: 1,
+        cursor: {
+          id: cursor as string,
+        },
+        orderBy: {
+          [order as string]: direction,
+        },
+      });
+      const total = await prisma.post.count({
+        where: {
+          show: true,
+        },
+      });
+      res.status(200).json({
+        success: true,
+        data: {
+          posts,
+          total,
+        },
+      });
+    } else if (method === 'POST') {
       if (!session || session.user.role !== 'ADMIN') {
         throw new Error('Unauthorized');
       }
@@ -89,6 +115,7 @@ export default async function handler(
                   }
                   return false;
                 }),
+              description: yup.string().required('Description is required'),
               content: yup.string().required('Content is required'),
             });
             await postSchema.validate({
@@ -97,9 +124,10 @@ export default async function handler(
             });
 
             const file = files.coverImage as formidable.File;
+            const fileCode = cuid();
             const fileName = `${format(Date.now(), 'yyyy-M-d')}-${
               fields.slug
-            }-${cuid()}.${file.name.split('.').pop()}`;
+            }-${fileCode}.${file.name.split('.').pop()}`;
             const bucketParams = {
               Bucket: 'simesim-staging',
               Key: fileName,
@@ -109,6 +137,21 @@ export default async function handler(
             const data = await s3.send(new PutObjectCommand(bucketParams));
             if (data.$metadata.httpStatusCode === 200) {
               // If no error - create new post record
+
+              // Create image thumbnail
+              const coverImageThumbnail = await imageThumbnail(file.path);
+              const thumbnailFileName = `${format(Date.now(), 'yyyy-M-d')}-${
+                fields.slug
+              }-${fileCode}-thumbnail.${file.name.split('.').pop()}`;
+
+              const thumbnailBucketParams = {
+                Bucket: 'simesim-staging',
+                Key: thumbnailFileName,
+                Body: coverImageThumbnail,
+                ACL: 'public-read',
+              };
+
+              await s3.send(new PutObjectCommand(thumbnailBucketParams));
 
               // Add style tag to img tags
               const content = fields.content.replace(
@@ -145,6 +188,7 @@ export default async function handler(
                   description: description ?? undefined,
                   content,
                   coverImage: fileName,
+                  thumbnail: thumbnailFileName,
                 },
               });
               res.status(201).json({ success: true, data: newPost });
@@ -251,9 +295,19 @@ export default async function handler(
             },
           },
         });
-        const deleteKeys = posts.map((post) => ({
-          Key: post.coverImage,
-        }));
+        const deleteKeys = posts.reduce<{ Key: string }[]>(
+          (acc, post) => [
+            ...acc,
+            {
+              Key: post.coverImage,
+            },
+            {
+              Key: post.thumbnail,
+            },
+          ],
+          []
+        );
+
         const deleteParams = {
           Bucket: 'simesim-staging',
           Delete: {
@@ -275,11 +329,22 @@ export default async function handler(
             id: input.where.id,
           },
         });
-        const bucketParams = {
+        const deleteKeys = [
+          {
+            Key: post?.coverImage,
+          },
+          {
+            Key: post?.thumbnail,
+          },
+        ];
+
+        const deleteParams = {
           Bucket: 'simesim-staging',
-          Key: post?.coverImage,
+          Delete: {
+            Objects: deleteKeys,
+          },
         };
-        const data = await s3.send(new DeleteObjectCommand(bucketParams));
+        const data = await s3.send(new DeleteObjectsCommand(deleteParams));
         if (data.$metadata.httpStatusCode === 204) {
           const deleteOne: Post = await prisma.post.delete({
             ...input,
