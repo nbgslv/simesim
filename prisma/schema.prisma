@@ -298,3 +298,17 @@ model ApiKey {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @default("")
+  slug        String   @unique
+  content     String
+  coverImage  String
+  thumbnail   String   @default("")
+  show        Boolean  @default(false)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -20,6 +20,8 @@ $grid-breakpoints: (
 );
 
 $text-color: map-get($theme-colors, 'dark');
+$gray-600: #6c757d;
+$text-muted: $gray-600;;
 $background-color: map-get($theme-colors, 'light');
 $primary-color: map-get($theme-colors, 'primary');
 $secondary-color: map-get($theme-colors, 'secondary');
