@@ -17,7 +17,7 @@ const useInfiniteScroll = <T extends Record<any, any>>({
   limit,
 }: UseInfiniteScrollProps<T>) => {
   const [items, setItems] = useState<T[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [hasNext, setHasNext] = useState(true);
   const [cursor, setCursor] = useState('');
   const [loaded, setLoaded] = useState(false);
