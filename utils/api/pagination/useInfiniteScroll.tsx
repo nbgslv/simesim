@@ -52,7 +52,6 @@ const useInfiniteScroll = <T extends Record<any, any>>({
         setItems((prevItems) => [...prevItems, ...newItems]);
         setCursor(newItems[newItems.length - 1].id);
         setHasNext(total > items.length + limit);
-        setLoading(false);
       }
     } catch (error) {
       console.error(error);
