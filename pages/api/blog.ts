@@ -34,9 +34,8 @@ async function buffer(readable: Readable) {
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<
-    ApiResponse<
-      Partial<Post> | { posts: Post[]; total: number } | Prisma.BatchPayload
-    >
+    | ApiResponse<Partial<Post> | Prisma.BatchPayload>
+    | { data: Post[]; total: number }
   >
 ) {
   try {
@@ -48,30 +47,42 @@ export default async function handler(
     const { method } = req;
     if (method === 'GET') {
       const { limit, cursor, order, direction } = req.query;
-      const posts = await prisma.post.findMany({
-        where: {
-          show: true,
-        },
-        take: parseInt(limit as string, 10),
-        skip: 1,
-        cursor: {
-          id: cursor as string,
-        },
-        orderBy: {
-          [order as string]: direction,
-        },
-      });
+
       const total = await prisma.post.count({
         where: {
           show: true,
         },
       });
+
+      let posts = [];
+      if (limit && parseInt(limit as string, 10) < 0) {
+        posts = await prisma.post.findMany({
+          where: {
+            show: true,
+          },
+          orderBy: {
+            [order as string]: direction,
+          },
+          cursor: { id: cursor as string },
+          take: -Number.MAX_SAFE_INTEGER,
+        });
+      } else {
+        posts = await prisma.post.findMany({
+          where: {
+            show: true,
+          },
+          take: parseInt(limit as string, 10),
+          skip: cursor ? 1 : 0,
+          cursor: cursor ? { id: cursor as string } : undefined,
+          orderBy: {
+            [order as string]: direction,
+          },
+        });
+      }
       res.status(200).json({
         success: true,
-        data: {
-          posts,
-          total,
-        },
+        data: posts,
+        total,
       });
     } else if (method === 'POST') {
       if (!session || session.user.role !== 'ADMIN') {

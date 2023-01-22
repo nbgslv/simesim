@@ -7,6 +7,9 @@
 const { withSentryConfig } = require("@sentry/nextjs");
 
 const nextConfig = {
+  experimental: {
+    scrollRestoration: true,
+  },
   reactStrictMode: true,
   swcMinify: true,
   typescript: {

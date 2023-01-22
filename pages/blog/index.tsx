@@ -2,43 +2,42 @@ import React, { useEffect } from 'react';
 import { format } from 'date-fns';
 import { Col, Container, Row, Spinner } from 'react-bootstrap';
 import { Post } from '@prisma/client';
-import useInfiniteScroll from 'react-infinite-scroll-hook';
+import { useInView } from 'react-intersection-observer';
 import MainLayout from '../../components/Layouts/MainLayout';
 import PostCard from '../../components/Blog/PostCard';
 import prisma from '../../lib/prisma';
 import styles from '../../styles/blog.module.scss';
-import usePagination from '../../utils/api/pagination/usePagination';
+import useInfiniteScroll from '../../utils/api/pagination/useInfiniteScroll';
 
-const POST_QUANTITY = 4;
+const POST_QUANTITY = 8;
 
-const Index = ({
-  posts,
-  cursor,
-  total,
-}: {
-  posts: Post[];
-  cursor: string;
-  total: number;
-}) => {
-  const [postItems, setPostItems] = React.useState<Post[]>(posts);
+const Index = () => {
+  const { ref, inView } = useInView();
 
-  const { loading, items, hasNextPage, error, loadMore } = usePagination<Post>({
-    model: 'blog',
-    steps: POST_QUANTITY,
-    firstCursor: cursor,
-    total,
+  const {
+    loading,
+    items: postItems,
+    loadMore,
+    hasNext,
+  } = useInfiniteScroll<Post>({
+    getItems: async (cursor, limit) => {
+      const res = await fetch(
+        `/api/blog?cursor=${cursor}&limit=${limit}&order=createdAt&direction=desc`
+      );
+      const { data: newItems, total } = await res.json();
+      return {
+        items: newItems,
+        total,
+      };
+    },
+    limit: POST_QUANTITY,
   });
 
   useEffect(() => {
-    setPostItems([...posts, ...items]);
-  }, [items]);
-
-  const [sentryRef] = useInfiniteScroll({
-    loading,
-    hasNextPage,
-    onLoadMore: loadMore,
-    disabled: error,
-  });
+    if (inView && hasNext) {
+      loadMore();
+    }
+  }, [inView, hasNext]);
 
   return (
     <MainLayout title="בלוג" hideJumbotron>
@@ -51,15 +50,14 @@ const Index = ({
                 <PostCard post={post} />
               </Col>
             ))}
-            {loading || hasNextPage ? (
-              <div ref={sentryRef}>
-                <Row>
-                  <Col className="text-center">
-                    <Spinner animation={'border'} />
-                  </Col>
-                </Row>
-              </div>
-            ) : null}
+            {loading && (
+              <Row>
+                <Col className="text-center">
+                  <Spinner animation={'border'} />
+                </Col>
+              </Row>
+            )}
+            <div ref={ref} style={{ visibility: 'hidden' }} />
           </Row>
         </Container>
       </div>
