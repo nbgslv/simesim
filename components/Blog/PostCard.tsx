@@ -17,6 +17,7 @@ const PostCard = ({ post }: { post: Post }) => {
     >
       <Card className={styles.main}>
         <Card.Img
+          alt={post.title}
           className={styles.coverImage}
           variant="top"
           src={`${process.env.NEXT_PUBLIC_DO_SPACE_URL}/${post.coverImage}`}

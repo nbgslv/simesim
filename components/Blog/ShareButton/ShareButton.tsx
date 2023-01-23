@@ -27,7 +27,7 @@ import {
 import styles from './ShareButton.module.scss';
 
 const ShareButton = ({ url, title }: { url: string; title: string }) => (
-  <Dropdown className={styles.dropdown}>
+  <Dropdown className={styles.dropdown} aria-label="Share this blog">
     <Dropdown.Toggle variant="primary" id="dropdown-basic">
       <FontAwesomeIcon icon={solid('share-nodes')} />
     </Dropdown.Toggle>

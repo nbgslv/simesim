@@ -52,7 +52,7 @@ const Index = () => {
             ))}
             {loading && (
               <Row>
-                <Col className="text-center">
+                <Col className="w-100 h-100 text-center">
                   <Spinner animation={'border'} />
                 </Col>
               </Row>
