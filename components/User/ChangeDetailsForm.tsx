@@ -5,8 +5,6 @@ import { User } from '@prisma/client';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { signOut } from 'next-auth/react';
-import { useCookies } from 'react-cookie';
-import { useRouter } from 'next/router';
 import styles from './ChangeDetailsForm.module.scss';
 
 const schema = yup.object().shape({
@@ -16,10 +14,7 @@ const schema = yup.object().shape({
   email: yup.string().length(10, 'טלפון לא תקין').required('שדה חובה'),
 });
 const ChangeDetailsForm = ({ user }: { user: Partial<User> }) => {
-  const [pageLoading, setPageLoading] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
-  const [cookies, setCookie, removeCookie] = useCookies(['changeDetails']);
-  const router = useRouter();
   const {
     register,
     reset,
@@ -38,50 +33,27 @@ const ChangeDetailsForm = ({ user }: { user: Partial<User> }) => {
   });
 
   useEffect(() => {
-    (async () => {
-      if (
-        cookies.changeDetails &&
-        router.query.action &&
-        router.query.action === 'updateDetails'
-      ) {
-        const updatedUser = await fetch(
-          `/api/user/${cookies.changeDetails.id}`,
-          {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(cookies.changeDetails),
-          }
-        );
-        if (updatedUser.status === 200) {
-          removeCookie('changeDetails');
-          await router.replace(`/user/changeDetails?success=true`);
-        }
-      } else {
-        if (user) {
-          reset(user);
-        }
-        setPageLoading(false);
-      }
-    })();
-  }, [cookies.changeDetails, user, router.query]);
+    if (user) {
+      reset(user);
+    }
+  }, [user]);
 
   const updateDetails = async (data: Partial<User>) => {
     setLoading(true);
-    setCookie('changeDetails', JSON.stringify({ id: user.id, ...data }));
-    await signOut({
-      callbackUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/login?phone=${data.email}&action=updateDetails`,
+    const changeDetailsData = await fetch(`/api/user/${user.id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
     });
+    const changeDetailsDataJson = await changeDetailsData.json();
+    if (changeDetailsDataJson.success) {
+      await signOut({
+        callbackUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/login?phone=${data.email}&changeDetailsId=${changeDetailsDataJson.data.id}`,
+      });
+    }
   };
-
-  if (pageLoading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center">
-        <Spinner animation="border" />
-      </div>
-    );
-  }
 
   return (
     <Form className={styles.main}>
@@ -164,7 +136,11 @@ const ChangeDetailsForm = ({ user }: { user: Partial<User> }) => {
               className={`${styles.button} mt-3`}
             >
               {loading ? (
-                <Spinner animation="border" size="sm" />
+                <Spinner
+                  animation="border"
+                  size="sm"
+                  style={{ color: '#fff' }}
+                />
               ) : (
                 'עדכון פרטים'
               )}
