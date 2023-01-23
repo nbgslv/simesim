@@ -109,9 +109,9 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
           <Form
             className={`${styles.signIn} d-flex flex-column align-items-center justify-content-center`}
           >
-            {router.query.paymentUrl && (
+            {router.query.phone && router.query.orderId && (
               <Alert className="text-center" variant="info">
-                לפני שנמשיך, וכדי לוודא שאתם לא רובוטים,
+                לפני שנמשיך, וכדי לאמת את זהותכם,
                 <br /> נשלח לטלפון שתזינו הודעה עם קוד, אותו תתבקשו להזין במסך
                 הבא
               </Alert>
