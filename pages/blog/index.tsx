@@ -99,7 +99,7 @@ export const getStaticProps = async () => {
   return {
     props: {
       posts: serializedPosts,
-      cursor,
+      cursor: cursor || null,
       total: totalPosts,
     },
   };
