@@ -73,13 +73,9 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
         `${process.env.NEXT_PUBLIC_BASE_URL}/order/payment?orderId=${router.query.orderId}`
       );
       setPhoneNumber(router.query.phone as string);
-    } else if (
-      router.query.phone &&
-      router.query.action &&
-      router.query.action === 'updateDetails'
-    ) {
+    } else if (router.query.phone && router.query.changeDetailsId) {
       setCallbackUrl(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/user/changeDetails?action=updateDetails`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/user/changeDetails?changeDetailsId=${router.query.changeDetailsId}`
       );
       setPhoneNumber(router.query.phone as string);
     }
@@ -116,7 +112,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
                 הבא
               </Alert>
             )}
-            {router.query.action && router.query.action === 'updateDetails' && (
+            {router.query.phone && router.query.changeDetailsId && (
               <Alert className="text-center" variant="info">
                 על-מנת לעדכן את פרטי החשבון, עלינו לאמת את זהותך.
                 <br />

@@ -17,7 +17,15 @@ export default async function handler(
       authOptions(req as NextApiRequest, res as NextApiResponse)
     );
     const { method } = req;
-    if (method === 'PUT') {
+    if (method === 'POST') {
+      if (!session) {
+        res.status(401).json({
+          name: 'UNAUTHORIZED',
+          success: false,
+          message: 'Unauthorized',
+        });
+        return;
+      }
       const { id } = req.query;
       const { firstName, lastName, email, emailEmail } = req.body;
       const postSchema = yup.object({
@@ -34,27 +42,60 @@ export default async function handler(
         email,
         emailEmail,
       });
-      if (!session || session.user.id !== id) {
-        res.status(401).json({
-          name: 'UNAUTHORIZED',
-          success: false,
-          message: 'Unauthorized',
-        });
-        return;
-      }
-
-      const user = await prisma.user.update({
+      const changeDetails = await prisma.changeDetails.create({
+        data: {
+          user: {
+            connect: {
+              id: id as string,
+            },
+          },
+          firstName,
+          lastName,
+          email,
+          emailEmail,
+        },
+      });
+      res.status(200).json({ success: true, data: { id: changeDetails.id } });
+    } else if (method === 'PUT') {
+      const { id } = req.query;
+      const postSchema = yup.object({
+        id: yup.string().required(),
+      });
+      await postSchema.validate({
+        id,
+      });
+      const updateDetails = await prisma.changeDetails.findUnique({
         where: {
           id: id as string,
         },
-        data: {
-          firstName: firstName as string,
-          lastName: lastName as string,
-          email: email as string,
-          emailEmail: emailEmail as string,
-        },
       });
-      res.status(200).json({ success: true, data: user });
+      if (!updateDetails) {
+        res.status(404).json({
+          name: 'NOT_FOUND',
+          success: false,
+          message: 'Not found',
+        });
+        return;
+      }
+      const [updatedUser] = await prisma.$transaction([
+        prisma.user.update({
+          where: {
+            id: updateDetails.userId,
+          },
+          data: {
+            firstName: updateDetails.firstName,
+            lastName: updateDetails.lastName,
+            email: updateDetails.email as string,
+            emailEmail: updateDetails.emailEmail as string,
+          },
+        }),
+        prisma.changeDetails.delete({
+          where: {
+            id: updateDetails.id as string,
+          },
+        }),
+      ]);
+      res.status(200).json({ success: true, data: updatedUser });
     } else {
       res.status(405).json({
         name: 'METHOD_NOT_ALLOWED',
