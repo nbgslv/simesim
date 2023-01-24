@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback, useEffect, useRef } from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import Image from 'next/image';
 import { AnimatePresence, motion, useAnimation, Variants } from 'framer-motion';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
@@ -191,6 +191,13 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
             className={`${styles.iconSuccess} h-100 w-100 position-relative`}
           >
             <FontAwesomeIcon icon={solid('check')} />
+            <Button
+              href="/#bundles-section"
+              variant="primary"
+              className={styles.orderButton}
+            >
+              לקנייה
+            </Button>
           </div>
         </div>
       );

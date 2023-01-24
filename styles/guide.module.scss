@@ -4,6 +4,7 @@
   padding: 1rem;
   background-color: $background-color;
   height: 100%;
+  position: relative;
 }
 
 .container {
@@ -14,4 +15,11 @@
   :global * {
     color: $text-color;
   }
+}
+
+.upButton {
+  background-color: map-get($theme-colors, 'primary') !important;
+  position: fixed !important;
+  bottom: 85px;
+  right: 20px;
 }
