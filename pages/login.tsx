@@ -73,13 +73,9 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
         `${process.env.NEXT_PUBLIC_BASE_URL}/order/payment?orderId=${router.query.orderId}`
       );
       setPhoneNumber(router.query.phone as string);
-    } else if (
-      router.query.phone &&
-      router.query.action &&
-      router.query.action === 'updateDetails'
-    ) {
+    } else if (router.query.phone && router.query.changeDetailsId) {
       setCallbackUrl(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/user/changeDetails?action=updateDetails`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/user/changeDetails?changeDetailsId=${router.query.changeDetailsId}`
       );
       setPhoneNumber(router.query.phone as string);
     }
@@ -109,14 +105,14 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
           <Form
             className={`${styles.signIn} d-flex flex-column align-items-center justify-content-center`}
           >
-            {router.query.paymentUrl && (
+            {router.query.phone && router.query.orderId && (
               <Alert className="text-center" variant="info">
                 לפני שנמשיך, וכדי לוודא שאתם לא רובוטים,
                 <br /> נשלח לטלפון שתזינו הודעה עם קוד, אותו תתבקשו להזין במסך
                 הבא
               </Alert>
             )}
-            {router.query.action && router.query.action === 'updateDetails' && (
+            {router.query.phone && router.query.changeDetailsId && (
               <Alert className="text-center" variant="info">
                 על-מנת לעדכן את פרטי החשבון, עלינו לאמת את זהותך.
                 <br />
