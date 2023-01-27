@@ -2,6 +2,7 @@ import React, { ReactNode, useCallback, useEffect } from 'react';
 import Head from 'next/head';
 import { Fab } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/router';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 import styles from './MainLayout.module.scss';
@@ -18,6 +19,7 @@ const MainLayout = ({
   metaDescription?: string;
 }) => {
   const [showOrderButton, setShowOrderButton] = React.useState<boolean>(false);
+  const router = useRouter();
 
   const handleScroll = useCallback(() => {
     if (window.scrollY > 1200) {
@@ -46,7 +48,7 @@ const MainLayout = ({
       <Header hideJumbotron={hideJumbotron} />
       <main>{children}</main>
       <AnimatePresence>
-        {showOrderButton && (
+        {showOrderButton && router.pathname === '/' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
