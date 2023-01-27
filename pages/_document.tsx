@@ -73,7 +73,6 @@ export default function Document() {
       <body>
         <Main />
         <NextScript />
-        <script></script>
         <Script
           strategy="beforeInteractive"
           src="//code.tidio.co/mpdxbn0v9arhag3ffbbicuxm4tzftnih.js"
