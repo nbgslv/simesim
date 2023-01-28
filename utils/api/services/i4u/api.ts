@@ -23,7 +23,7 @@ export default class Invoice4UClearing {
     'https://api.invoice4u.co.il/Services/ApiService.svc';
 
   private readonly apiTestUrl =
-    'https://private-anon-0f36448759-invoice4uclearingapis.apiary-mock.com/Services/ApiService.svc';
+    'https://private-anon-10dc6c5189-invoice4uclearingapis.apiary-mock.com/Services/ApiService.svc';
 
   private readonly returnUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/order`;
 

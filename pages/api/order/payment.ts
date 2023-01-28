@@ -88,14 +88,26 @@ export default async function handler(
           },
           data: {
             payment: {
-              create: {
-                amount: orderData.price,
-                user: {
-                  connect: {
-                    id: orderData.userId,
+              update: {
+                where: {
+                  id: orderData.payment?.id,
+                },
+                data: {
+                  status: PaymentStatus.FAILED,
+                  paymentMethod: {
+                    create: {
+                      paymentType: paymentMethod as PaymentType,
+                      isBitPayment: paymentMethod === PaymentType.BIT,
+                      user: {
+                        connect: {
+                          id: orderData.user.id,
+                        },
+                      },
+                      cardType: '',
+                      last4: '',
+                    },
                   },
                 },
-                status: PaymentStatus.FAILED,
               },
             },
           },
@@ -109,17 +121,30 @@ export default async function handler(
         },
         data: {
           payment: {
-            create: {
-              clearingTraceId,
-              paymentId,
-              i4UClearingLogId: clearingLogId,
-              amount: orderData.price,
-              user: {
-                connect: {
-                  id: orderData.userId,
+            update: {
+              where: {
+                id: orderData.payment?.id,
+              },
+              data: {
+                clearingTraceId,
+                paymentId,
+                i4UClearingLogId: clearingLogId,
+                amount: orderData.price,
+                status: PaymentStatus.PENDING,
+                paymentMethod: {
+                  create: {
+                    paymentType: paymentMethod as PaymentType,
+                    isBitPayment: false,
+                    cardType: '',
+                    last4: '',
+                    user: {
+                      connect: {
+                        id: orderData.user.id,
+                      },
+                    },
+                  },
                 },
               },
-              status: PaymentStatus.PENDING,
             },
           },
         },

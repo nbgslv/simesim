@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { PaymentType, Plan, Prisma } from '@prisma/client';
+import { PaymentStatus, PaymentType, Plan, Prisma } from '@prisma/client';
 import { unstable_getServerSession } from 'next-auth';
 import prisma from '../../../lib/prisma';
 import { ApiResponse } from '../../../lib/types/api';
@@ -146,8 +146,11 @@ export default async function handler(
 
       // Update payment and payment method
       if (plan && plan.userId === session?.user?.id) {
-        if (plan.payment?.status !== 'PAID') {
-          const paymentMethod = await prisma.paymentMethod.create({
+        if (plan.payment?.status !== PaymentStatus.PAID) {
+          const paymentMethod = await prisma.paymentMethod.update({
+            where: {
+              id: plan.payment?.paymentMethodId as string,
+            },
             data: {
               paymentType: isBitPayment
                 ? PaymentType.BIT
@@ -157,7 +160,7 @@ export default async function handler(
               last4: clearingLog.d[0]?.CreditNumber || '',
               user: {
                 connect: {
-                  id: session?.user?.id,
+                  id: session?.user?.id as string,
                 },
               },
             },
@@ -172,7 +175,7 @@ export default async function handler(
               paymentDate: new Date(),
               docId: clearingLog.d[0]?.DocId,
               isDocumentCreated: clearingLog.d[0]?.IsDocumentCreated,
-              status: 'PAID',
+              status: PaymentStatus.PAID,
               paymentMethodId: paymentMethod.id,
             },
           });

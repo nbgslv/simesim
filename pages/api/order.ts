@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { unstable_getServerSession } from 'next-auth';
-import { Plan } from '@prisma/client';
+import { PaymentStatus, Plan } from '@prisma/client';
 import * as yup from 'yup';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
@@ -106,7 +106,7 @@ export default async function handler(
       // Create order with pending payment(plan)
       const plan = await prisma.plan.create({
         data: {
-          status: 'ACTIVE',
+          status: 'PENDING',
           planModel: {
             connect: {
               id: newOrderData.planModel,
@@ -121,7 +121,7 @@ export default async function handler(
           payment: {
             create: {
               amount: price,
-              status: 'PENDING',
+              status: PaymentStatus.PENDING,
               coupon: couponData,
               user: {
                 connect: {

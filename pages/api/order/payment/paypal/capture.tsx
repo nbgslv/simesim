@@ -47,26 +47,9 @@ export default async function handler(
               data: {
                 payment: {
                   update: {
-                    // @ts-ignore
                     status: PaymentStatus.PAID,
-                    // @ts-ignore
                     paymentId: payment.id,
-                    // @ts-ignore
                     paymentDate: payment.update_time,
-                    // @ts-ignore
-                    paymentMethod: {
-                      create: {
-                        paymentType: 'PAYPAL',
-                        isBitPayment: false,
-                        cardType: 'PAYPAL',
-                        last4: '0000',
-                        user: {
-                          connect: {
-                            id: session.user.id,
-                          },
-                        },
-                      },
-                    },
                   },
                 },
               },
