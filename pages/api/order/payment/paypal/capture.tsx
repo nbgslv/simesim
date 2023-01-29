@@ -64,11 +64,13 @@ export default async function handler(
 
             await i4uApi.verifyLogin();
             const i4uResponse = await i4uApi.sendInvoice({
-              subject: 'חשבון קבלה עבור ה-eSim שלך',
+              customerName: `${plan?.user.firstName} ${plan?.user.lastName}`,
               payments: [
                 {
                   Amount: parseInt(payment.transactions[0].amount.total, 10),
-                  PaymentType: PaymentType.CreditCard,
+                  PaymentType: PaymentType.Other,
+                  PaymentTypeLiteral: 'PayPal',
+                  Date: new Date().toISOString(),
                 },
               ],
               items: [
@@ -99,6 +101,7 @@ export default async function handler(
                     status: PaymentStatus.PAID,
                     paymentId: payment.id,
                     paymentDate: payment.update_time,
+                    docId: i4uResponse.d.ID,
                   },
                 },
               },

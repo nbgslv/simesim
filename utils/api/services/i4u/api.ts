@@ -239,7 +239,7 @@ export default class Invoice4UClearing {
   }
 
   public async sendInvoice({
-    subject,
+    customerName,
     payments,
     items,
     emails,
@@ -258,8 +258,11 @@ export default class Invoice4UClearing {
           },
           body: JSON.stringify({
             doc: {
+              GeneralCustomer: {
+                Name: customerName,
+              },
               DocumentType: 3,
-              Subject: subject,
+              Subject: '',
               TaxIncluded: false,
               Payments: payments,
               Items: items,
@@ -283,10 +286,15 @@ export default class Invoice4UClearing {
 
       const responseJson = await response.json();
       if (responseJson.d.Errors && responseJson.d.Errors.length > 0) {
-        // eslint-disable-next-line no-console
-        console.log({ error: responseJson.d.Errors });
+        throw new Error(
+          responseJson.d.Errors.reduce(
+            (acc: string, error: string) => `${acc}, ${error}`,
+            ''
+          )
+        );
       }
-      return await response.json();
+
+      return responseJson;
     } catch (e: unknown) {
       console.error(e);
       throw new Error((e as Error).message);

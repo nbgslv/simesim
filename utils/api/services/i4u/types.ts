@@ -132,11 +132,14 @@ export enum PaymentType {
   MoneyTransfer = 3,
   Cash = 4,
   Credit = 5,
+  Other = 7,
+  NikuyMas = 6,
 }
 
 export type Payment = {
   Amount: number;
   PaymentType: PaymentType;
+  PaymentTypeLiteral?: string;
   Date?: string;
 };
 
@@ -153,7 +156,7 @@ export type Email = {
 };
 
 export type SendInvoiceProps = {
-  subject: string;
+  customerName: string;
   payments: Payment[];
   items: ItemForInvoice[];
   emails: Email[];
