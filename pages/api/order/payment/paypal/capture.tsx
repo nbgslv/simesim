@@ -54,7 +54,12 @@ export default async function handler(
             throw new Error(error.message);
           } else if (payment.state === 'approved') {
             // eslint-disable-next-line no-console
-            console.log({ payment });
+            console.log({
+              payment,
+              transactions: payment.transactions,
+              // @ts-ignore
+              payer: payment.payer.payer_info,
+            });
             const i4uApi = new Invoice4UClearing(
               process.env.INVOICE4U_API_KEY!,
               process.env.INVOICE4U_USER!,
@@ -82,9 +87,7 @@ export default async function handler(
               ],
               emails: [
                 {
-                  Mail:
-                    payment.transactions[0].payee?.email ||
-                    (plan?.user.emailEmail as string),
+                  Mail: plan?.user.emailEmail as string,
                   IsUserMail: false,
                 },
               ],
