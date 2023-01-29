@@ -53,13 +53,6 @@ export default async function handler(
             console.error(error.response.details);
             throw new Error(error.message);
           } else if (payment.state === 'approved') {
-            // eslint-disable-next-line no-console
-            console.log({
-              payment,
-              transactions: payment.transactions,
-              // @ts-ignore
-              payer: payment.payer.payer_info,
-            });
             const i4uApi = new Invoice4UClearing(
               process.env.INVOICE4U_API_KEY!,
               process.env.INVOICE4U_USER!,
@@ -75,7 +68,8 @@ export default async function handler(
                   Amount: parseInt(payment.transactions[0].amount.total, 10),
                   PaymentType: PaymentType.Other,
                   PaymentTypeLiteral: 'PayPal',
-                  Date: new Date().toISOString(),
+                  // eslint-disable-next-line no-useless-escape
+                  Date: `\/Date(${Date.now()})\/`,
                 },
               ],
               items: [
@@ -92,9 +86,6 @@ export default async function handler(
                 },
               ],
             });
-
-            // eslint-disable-next-line no-console
-            console.log({ i4uResponse });
 
             const updatedPlan = await prisma.plan.update({
               where: { id: orderId as string },

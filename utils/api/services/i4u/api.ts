@@ -275,17 +275,10 @@ export default class Invoice4UClearing {
 
       /** * Testing ** */
       if (this.test) {
-        // eslint-disable-next-line no-console
-        console.log({ response });
         const responseJson = await response.json();
-        // eslint-disable-next-line no-console
-        console.log({ responseJson });
         return { d: responseJson };
       }
       /** * Testing ** */
-
-      // eslint-disable-next-line no-console
-      console.log({ response });
 
       const responseJson = await response.json();
       if (responseJson.d.Errors && responseJson.d.Errors.length > 0) {
