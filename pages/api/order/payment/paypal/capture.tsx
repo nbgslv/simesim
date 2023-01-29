@@ -2,10 +2,12 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { unstable_getServerSession } from 'next-auth';
 import paypal, { Payment, SDKError } from 'paypal-rest-sdk';
 import { PaymentStatus } from '@prisma/client';
+import { PaymentType } from '../../../../../utils/api/services/i4u/types';
 import { ApiResponse } from '../../../../../lib/types/api';
 import { authOptions } from '../../../auth/[...nextauth]';
 import prisma from '../../../../../lib/prisma';
 import createLine, { LineStatus } from '../../../../../utils/createLine';
+import Invoice4UClearing from '../../../../../utils/api/services/i4u/api';
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,6 +30,15 @@ export default async function handler(
         return;
       }
       const { orderId, paymentId, payerId } = req.body;
+      const plan = await prisma.plan.findUnique({
+        where: {
+          id: orderId as string,
+        },
+        include: {
+          planModel: true,
+          user: true,
+        },
+      });
       paypal.configure({
         mode: process.env.CUSTOM_ENV === 'production' ? 'live' : 'sandbox',
         client_id: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
@@ -42,6 +53,40 @@ export default async function handler(
             console.error(error.response.details);
             throw new Error(error.message);
           } else if (payment.state === 'approved') {
+            const i4uApi = new Invoice4UClearing(
+              process.env.INVOICE4U_API_KEY!,
+              process.env.INVOICE4U_USER!,
+              process.env.INVOICE4U_PASSWORD!,
+              process.env.INVOICE4U_TEST === 'true'
+            );
+
+            await i4uApi.verifyLogin();
+            const i4uResponse = await i4uApi.sendInvoice({
+              customerName: `${plan?.user.firstName} ${plan?.user.lastName}`,
+              payments: [
+                {
+                  Amount: parseInt(payment.transactions[0].amount.total, 10),
+                  PaymentType: PaymentType.Other,
+                  PaymentTypeLiteral: 'PayPal',
+                  // eslint-disable-next-line no-useless-escape
+                  Date: `\/Date(${Date.now()})\/`,
+                },
+              ],
+              items: [
+                {
+                  Name: plan?.planModel.name as string,
+                  Quantity: 1,
+                  Price: parseInt(payment.transactions[0].amount.total, 10),
+                },
+              ],
+              emails: [
+                {
+                  Mail: plan?.user.emailEmail as string,
+                  IsUserMail: false,
+                },
+              ],
+            });
+
             const updatedPlan = await prisma.plan.update({
               where: { id: orderId as string },
               data: {
@@ -50,6 +95,7 @@ export default async function handler(
                     status: PaymentStatus.PAID,
                     paymentId: payment.id,
                     paymentDate: payment.update_time,
+                    docId: i4uResponse.d.ID,
                   },
                 },
               },

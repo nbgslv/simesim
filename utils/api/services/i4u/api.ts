@@ -6,6 +6,7 @@ import {
   CreatePaymentClearingParams,
   GetClearingLogParamsResponse,
   GetClearingLogResponse,
+  SendInvoiceProps,
 } from './types';
 
 export default class Invoice4UClearing {
@@ -23,7 +24,7 @@ export default class Invoice4UClearing {
     'https://api.invoice4u.co.il/Services/ApiService.svc';
 
   private readonly apiTestUrl =
-    'https://private-anon-10dc6c5189-invoice4uclearingapis.apiary-mock.com/Services/ApiService.svc';
+    'https://private-anon-51363226ef-invoice4uapi.apiary-mock.com/Services/ApiService.svc';
 
   private readonly returnUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/order`;
 
@@ -231,6 +232,65 @@ export default class Invoice4UClearing {
       /** * Testing ** */
 
       return await response.json();
+    } catch (e: unknown) {
+      console.error(e);
+      throw new Error((e as Error).message);
+    }
+  }
+
+  public async sendInvoice({
+    customerName,
+    payments,
+    items,
+    emails,
+  }: SendInvoiceProps) {
+    try {
+      if (!this.token) {
+        throw new Error('You must verify your login first');
+      }
+
+      const response = await fetch(
+        `${this.isTest ? this.apiTestUrl : this.apiUrl}/CreateDocument`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            doc: {
+              GeneralCustomer: {
+                Name: customerName,
+              },
+              DocumentType: 3,
+              Subject: '',
+              TaxIncluded: false,
+              Payments: payments,
+              Items: items,
+              AssociatedEmails: emails,
+            },
+            token: this.token,
+          }),
+        }
+      );
+
+      /** * Testing ** */
+      if (this.test) {
+        const responseJson = await response.json();
+        return { d: responseJson };
+      }
+      /** * Testing ** */
+
+      const responseJson = await response.json();
+      if (responseJson.d.Errors && responseJson.d.Errors.length > 0) {
+        throw new Error(
+          responseJson.d.Errors.reduce(
+            (acc: string, error: string) => `${acc}, ${error}`,
+            ''
+          )
+        );
+      }
+
+      return responseJson;
     } catch (e: unknown) {
       console.error(e);
       throw new Error((e as Error).message);
