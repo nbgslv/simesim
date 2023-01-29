@@ -281,6 +281,11 @@ export default class Invoice4UClearing {
       }
       /** * Testing ** */
 
+      const responseJson = await response.json();
+      if (responseJson.d.Errors && responseJson.d.Errors.length > 0) {
+        // eslint-disable-next-line no-console
+        console.log({ error: responseJson.d.Errors });
+      }
       return await response.json();
     } catch (e: unknown) {
       console.error(e);
