@@ -85,7 +85,7 @@ export default async function handler(
                   Mail:
                     payment.transactions[0].payee?.email ||
                     (plan?.user.emailEmail as string),
-                  IsUserMail: true,
+                  IsUserMail: false,
                 },
               ],
             });
