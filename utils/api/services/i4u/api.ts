@@ -257,12 +257,14 @@ export default class Invoice4UClearing {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            DocumentType: 3,
-            Subject: subject,
-            TaxIncluded: false,
-            Payments: payments,
-            Items: items,
-            AssociatedEmails: emails,
+            doc: {
+              DocumentType: 3,
+              Subject: subject,
+              TaxIncluded: false,
+              Payments: payments,
+              Items: items,
+              AssociatedEmails: emails,
+            },
             token: this.token,
           }),
         }
