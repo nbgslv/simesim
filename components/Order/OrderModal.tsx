@@ -55,7 +55,7 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
   useEffect(() => {
     if (bundle) {
       setPrice(bundle.price);
-      setAmountDays(bundle.refill.amount_days || 0);
+      setAmountDays(bundle.refill.amount_days || 365);
     }
   }, [bundle]);
 
