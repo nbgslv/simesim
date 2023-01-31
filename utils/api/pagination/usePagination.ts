@@ -31,7 +31,6 @@ function usePagination<T extends Record<any, any>>({
         const { total, items } = await apiFetch(currentPage, itemsPerPage);
         setTotalPages(Math.ceil(total / itemsPerPage));
         setCurrentItems(items);
-        setIsLoading(false);
       } catch (e) {
         setError(e as Error);
       } finally {

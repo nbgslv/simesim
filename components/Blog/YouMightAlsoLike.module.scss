@@ -6,6 +6,7 @@
   background-color: map-get($theme-colors, 'orange');
   border-radius: 6px;
   scale: 1;
+  height: 15rem;
   @include shadow;
 
   :global * {
@@ -14,8 +15,12 @@
 }
 
 .coverImage {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   width: 10rem;
-  height: 80%;
+  height: 70%;
   object-fit: cover;
+}
+
+.postTitle {
+  margin-bottom: 1rem;
 }
