@@ -1,41 +1,68 @@
 import React, { useEffect } from 'react';
 import { Col, Container, Row, Spinner } from 'react-bootstrap';
 import { Post } from '@prisma/client';
-import { useInView } from 'react-intersection-observer';
+import { useRouter } from 'next/router';
 import MainLayout from '../../components/Layouts/MainLayout';
 import PostCard from '../../components/Blog/PostCard';
 import styles from '../../styles/blog.module.scss';
-import useInfiniteScroll from '../../utils/api/pagination/useInfiniteScroll';
+import prisma from '../../lib/prisma';
+import usePagination from '../../utils/api/pagination/usePagination';
+import Pagination from '../../components/Pagination/Pagination';
 
-const POST_QUANTITY = 8;
+const POST_QUANTITY = 12;
 
-const Index = () => {
-  const { ref, inView } = useInView();
+type BlogProps = {
+  initialPosts: Post[];
+  total: number;
+};
+
+const Index = ({ initialPosts, total }: BlogProps) => {
+  const [posts, setPosts] = React.useState<Post[]>([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (initialPosts.length) setPosts(initialPosts);
+  }, [initialPosts]);
 
   const {
-    loading,
-    items: postItems,
-    loadMore,
-    hasNext,
-  } = useInfiniteScroll<Post>({
-    getItems: async (cursor, limit) => {
-      const res = await fetch(
-        `/api/blog?cursor=${cursor}&limit=${limit}&order=createdAt&direction=desc`
+    currentItems,
+    currentPage,
+    goToPage,
+    isLoading,
+  } = usePagination<Post>({
+    apiFetch: async (page, itemsPerPage) => {
+      const postsFromApi: Response = await fetch(
+        `/api/blog?page=${page}&itemsPerPage=${itemsPerPage}`
       );
-      const { data: newItems, total } = await res.json();
-      return {
-        items: newItems,
-        total,
-      };
+      const data = await postsFromApi.json();
+      return data.data;
     },
-    limit: POST_QUANTITY,
+    itemsPerPage: POST_QUANTITY,
   });
 
   useEffect(() => {
-    if (inView && hasNext) {
-      loadMore();
+    if (currentItems?.length) setPosts(currentItems);
+  }, [currentItems]);
+
+  useEffect(() => {
+    if (router.query.page) {
+      goToPage(Number(router.query.page));
     }
-  }, [inView, hasNext]);
+  }, [router.query.page]);
+
+  useEffect(() => {
+    router.push(
+      `/blog?page=${currentPage}&itemsPerPage=${POST_QUANTITY}`,
+      undefined,
+      { shallow: true }
+    );
+  }, [currentPage]);
+
+  const handlePageChange = (page: number) => {
+    router.push(`/blog?page=${page}&itemsPerPage=${POST_QUANTITY}`, undefined, {
+      shallow: true,
+    });
+  };
 
   return (
     <MainLayout title="בלוג" hideJumbotron>
@@ -43,24 +70,67 @@ const Index = () => {
         <h1 className="mb-5">הבלוג</h1>
         <Container>
           <Row>
-            {postItems.map((post) => (
-              <Col md={3} key={post.id} className="mb-5">
-                <PostCard post={post} />
+            {isLoading ? (
+              <Col
+                className="w-100 d-flex justify-content-center align-items-center"
+                style={{ height: '1058px' }}
+              >
+                <Spinner animation={'border'} />
               </Col>
-            ))}
-            {loading && (
-              <Row>
-                <Col className="w-100 h-100 text-center">
-                  <Spinner animation={'border'} />
-                </Col>
-              </Row>
+            ) : (
+              <>
+                {posts.map((post) => (
+                  <Col md={3} key={post.id} className="mb-5">
+                    <PostCard post={post} />
+                  </Col>
+                ))}
+              </>
             )}
-            <div ref={ref} style={{ visibility: 'hidden' }} />
+          </Row>
+          <Row>
+            <Col>
+              <Pagination
+                pages={[...Array(Math.ceil(total / POST_QUANTITY)).keys()]}
+                currentPage={currentPage}
+                handlePageChange={handlePageChange}
+              />
+            </Col>
           </Row>
         </Container>
       </div>
     </MainLayout>
   );
 };
+
+export async function getStaticProps() {
+  const total = await prisma.post.count({
+    where: {
+      show: true,
+    },
+  });
+  const posts = await prisma.post.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+    where: {
+      show: true,
+    },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      description: true,
+      coverImage: true,
+    },
+    take: POST_QUANTITY,
+  });
+
+  return {
+    props: {
+      initialPosts: posts,
+      total,
+    },
+  };
+}
 
 export default Index;

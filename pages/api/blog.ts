@@ -21,6 +21,7 @@ import { ApiResponse } from '../../lib/types/api';
 import { authOptions } from './auth/[...nextauth]';
 import { Input } from '../../utils/api/services/adminApi';
 import { deleteSchema } from '../../utils/api/validation';
+import { PaginationApiResponse } from '../../utils/api/pagination/usePagination';
 
 async function buffer(readable: Readable) {
   const chunks = [];
@@ -34,7 +35,9 @@ async function buffer(readable: Readable) {
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<
-    | ApiResponse<Partial<Post> | Prisma.BatchPayload>
+    | ApiResponse<
+        PaginationApiResponse<Partial<Post>> | Post | Prisma.BatchPayload
+      >
     | { data: Post[]; total: number }
   >
 ) {
@@ -46,7 +49,7 @@ export default async function handler(
     );
     const { method } = req;
     if (method === 'GET') {
-      const { limit, cursor, order, direction } = req.query;
+      const { page, itemsPerPage } = req.query;
 
       const total = await prisma.post.count({
         where: {
@@ -54,35 +57,32 @@ export default async function handler(
         },
       });
 
-      let posts = [];
-      if (limit && parseInt(limit as string, 10) < 0) {
-        posts = await prisma.post.findMany({
-          where: {
-            show: true,
-          },
-          orderBy: {
-            [order as string]: direction,
-          },
-          cursor: { id: cursor as string },
-          take: -Number.MAX_SAFE_INTEGER,
-        });
-      } else {
-        posts = await prisma.post.findMany({
-          where: {
-            show: true,
-          },
-          take: parseInt(limit as string, 10),
-          skip: cursor ? 1 : 0,
-          cursor: cursor ? { id: cursor as string } : undefined,
-          orderBy: {
-            [order as string]: direction,
-          },
-        });
-      }
+      const posts = await prisma.post.findMany({
+        where: {
+          show: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: parseInt(itemsPerPage as string, 10),
+        skip:
+          (parseInt(page as string, 10) - 1) *
+          parseInt(itemsPerPage as string, 10),
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          description: true,
+          coverImage: true,
+        },
+      });
+
       res.status(200).json({
         success: true,
-        data: posts,
-        total,
+        data: {
+          items: posts,
+          total,
+        },
       });
     } else if (method === 'POST') {
       if (!session || session.user.role !== 'ADMIN') {
