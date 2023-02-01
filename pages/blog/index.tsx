@@ -44,6 +44,11 @@ const Index = ({ initialPosts, total }: BlogProps) => {
       } else {
         setPosts(currentItems);
       }
+    } else {
+      setPosts(initialPosts);
+      router.push(`/blog?page=1&itemsPerPage=${POST_QUANTITY}`, undefined, {
+        shallow: true,
+      });
     }
   }, [initialPosts, currentItems, router.query.page]);
 
