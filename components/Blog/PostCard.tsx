@@ -1,21 +1,17 @@
 import React from 'react';
 import { Card } from 'react-bootstrap';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/router';
 import { Post } from '@prisma/client';
 import Link from 'next/link';
 import styles from './PostCard.module.scss';
 
-const PostCard = ({ post }: { post: Post }) => {
-  const router = useRouter();
-
-  return (
-    <Link href={`/blog/${post.slug}`} passHref legacyBehavior>
+const PostCard = ({ post }: { post: Post }) => (
+  <Link href={`/blog/${post.slug}`} passHref legacyBehavior>
+    <a className={styles.cardLink}>
       <motion.div
-        role="button"
+        initial={{ scale: 1 }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => router.push(`/blog/${post.slug}`)}
       >
         <Card className={styles.main}>
           <Card.Img
@@ -32,8 +28,8 @@ const PostCard = ({ post }: { post: Post }) => {
           </Card.Body>
         </Card>
       </motion.div>
-    </Link>
-  );
-};
+    </a>
+  </Link>
+);
 
 export default PostCard;

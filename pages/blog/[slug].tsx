@@ -5,6 +5,7 @@ import { Col, Container, Row, Spinner } from 'react-bootstrap';
 import sanitizeHtml from 'sanitize-html';
 import { useRouter } from 'next/router';
 import { format } from 'date-fns';
+import Head from 'next/head';
 import prisma from '../../lib/prisma';
 import MainLayout from '../../components/Layouts/MainLayout';
 import styles from '../../styles/slug.module.scss';
@@ -36,6 +37,21 @@ const Slug = ({ postId, morePosts }: { postId: string; morePosts: Post[] }) => {
 
   return (
     <MainLayout title={post?.title || 'טוען...'} hideJumbotron>
+      <Head>
+        <meta name="description" content={post?.description || ''} />
+        <meta property="og:title" content={post?.title || ''} />
+        <meta property="og:description" content={post?.description || ''} />
+        <meta property="og:image" content={post?.coverImage || ''} />
+        <meta
+          property="og:url"
+          content={`${process.env.NEXT_PUBLIC_BASE_URL}/blog/${post?.slug}`}
+        />
+        <meta property="og:type" content="article" />
+        <link
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_BASE_URL}/blog/${post?.slug}`}
+        />
+      </Head>
       <div className={styles.main}>
         <Container>
           <>

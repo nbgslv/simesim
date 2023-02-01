@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Col, Container, Row, Spinner } from 'react-bootstrap';
 import { Post } from '@prisma/client';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import MainLayout from '../../components/Layouts/MainLayout';
 import PostCard from '../../components/Blog/PostCard';
 import styles from '../../styles/blog.module.scss';
@@ -54,6 +55,12 @@ const Index = ({ initialPosts, total }: BlogProps) => {
 
   return (
     <MainLayout title="בלוג" hideJumbotron>
+      <Head>
+        <link
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_BASE_URL}/blog`}
+        />
+      </Head>
       <div className={styles.main}>
         <h1 className="mb-5">הבלוג</h1>
         <Container>
