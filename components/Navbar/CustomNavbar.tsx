@@ -93,22 +93,22 @@ function CustomNavbar({
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav activeKey={router.pathname} defaultActiveKey="/">
-            <Link href="/" passHref>
+            <Link href="/" passHref legacyBehavior>
               <Nav.Link className="d-none">בית</Nav.Link>
             </Link>
-            <Link href="/#bundles-section" passHref>
+            <Link href="/#bundles-section" passHref legacyBehavior>
               <Nav.Link>{text.header.navbar.order}</Nav.Link>
             </Link>
-            <Link href="/info" passHref>
+            <Link href="/info" passHref legacyBehavior>
               <Nav.Link>{text.header.navbar.info}</Nav.Link>
             </Link>
-            <Link href="/guide" passHref>
+            <Link href="/guide" passHref legacyBehavior>
               <Nav.Link>{text.header.navbar.guide}</Nav.Link>
             </Link>
-            <Link href="/about" passHref>
+            <Link href="/about" passHref legacyBehavior>
               <Nav.Link>{text.header.navbar.about}</Nav.Link>
             </Link>
-            <Link href="/contact" passHref>
+            <Link href="/contact" passHref legacyBehavior>
               <Nav.Link>{text.header.navbar.contact}</Nav.Link>
             </Link>
           </Nav>
@@ -134,7 +134,7 @@ function CustomNavbar({
                 </NavDropdown.Item>
               </NavDropdown>
             ) : (
-              <Link href="/login" passHref>
+              <Link href="/login" passHref legacyBehavior>
                 <Nav.Link>{text.header.navbar.login}</Nav.Link>
               </Link>
             )}
@@ -142,7 +142,6 @@ function CustomNavbar({
         </Navbar.Collapse>
         <Link href="/" passHref>
           <Navbar.Brand
-            href="/"
             className="d-flex justify-content-end"
             style={{ marginLeft: '0' }}
           >

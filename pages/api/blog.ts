@@ -50,6 +50,9 @@ export default async function handler(
     const { method } = req;
     if (method === 'GET') {
       const { page, itemsPerPage } = req.query;
+      if (!page || !itemsPerPage) {
+        return;
+      }
 
       const total = await prisma.post.count({
         where: {

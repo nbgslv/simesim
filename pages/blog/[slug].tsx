@@ -11,19 +11,9 @@ import styles from '../../styles/slug.module.scss';
 import YouMightAlsoLike from '../../components/Blog/YouMightAlsoLike';
 import ShareButton from '../../components/Blog/ShareButton/ShareButton';
 
-const Slug = ({
-  postId,
-  morePostsIds,
-}: {
-  postId: string;
-  morePostsIds: string[] | null;
-}) => {
+const Slug = ({ postId, morePosts }: { postId: string; morePosts: Post[] }) => {
   const [postLoading, setPostLoading] = React.useState<boolean>(true);
-  const [morePostsLoading, setMorePostsLoading] = React.useState<boolean>(true);
   const [post, setPost] = React.useState<Partial<Post> | null>(null);
-  const [morePostsToShow, setMorePostsToShow] = React.useState<Post[] | null>(
-    null
-  );
   const router = useRouter();
 
   useEffect(() => {
@@ -43,27 +33,6 @@ const Slug = ({
       }
     })();
   }, [postId]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        if (!morePostsToShow && morePostsIds?.length) {
-          const posts = await fetch(
-            `/api/blog?limit=${3}&cursor=${
-              morePostsIds[0]
-            }&order=views&direction=desc`
-          );
-          const { data } = await posts.json();
-          setMorePostsToShow(data.posts);
-        }
-      } catch (error) {
-        console.error(error);
-        await router.push('/error');
-      } finally {
-        setMorePostsLoading(false);
-      }
-    })();
-  }, [morePostsIds]);
 
   return (
     <MainLayout title={post?.title || 'טוען...'} hideJumbotron>
@@ -127,16 +96,10 @@ const Slug = ({
                     />
                   </Col>
                 </Row>
-                {morePostsToShow?.length ? (
+                {morePosts?.length ? (
                   <Row className="w-100 text-center">
                     <Col>
-                      {morePostsLoading ? (
-                        <div className="text-center">
-                          <Spinner animation={'border'} />
-                        </div>
-                      ) : (
-                        <YouMightAlsoLike posts={morePostsToShow} />
-                      )}
+                      <YouMightAlsoLike posts={morePosts} />
                     </Col>
                   </Row>
                 ) : null}
@@ -152,7 +115,7 @@ const Slug = ({
 export const getStaticProps: GetStaticProps<
   {
     postId: string | null;
-    morePostsIds: string[] | null;
+    morePosts?: Partial<Post>[] | null;
   },
   { slug: string }
 > = async (context) => {
@@ -188,6 +151,10 @@ export const getStaticProps: GetStaticProps<
     },
     select: {
       id: true,
+      slug: true,
+      title: true,
+      description: true,
+      coverImage: true,
     },
     take: 3,
   });
@@ -196,12 +163,10 @@ export const getStaticProps: GetStaticProps<
     return { props: { postId: null, morePostsIds: null } };
   }
 
-  const serializedMorePosts = morePosts.map((postOfPosts) => postOfPosts.id);
-
   return {
     props: {
       postId: post.id,
-      morePostsIds: serializedMorePosts,
+      morePosts,
     },
   };
 };

@@ -20,10 +20,6 @@ const Index = ({ initialPosts, total }: BlogProps) => {
   const [posts, setPosts] = React.useState<Post[]>([]);
   const router = useRouter();
 
-  useEffect(() => {
-    if (initialPosts.length) setPosts(initialPosts);
-  }, [initialPosts]);
-
   const {
     currentItems,
     currentPage,
@@ -41,28 +37,15 @@ const Index = ({ initialPosts, total }: BlogProps) => {
   });
 
   useEffect(() => {
-    if (currentItems?.length) setPosts(currentItems);
-  }, [currentItems]);
-
-  useEffect(() => {
     if (router.query.page) {
       goToPage(Number(router.query.page));
+      if (router.query.page === '1' && initialPosts.length > 0) {
+        setPosts(initialPosts);
+      } else {
+        setPosts(currentItems);
+      }
     }
-  }, [router.query.page]);
-
-  useEffect(() => {
-    router.push(
-      `/blog?page=${currentPage}&itemsPerPage=${POST_QUANTITY}`,
-      undefined,
-      { shallow: true }
-    );
-  }, [currentPage]);
-
-  const handlePageChange = (page: number) => {
-    router.push(`/blog?page=${page}&itemsPerPage=${POST_QUANTITY}`, undefined, {
-      shallow: true,
-    });
-  };
+  }, [initialPosts, currentItems, router.query.page]);
 
   return (
     <MainLayout title="בלוג" hideJumbotron>
@@ -92,7 +75,9 @@ const Index = ({ initialPosts, total }: BlogProps) => {
               <Pagination
                 pages={[...Array(Math.ceil(total / POST_QUANTITY)).keys()]}
                 currentPage={currentPage}
-                handlePageChange={handlePageChange}
+                setUrl={(page) =>
+                  `/blog?page=${page}&itemsPerPage=${POST_QUANTITY}`
+                }
               />
             </Col>
           </Row>
