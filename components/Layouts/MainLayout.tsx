@@ -11,12 +11,14 @@ const MainLayout = ({
   title,
   children,
   hideJumbotron = false,
-  metaDescription,
+  metaDescription = '',
+  metaCanonical = '',
 }: {
   title: string;
   children: ReactNode;
   hideJumbotron?: boolean;
   metaDescription?: string;
+  metaCanonical?: string;
 }) => {
   const [showOrderButton, setShowOrderButton] = React.useState<boolean>(false);
   const router = useRouter();
@@ -44,6 +46,7 @@ const MainLayout = ({
         {metaDescription && (
           <meta name="description" content={metaDescription} />
         )}
+        {metaCanonical && <link rel="canonical" href={metaCanonical} />}
       </Head>
       <Header hideJumbotron={hideJumbotron} />
       <main>{children}</main>

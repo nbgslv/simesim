@@ -91,7 +91,12 @@ const Contact = () => {
   };
 
   return (
-    <MainLayout title="צור קשר" metaDescription={'צור קשר'} hideJumbotron>
+    <MainLayout
+      title="צור קשר"
+      metaDescription={'צור קשר'}
+      metaCanonical={`${process.env.NEXT_PUBLIC_BASE_URL}/contact`}
+      hideJumbotron
+    >
       <div className={styles.main}>
         <h1 className="text-center p-2">{text.contact.title}</h1>
         <Container

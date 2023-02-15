@@ -7,6 +7,7 @@ const Info = () => (
   <MainLayout
     title="eSim"
     metaDescription={'מה זה כרטיס eSim ואיך זה טוב לנו'}
+    metaCanonical={`${process.env.NEXT_PUBLIC_BASE_URL}/info`}
     hideJumbotron
   >
     <div className={styles.wrapper}>
