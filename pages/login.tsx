@@ -99,7 +99,11 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
 
   if (status === 'unauthenticated')
     return (
-      <MainLayout title="התחברות" hideJumbotron>
+      <MainLayout
+        title="התחברות"
+        metaCanonical={`${process.env.NEXT_PUBLIC_BASE_URL}/login`}
+        hideJumbotron
+      >
         <div className={styles.main}>
           <h1 className="text-center p-2">התחברות</h1>
           <Form

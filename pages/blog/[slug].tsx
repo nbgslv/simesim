@@ -36,7 +36,11 @@ const Slug = ({ postId, morePosts }: { postId: string; morePosts: Post[] }) => {
   }, [postId]);
 
   return (
-    <MainLayout title={post?.title || 'טוען...'} hideJumbotron>
+    <MainLayout
+      title={post?.title || 'טוען...'}
+      metaCanonical={`${process.env.NEXT_PUBLIC_BASE_URL}/blog/${post?.slug}`}
+      hideJumbotron
+    >
       <Head>
         <meta name="description" content={post?.description || ''} />
         <meta property="og:title" content={post?.title || ''} />
@@ -47,10 +51,6 @@ const Slug = ({ postId, morePosts }: { postId: string; morePosts: Post[] }) => {
           content={`${process.env.NEXT_PUBLIC_BASE_URL}/blog/${post?.slug}`}
         />
         <meta property="og:type" content="article" />
-        <link
-          rel="canonical"
-          href={`${process.env.NEXT_PUBLIC_BASE_URL}/blog/${post?.slug}`}
-        />
       </Head>
       <div className={styles.main}>
         <Container>
