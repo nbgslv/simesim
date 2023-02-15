@@ -22,7 +22,10 @@ export const getServerSideProps = async ({ res }: { res: NextApiResponse }) => {
     )
     .map(
       (staticPagePath) =>
-        `${process.env.NEXTAUTH_URL}/${staticPagePath.replace('.tsx', '')}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/${staticPagePath.replace(
+          '.tsx',
+          ''
+        )}`
     );
 
   const posts = await prisma.post.findMany({
@@ -34,7 +37,7 @@ export const getServerSideProps = async ({ res }: { res: NextApiResponse }) => {
     },
   });
   const dynamicPaths = posts.map(
-    (post) => `${process.env.NEXTAUTH_URL}/blog/${post.slug}`
+    (post) => `${process.env.NEXT_PUBLIC_BASE_URL}/blog/${post.slug}`
   );
 
   const allPaths = [...staticPaths, ...dynamicPaths];

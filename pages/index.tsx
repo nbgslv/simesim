@@ -39,6 +39,7 @@ export default function Home({
     <MainLayout
       title="שים eSim"
       metaDescription={'שים eSim חבילות גלישה זולות לחו"ל בלי להחליף כרטיס sim'}
+      metaCanonical={`${process.env.NEXT_PUBLIC_BASE_URL}/`}
     >
       <BundlesSection
         bucket={bucket}

@@ -9,6 +9,7 @@ const About = () => (
     metaDescription={
       'שים eSim שמה לעצמה למטרה לספק חויית שירות איכותית וטובה, ולספק מבחר אפשרויות רכישה זולות, של חבילות גלישה בחו"ל'
     }
+    metaCanonical={`${process.env.NEXT_PUBLIC_BASE_URL}/about`}
     hideJumbotron
   >
     <div className={styles.wrapper}>
