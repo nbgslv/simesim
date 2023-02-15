@@ -39,11 +39,8 @@ export default function Document() {
           rel="stylesheet"
         />
         <Script
-          strategy="beforeInteractive"
-          src={`https://www.googleoptimize.com/optimize.js?id=${process.env.GA_OPTIMIZE_ID}`}
-        />
-        <Script
           id="meta-pixel"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
             !function(f,b,e,v,n,t,s)

@@ -1,5 +1,5 @@
 import { Country, PlanModel, Prisma } from '@prisma/client';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import Lottie from 'react-lottie';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -10,10 +10,8 @@ import styles from './BundlesSection.module.scss';
 import * as travelImageData from '../../public/travel.json';
 import OrderModal from '../Order/OrderModal';
 import Bundles from './Bundles';
-import BundlesScroll from './BundlesScroll';
 
 type BundlesSectionProps = {
-  bucket: string | null;
   countriesList: Country[];
   bundlesList: (PlanModel &
     Prisma.PlanModelGetPayload<{
@@ -22,7 +20,6 @@ type BundlesSectionProps = {
 };
 
 const BundlesSection = ({
-  bucket,
   countriesList,
   bundlesList,
 }: BundlesSectionProps) => {
@@ -41,16 +38,6 @@ const BundlesSection = ({
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
   const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
   const countrySearchRef = useRef<any>();
-
-  useEffect(() => {
-    if (bucket !== 'b') {
-      if (currentStep === 2) {
-        setOrderModalOpen(true);
-      } else {
-        setOrderModalOpen(false);
-      }
-    }
-  }, [currentStep, bucket]);
 
   const handleCountrySelect = (country: ExtendedCountry | null) => {
     setSelectedCountry(country);
@@ -117,21 +104,14 @@ const BundlesSection = ({
                   <h3>2. בוחרים חבילת דאטה</h3>
                 </div>
                 <div className="h-100">
-                  {bucket === 'b' ? (
-                    <Bundles
-                      bundlesList={filteredBundles}
-                      onChange={handleBundleSelect}
-                    />
-                  ) : (
-                    <BundlesScroll
-                      bundlesList={filteredBundles}
-                      setBundle={handleBundleSelect}
-                    />
-                  )}
+                  <Bundles
+                    bundlesList={filteredBundles}
+                    onChange={handleBundleSelect}
+                  />
                 </div>
               </div>
             ) : null}
-            {bucket === 'b' && currentStep >= 1 ? (
+            {currentStep >= 1 && (
               <div className="d-flex justify-content-between">
                 <Button
                   variant="primary"
@@ -160,7 +140,7 @@ const BundlesSection = ({
                   בא לי מדינה אחרת
                 </Button>
               </div>
-            ) : null}
+            )}
             <OrderModal
               show={orderModalOpen}
               onHide={handleOrderModalClose}
