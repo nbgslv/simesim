@@ -1,7 +1,8 @@
 @import 'styles/variables';
 
 .main {
-  height: 100vh;
+  min-height: 100vh;
+  height: 50rem;
   background-color: map-get($theme-colors, 'light');
 
   @media (max-width: map-get($grid-breakpoints, 'md')) {
@@ -10,7 +11,7 @@
 }
 
 .mainRow {
-  height: 89%;
+  height: 78%;
   @media (max-width: map-get($grid-breakpoints, 'md')) {
     flex-direction: column !important;
     padding: 1rem;
@@ -92,6 +93,14 @@
 
 .orderButton {
   width: 100%;
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.moreButton {
+  width: 50%;
   height: 3rem;
   display: flex;
   justify-content: center;

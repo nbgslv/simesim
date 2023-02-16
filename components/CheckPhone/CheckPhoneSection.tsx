@@ -1,6 +1,7 @@
 import React, { ReactNode, useCallback, useEffect, useRef } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import Image from 'next/image';
+import Link from 'next/link';
 import { AnimatePresence, motion, useAnimation, Variants } from 'framer-motion';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -314,6 +315,15 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
             </motion.div>
           </Col>
         )}
+      </Row>
+      <Row>
+        <Col className="d-flex justify-content-center">
+          <Link href="/supported_devices" passHref legacyBehavior>
+            <Button className={styles.moreButton} variant="primary">
+              לרשימה המלאה
+            </Button>
+          </Link>
+        </Col>
       </Row>
     </SectionComponent>
   );
