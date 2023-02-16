@@ -1,0 +1,35 @@
+@import "styles/variables";
+
+.wrapper {
+  padding: 1rem;
+  background-color: $background-color;
+  min-height: $page-height;
+  height: 100%;
+  position: relative;
+  direction: ltr;
+  position: relative;
+
+  :global * :not(button) {
+    color: $text-color;
+  }
+
+  :global .accordion-button::after {
+    margin-right: 0 !important;
+    margin-left: auto !important;
+  }
+}
+
+.exceptions {
+  direction: rtl;
+}
+
+.exceptionsContent {
+  direction: ltr;
+}
+
+.disclaimer {
+  direction: rtl;
+  position: absolute;
+  bottom: 1rem;
+  right: 2rem;
+}
