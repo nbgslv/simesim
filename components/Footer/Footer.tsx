@@ -37,6 +37,11 @@ const Footer = () => (
               <Nav.Link href="/info">{text.header.navbar.info}</Nav.Link>
             </Nav.Item>
             <Nav.Item>
+              <Nav.Link href="/supported_devices">
+                {text.header.navbar.supportedDevices}
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
               <Nav.Link href="/guide">{text.header.navbar.guide}</Nav.Link>
             </Nav.Item>
             <Nav.Item>
