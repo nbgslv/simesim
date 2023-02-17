@@ -1,18 +1,25 @@
 import React, { useEffect } from 'react';
-import { PlanModel, Prisma } from '@prisma/client';
+import { Country, PlanModel, Prisma } from '@prisma/client';
 import { Col, Row } from 'react-bootstrap';
+import { useMediaQuery } from 'react-responsive';
 import BundleCard from './BundleCard';
 import styles from './Bundles.module.scss';
+// eslint-disable-next-line import/no-cycle
+import RoamingCountries from './RoamingCountries';
+
+export type BundlesList = PlanModel &
+  Prisma.PlanModelGetPayload<{
+    include: { refill: { include: { bundle: true } } };
+  }>;
 
 const Bundles = ({
   bundlesList,
   onChange,
+  countriesList,
 }: {
-  bundlesList: (PlanModel &
-    Prisma.PlanModelGetPayload<{
-      include: { refill: { include: { bundle: true } } };
-    }>)[];
+  bundlesList: BundlesList[];
   onChange: (bundleId: string | null) => void;
+  countriesList: Country[];
 }) => {
   const [selectedBundle, setSelectedBundle] = React.useState<string | null>(
     null
@@ -36,6 +43,7 @@ const Bundles = ({
   const [daysOptions, setDaysOptions] = React.useState<
     { option: number; disabled: boolean }[]
   >([]);
+  const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
 
   useEffect(() => {
     if (bundlesList.length) {
@@ -161,7 +169,7 @@ const Bundles = ({
               .sort((a, b) => a.option - b.option)
               .map((volumeOption) => (
                 <Col
-                  className="d-flex justify-content-center align-items-center"
+                  className="d-flex justify-content-center align-items-center mb-4"
                   key={volumeOption.option}
                 >
                   <BundleCard
@@ -204,9 +212,57 @@ const Bundles = ({
         </Row>
       </div>
       {selectedBundle ? (
-        <div className={styles.price}>
-          {'\u20AA'}
-          {bundlesList.find((bundle) => bundle.id === selectedBundle)?.price}
+        <div>
+          <div className={styles.price}>
+            {'\u20AA'}
+            {bundlesList.find((bundle) => bundle.id === selectedBundle)?.price}
+          </div>
+          {bundlesList.find((bundle) => bundle.id === selectedBundle)?.refill
+            .bundle.coverage.length && isMobile ? (
+            <div className="mb-4">
+              <RoamingCountries
+                countriesList={countriesList}
+                selectedBundle={bundlesList.find(
+                  (bundle) => bundle.id === selectedBundle
+                )}
+              />
+            </div>
+          ) : (
+            bundlesList.find((bundle) => bundle.id === selectedBundle)?.refill
+              .bundle.coverage.length && (
+              <Row className="d-flex flex-column justify-content-center align-items-center mb-4">
+                <Col>
+                  <Row>
+                    <Col className={styles.roamingCountriesHeader}>
+                      טסים למדינות נוספות? הכרטיס יהיה תקף גם במעבר למדינות
+                      הבאות:
+                    </Col>
+                  </Row>
+                  <Row className={`text-center ${styles.whiteSpaceNowrap}`}>
+                    {bundlesList
+                      .find((bundle) => bundle.id === selectedBundle)
+                      ?.refill.bundle.coverage.map((country: string, i) => (
+                        <>
+                          <Col key={country}>
+                            {
+                              countriesList.find(
+                                (countryOfCountriesList) =>
+                                  countryOfCountriesList.name === country
+                              )?.translation
+                            }
+                          </Col>
+                          {i !==
+                            bundlesList.find(
+                              (bundle) => bundle.id === selectedBundle
+                            )!.refill.bundle.coverage.length -
+                              1 && <Col>{'\u2022'}</Col>}
+                        </>
+                      ))}
+                  </Row>
+                </Col>
+              </Row>
+            )
+          )}
         </div>
       ) : null}
     </div>
