@@ -105,6 +105,7 @@ const BundlesSection = ({
                 </div>
                 <div className="h-100">
                   <Bundles
+                    countriesList={countriesList}
                     bundlesList={filteredBundles}
                     onChange={handleBundleSelect}
                   />
@@ -148,6 +149,7 @@ const BundlesSection = ({
               bundle={bundlesList.find(
                 (bundle) => bundle.id === selectedBundle
               )}
+              countriesList={countriesList}
             />
           </Col>
           {!isMobile && !selectedCountry && (
