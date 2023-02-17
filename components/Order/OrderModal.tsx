@@ -8,17 +8,19 @@ import * as yup from 'yup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { useRouter } from 'next/router';
-import { Coupon, PlanModel, Prisma } from '@prisma/client';
+import { Country, Coupon, PlanModel, Prisma } from '@prisma/client';
 import Link from 'next/link';
 import { Context, useUserStore } from '../../lib/context/UserStore';
 import { Action } from '../../lib/reducer/reducer';
 import styles from './OrderModal.module.scss';
 import Input from '../Input/Input';
 import { toFixedNumber } from '../../utils/math';
+import RoamingCountries from '../Bundles/RoamingCountries';
 
 type BundlesSectionProps = {
   show: boolean;
   onHide: () => void;
+  countriesList: Country[];
   bundle?: PlanModel &
     Prisma.PlanModelGetPayload<{
       include: { refill: { include: { bundle: true } } };
@@ -34,7 +36,13 @@ const schema = yup.object().shape({
   terms: yup.boolean().oneOf([true]).required('שדה חובה'),
 });
 
-const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
+const OrderModal = ({
+  show,
+  onHide,
+  bundle,
+  country,
+  countriesList,
+}: BundlesSectionProps) => {
   const [price, setPrice] = useState<number>(0);
   const [amountDays, setAmountDays] = useState<number>(0);
   const [coupon, setCoupon] = useState<string>('');
@@ -244,6 +252,16 @@ const OrderModal = ({ show, onHide, bundle, country }: BundlesSectionProps) => {
               </div>
             </Col>
           </Row>
+          {bundle && bundle.refill.bundle.coverage.length > 0 && (
+            <Row className={styles.orderModalRow}>
+              <Col>
+                <RoamingCountries
+                  countriesList={countriesList}
+                  selectedBundle={bundle}
+                />
+              </Col>
+            </Row>
+          )}
           <Row className={styles.orderModalRow}>
             <Col className={styles.bundleTextDestination}>טסים ל{country}</Col>
           </Row>

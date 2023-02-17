@@ -1,0 +1,17 @@
+@import "styles/variables";
+
+.countriesAccordion {
+  :global * :not(button) {
+    color: $text-color !important;
+  }
+
+  :global .accordion-button {
+    font-size: 0.7rem;
+  }
+
+  font-size: 0.7rem;
+}
+
+.whiteSpaceNowrap {
+  white-space: nowrap;
+}
