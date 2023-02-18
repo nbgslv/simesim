@@ -164,7 +164,7 @@ const Coupons = ({
       headerName: 'Uses',
     },
     {
-      field: 'planModelId',
+      field: 'planModels',
       headerName: 'Plan Model',
       renderCell: (params) => (
         <Button
@@ -182,16 +182,18 @@ const Coupons = ({
             value: planModel.id,
             label: planModel.name,
           }))}
+          isMulti
           onSelect={(option) => {
-            params.api.setEditCellValue({ ...params, value: option?.value });
+            console.log({ option });
+            params.api.setEditCellValue({ ...params, value: option });
           }}
-          defaultValue={
-            params.row.planModelId &&
-            params.row.planModel && {
-              value: params.row.planModelId,
-              label: params.row.planModel.name,
-            }
-          }
+          defaultValue={params.value.map((planModel: PlanModel) => {
+            console.log(params.value);
+            return {
+              value: planModel.id,
+              label: planModel.name,
+            };
+          })}
         />
       ),
       width: 200,

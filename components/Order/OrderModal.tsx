@@ -120,7 +120,7 @@ const OrderModal = ({
         setCouponSet(coupon);
         setLoadingCoupon(true);
         const couponResult = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/coupon/${coupon}/${phoneNumber}`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/coupon/${coupon}?phoneNumber=${phoneNumber}&planModel=${bundle?.id}`
         );
         if (couponResult.status === 200) {
           const { data } = await couponResult.json();

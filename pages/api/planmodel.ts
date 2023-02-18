@@ -10,7 +10,9 @@ import { deleteSchema } from '../../utils/api/validation';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<Partial<PlanModel | Prisma.BatchPayload>>>
+  res: NextApiResponse<
+    ApiResponse<PlanModel[] | Partial<PlanModel | Prisma.BatchPayload>>
+  >
 ) {
   try {
     const session = await unstable_getServerSession(
@@ -19,7 +21,18 @@ export default async function handler(
       authOptions(req as NextApiRequest, res as NextApiResponse)
     );
     const { method } = req;
-    if (method === 'POST') {
+    if (method === 'GET') {
+      if (!session || session.user.role !== 'ADMIN') {
+        res.status(401).json({
+          name: 'UNAUTHORIZED',
+          success: false,
+          message: 'Unauthorized',
+        });
+        return;
+      }
+      const planModels = await prisma.planModel.findMany({});
+      res.status(200).json({ success: true, data: planModels });
+    } else if (method === 'POST') {
       if (!session || session.user.role !== 'ADMIN') {
         res.status(401).json({
           name: 'UNAUTHORIZED',

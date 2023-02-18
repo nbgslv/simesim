@@ -99,9 +99,42 @@ export default async function handler(
         return;
       }
       const { input } = req.body;
-      const update = await prisma.coupon.update({
-        ...input,
+      const coupon = await prisma.coupon.findUnique({
+        where: { id: input.where.id },
+        include: { planModels: { select: { id: true } } },
       });
+      if (!coupon) {
+        res.status(404).json({
+          name: 'NOT_FOUND',
+          success: false,
+          message: 'Coupon not found',
+        });
+        return;
+      }
+
+      let update = {};
+      if (input.data.planModels) {
+        update = await prisma.coupon.update({
+          ...input,
+          data: {
+            planModels: {
+              set: input.data.planModels.map(
+                (planModel: { value: string; label: string }) => ({
+                  id: planModel.value,
+                })
+              ),
+            },
+          },
+        });
+        delete input.data.planModels;
+      }
+      update = await prisma.coupon.update({
+        ...input,
+        data: {
+          ...input.data,
+        },
+      });
+
       res.status(200).json({ success: true, data: update });
     } else if (method === 'DELETE') {
       if (!session || session.user.role !== 'ADMIN') {

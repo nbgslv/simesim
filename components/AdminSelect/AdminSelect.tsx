@@ -46,6 +46,7 @@ const AdminSelect = <
   const handleSelect = (
     newValue: OnChangeValue<AdminSelectOption, IsMulti>
   ) => {
+    console.log({ newValue });
     setSelected(newValue);
     onSelect(newValue);
   };
