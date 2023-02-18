@@ -6,6 +6,7 @@ import styles from './Header.module.scss';
 import coverImage from '../../public/esimOne.png';
 import logoTextWhite from '../../public/logoTextWhite.png';
 import text from '../../lib/content/text.json';
+import AdvantagePoints from '../AdvantagePoints/AdvantagePoints';
 
 const Header = ({ hideJumbotron = false }: { hideJumbotron?: boolean }) => {
   const [navbarBackground, setNavbarBackground] = React.useState<string | null>(
@@ -61,33 +62,36 @@ const Header = ({ hideJumbotron = false }: { hideJumbotron?: boolean }) => {
                 />
               </Col>
               <Col>
-                <div>
-                  <Image
-                    src={logoTextWhite}
-                    alt="שים eSim"
-                    layout="fixed"
-                    width={300}
-                    height={55}
-                    priority
-                  />
+                <div className={styles.callToAction}>
+                  <div>
+                    <Image
+                      src={logoTextWhite}
+                      alt="שים eSim"
+                      layout="fixed"
+                      width={300}
+                      height={55}
+                      priority
+                    />
+                  </div>
+                  <p className="mt-4">{text.home.coverText}</p>
+                  <div className="d-flex justify-content-between mt-4 w-100">
+                    <Button
+                      variant="primary"
+                      className={styles.actionButton}
+                      href="/#bundles-section"
+                    >
+                      {text.home.orderButtonText}
+                    </Button>
+                    <Button
+                      variant="outline-primary"
+                      className={styles.actionButtonSecondary}
+                      href="/#timeline-section"
+                    >
+                      {text.home.moreDetailsButtonText}
+                    </Button>
+                  </div>
                 </div>
-                <p className="mt-4">{text.home.coverText}</p>
-                <div className="d-flex justify-content-between mt-4">
-                  <Button
-                    variant="primary"
-                    className={styles.actionButton}
-                    href="/#bundles-section"
-                  >
-                    {text.home.orderButtonText}
-                  </Button>
-                  <Button
-                    variant="outline-primary"
-                    className={styles.actionButtonSecondary}
-                    href="/#timeline-section"
-                  >
-                    {text.home.moreDetailsButtonText}
-                  </Button>
-                </div>
+                <AdvantagePoints />
               </Col>
             </Row>
           </Container>
