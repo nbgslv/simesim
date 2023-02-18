@@ -73,3 +73,18 @@
     font-size: 0.875rem;
   }
 }
+
+.callToAction {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+  height: 80%;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    margin-bottom: 1rem;
+    height: 46%;
+  }
+}
