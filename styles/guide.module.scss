@@ -44,4 +44,8 @@
   position: fixed !important;
   bottom: 125px;
   right: 27px;
+
+  :global svg {
+    width: 20px;
+  }
 }
