@@ -11,6 +11,7 @@ import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import UserStoreProvider from '../lib/context/UserStore';
 import { initialState, reducer } from '../lib/reducer/reducer';
 import * as gtag from '../lib/gtag';
+import * as fbq from '../lib/fbpixel';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -18,6 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     const handleRouteChange = (url: any) => {
       gtag.pageview(url);
+      fbq.pageview();
     };
 
     router.events.on('routeChangeComplete', handleRouteChange);

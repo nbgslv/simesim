@@ -16,6 +16,8 @@ import styles from './OrderModal.module.scss';
 import Input from '../Input/Input';
 import { toFixedNumber } from '../../utils/math';
 import RoamingCountries from '../Bundles/RoamingCountries';
+import { gtagEvent } from '../../lib/gtag';
+import { fbpEvent } from '../../lib/fbpixel';
 
 type BundlesSectionProps = {
   show: boolean;
@@ -100,6 +102,21 @@ const OrderModal = ({
 
   useEffect(() => {
     if (state.user.id) {
+      fbpEvent('AddToCart', {
+        content_ids: [bundle?.id],
+        content_name: bundle?.name,
+        content_type: 'product',
+        currency: 'ILS',
+        value: bundle?.price,
+      });
+      gtagEvent({
+        action: 'order_modal',
+        parameters: {
+          event_category: 'order',
+          event_label: 'order_modal',
+          value: bundle?.id,
+        },
+      });
       reset({
         firstName: state.user.name.split(' ')[0],
         lastName: state.user.name.split(' ')[1],
