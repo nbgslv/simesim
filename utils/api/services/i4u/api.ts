@@ -24,7 +24,7 @@ export default class Invoice4UClearing {
     'https://api.invoice4u.co.il/Services/ApiService.svc';
 
   private readonly apiTestUrl =
-    'https://private-anon-51363226ef-invoice4uapi.apiary-mock.com/Services/ApiService.svc';
+    'https://private-anon-814fd51e07-invoice4uclearingapis.apiary-mock.com/Services/ApiService.svc';
 
   private readonly returnUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/order`;
 
@@ -275,7 +275,7 @@ export default class Invoice4UClearing {
 
       /** * Testing ** */
       if (this.test) {
-        const responseJson = await response.json();
+        const responseJson = await response.text();
         return { d: responseJson };
       }
       /** * Testing ** */

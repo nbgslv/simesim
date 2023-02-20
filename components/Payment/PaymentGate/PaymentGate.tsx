@@ -4,8 +4,10 @@ import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { useRouter } from 'next/router';
-import { Prisma } from '@prisma/client';
 import styles from './PaymentGate.module.scss';
+import { gtagEvent } from '../../../lib/gtag';
+import { OrderData } from '../../../pages/api/order/[id]';
+import { fbpEvent } from '../../../lib/fbpixel';
 
 enum PaymentType {
   PAYPAL = 'PAYPAL',
@@ -15,9 +17,7 @@ enum PaymentType {
 
 const PaymentGate = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
-  const [orderData, setOrderData] = React.useState<Prisma.PlanGetPayload<{
-    include: { planModel: { select: { name: true; description: true } } };
-  }> | null>(null);
+  const [orderData, setOrderData] = React.useState<OrderData | null>(null);
   const [{ isPending }] = usePayPalScriptReducer();
   const router = useRouter();
 
@@ -38,6 +38,36 @@ const PaymentGate = () => {
 
   useEffect(() => {
     if (router.query.orderId && !isPending && orderData) {
+      fbpEvent('InitiateCheckout', {
+        content_category: 'product',
+        content_ids: orderData.items.map((item) => item.id),
+        contents: orderData.items.map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+          item_price: item.price,
+        })),
+        currency: 'ILS',
+        value: orderData.price,
+        num_items: orderData.items.length,
+      });
+      gtagEvent({
+        action: 'begin_checkout',
+        parameters: {
+          currency: 'ILS',
+          value: orderData.price,
+          coupon: orderData.coupon,
+          items: [
+            {
+              item_id: orderData.items[0].id,
+              item_name: orderData.items[0].name,
+              coupon: orderData.items[0].coupon,
+              discount: orderData.items[0].discount,
+              price: orderData.items[0].price,
+              quantity: orderData.items[0].quantity,
+            },
+          ],
+        },
+      });
       setLoading(false);
     }
   }, [router.query.orderId, isPending, orderData]);

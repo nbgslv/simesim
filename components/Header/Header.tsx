@@ -74,6 +74,7 @@ const Header = ({ hideJumbotron = false }: { hideJumbotron?: boolean }) => {
                     />
                   </div>
                   <p className="mt-4">{text.home.coverText}</p>
+
                   <div className="d-flex justify-content-between mt-4 w-100">
                     <Button
                       variant="primary"
@@ -90,6 +91,13 @@ const Header = ({ hideJumbotron = false }: { hideJumbotron?: boolean }) => {
                       {text.home.moreDetailsButtonText}
                     </Button>
                   </div>
+                  <Button
+                    variant="outline-primary"
+                    className={`${styles.actionButtonSecondary} w-100 mt-4`}
+                    href="/#check-phone-section"
+                  >
+                    {text.home.checkPhoneSupport}
+                  </Button>
                 </div>
                 <AdvantagePoints />
               </Col>

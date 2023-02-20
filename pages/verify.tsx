@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import styles from '../styles/verify.module.scss';
 import MainLayout from '../components/Layouts/MainLayout';
+import { gtagLogin } from '../lib/gtag';
 
 const Verify = ({ csrfToken }: { csrfToken: string }) => {
   const TIMER = 120000; // 2 minutes
@@ -81,6 +82,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
           }
         );
         if (res.redirected) {
+          gtagLogin(phoneNumber);
           await router.push(res.url);
         }
         setLoading(false);
