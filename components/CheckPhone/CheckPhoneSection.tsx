@@ -12,6 +12,7 @@ import SearchAutocomplete, {
   Item,
 } from '../SearchAutocomplete/SearchAutocomplete';
 import SectionComponent from '../Section/Section';
+import { gtagEvent } from '../../lib/gtag';
 
 type Brand = {
   exceptions: string[];
@@ -159,6 +160,12 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   }, [selectedBrand, phones]);
 
   const handleBrandSelect = (brand: BrandListItem) => {
+    gtagEvent({
+      action: 'search',
+      parameters: {
+        search_term: brand.displayValue,
+      },
+    });
     setSelectedBrand(brand);
   };
 
@@ -172,6 +179,12 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   };
 
   const handlePhoneSelect = (phone: PhoneListItem) => {
+    gtagEvent({
+      action: 'search',
+      parameters: {
+        search_term: phone.displayValue,
+      },
+    });
     setSelectedPhone(phone);
   };
 

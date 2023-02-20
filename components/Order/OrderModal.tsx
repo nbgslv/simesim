@@ -16,6 +16,7 @@ import styles from './OrderModal.module.scss';
 import Input from '../Input/Input';
 import { toFixedNumber } from '../../utils/math';
 import RoamingCountries from '../Bundles/RoamingCountries';
+import { gtagEvent } from '../../lib/gtag';
 
 type BundlesSectionProps = {
   show: boolean;
@@ -100,6 +101,14 @@ const OrderModal = ({
 
   useEffect(() => {
     if (state.user.id) {
+      gtagEvent({
+        action: 'order_modal',
+        parameters: {
+          event_category: 'order',
+          event_label: 'order_modal',
+          value: bundle?.id,
+        },
+      });
       reset({
         firstName: state.user.name.split(' ')[0],
         lastName: state.user.name.split(' ')[1],

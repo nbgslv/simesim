@@ -11,6 +11,7 @@ import MainLayout from '../../components/Layouts/MainLayout';
 import styles from '../../styles/slug.module.scss';
 import YouMightAlsoLike from '../../components/Blog/YouMightAlsoLike';
 import ShareButton from '../../components/Blog/ShareButton/ShareButton';
+import { gtagEvent } from '../../lib/gtag';
 
 const Slug = ({ postId, morePosts }: { postId: string; morePosts: Post[] }) => {
   const [postLoading, setPostLoading] = React.useState<boolean>(true);
@@ -20,6 +21,13 @@ const Slug = ({ postId, morePosts }: { postId: string; morePosts: Post[] }) => {
   useEffect(() => {
     (async () => {
       try {
+        gtagEvent({
+          action: 'select_content',
+          parameters: {
+            content_type: 'blog_post',
+            content_id: postId,
+          },
+        });
         const postData = await fetch(`/api/blog/${postId}`);
         const postDataJson = await postData.json();
         if (!postDataJson.success) {

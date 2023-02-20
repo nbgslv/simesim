@@ -6,6 +6,7 @@ import BundleCard from './BundleCard';
 import styles from './Bundles.module.scss';
 // eslint-disable-next-line import/no-cycle
 import RoamingCountries from './RoamingCountries';
+import { gtagEvent } from '../../lib/gtag';
 
 export type BundlesList = PlanModel &
   Prisma.PlanModelGetPayload<{
@@ -161,6 +162,28 @@ const Bundles = ({
     }
   }, [selectedBundleVolume]);
 
+  const handleBundleVolumeSelect = (value: string) => {
+    gtagEvent({
+      action: 'select_content',
+      parameters: {
+        content_type: 'bundle_volume',
+        content_id: value,
+      },
+    });
+    setSelectedBundleVolume(value);
+  };
+
+  const handleBundleDaysSelect = (value: string) => {
+    gtagEvent({
+      action: 'select_content',
+      parameters: {
+        content_type: 'bundle_days',
+        content_id: value,
+      },
+    });
+    setSelectedBundleDays(value);
+  };
+
   return (
     <div>
       <Row className="d-flex justify-content-center align-items-center">
@@ -178,7 +201,7 @@ const Bundles = ({
                     selected={
                       volumeOption.option.toString() === selectedBundleVolume
                     }
-                    onSelect={(value) => setSelectedBundleVolume(value)}
+                    onSelect={handleBundleVolumeSelect}
                     disabled={volumeOption.disabled}
                   />
                 </Col>
@@ -203,7 +226,7 @@ const Bundles = ({
                         (daysOption.option?.toString() || '365') ===
                         selectedBundleDays
                       }
-                      onSelect={(value) => setSelectedBundleDays(value)}
+                      onSelect={handleBundleDaysSelect}
                       disabled={daysOption.disabled}
                     />
                   </Col>

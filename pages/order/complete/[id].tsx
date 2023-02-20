@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { Spinner } from 'react-bootstrap';
 import styles from '../../../styles/Checkout.module.scss';
 import MainLayout from '../../../components/Layouts/MainLayout';
+import { gtagEvent } from '../../../lib/gtag';
 
 const Checkout = () => {
   const router = useRouter();
@@ -47,6 +48,27 @@ const Checkout = () => {
               await router.push('/error?error=Order');
             }
           } else {
+            gtagEvent({
+              action: 'purchase',
+              parameters: {
+                currency: 'ILS',
+                transaction_id: responseJson.data.id,
+                value: responseJson.data.price,
+                coupon: responseJson.data.coupon,
+                shipping: 0,
+                tax: 0,
+                items: [
+                  {
+                    item_id: responseJson.data.items[0].id,
+                    item_name: responseJson.data.items[0].name,
+                    coupon: responseJson.data.items[0].coupon,
+                    discount: responseJson.data.items[0].discount,
+                    price: responseJson.data.items[0].price,
+                    quantity: responseJson.data.items[0].quantity,
+                  },
+                ],
+              },
+            });
             await router.push(
               `${process.env.NEXT_PUBLIC_BASE_URL}/order/complete/success?status=complete&orderFriendlyId=${responseJson.data.friendlyId}`
             );
