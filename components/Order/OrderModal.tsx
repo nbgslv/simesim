@@ -102,6 +102,17 @@ const OrderModal = ({
 
   useEffect(() => {
     if (state.user.id) {
+      reset({
+        firstName: state.user.name.split(' ')[0],
+        lastName: state.user.name.split(' ')[1],
+        phoneNumber: state.user.email,
+        email: state.user.emailEmail,
+      });
+    }
+  }, [state]);
+
+  useEffect(() => {
+    if (show) {
       fbpEvent('AddToCart', {
         content_ids: [bundle?.id],
         content_name: bundle?.name,
@@ -117,14 +128,8 @@ const OrderModal = ({
           value: bundle?.id,
         },
       });
-      reset({
-        firstName: state.user.name.split(' ')[0],
-        lastName: state.user.name.split(' ')[1],
-        phoneNumber: state.user.email,
-        email: state.user.emailEmail,
-      });
     }
-  }, [state]);
+  }, [show]);
 
   const handleCoupon = async () => {
     try {
