@@ -4,6 +4,8 @@ import { Spinner } from 'react-bootstrap';
 import styles from '../../../styles/Checkout.module.scss';
 import MainLayout from '../../../components/Layouts/MainLayout';
 import { gtagEvent } from '../../../lib/gtag';
+import { fbpEvent } from '../../../lib/fbpixel';
+import { Item } from '../../api/order/[id]';
 
 const Checkout = () => {
   const router = useRouter();
@@ -48,6 +50,18 @@ const Checkout = () => {
               await router.push('/error?error=Order');
             }
           } else {
+            fbpEvent('Purchase', {
+              content_ids: responseJson.data.items.map((item: Item) => item.id),
+              content_name: responseJson.data.name,
+              content_type: 'product',
+              contents: responseJson.data.items.map((item: Item) => ({
+                id: item.id,
+                quantity: item.quantity,
+              })),
+              currency: 'ILS',
+              num_items: responseJson.data.items.length,
+              value: responseJson.data.price,
+            });
             gtagEvent({
               action: 'purchase',
               parameters: {

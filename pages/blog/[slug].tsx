@@ -12,6 +12,7 @@ import styles from '../../styles/slug.module.scss';
 import YouMightAlsoLike from '../../components/Blog/YouMightAlsoLike';
 import ShareButton from '../../components/Blog/ShareButton/ShareButton';
 import { gtagEvent } from '../../lib/gtag';
+import { fbpEvent } from '../../lib/fbpixel';
 
 const Slug = ({ postId, morePosts }: { postId: string; morePosts: Post[] }) => {
   const [postLoading, setPostLoading] = React.useState<boolean>(true);
@@ -21,6 +22,16 @@ const Slug = ({ postId, morePosts }: { postId: string; morePosts: Post[] }) => {
   useEffect(() => {
     (async () => {
       try {
+        const postData = await fetch(`/api/blog/${postId}`);
+        const postDataJson = await postData.json();
+        if (!postDataJson.success) {
+          throw new Error('Error fetching post');
+        }
+        fbpEvent('ViewContent', {
+          content_ids: [postId],
+          content_category: 'blog_post',
+          content_name: postDataJson.data.title,
+        });
         gtagEvent({
           action: 'select_content',
           parameters: {
@@ -28,11 +39,6 @@ const Slug = ({ postId, morePosts }: { postId: string; morePosts: Post[] }) => {
             content_id: postId,
           },
         });
-        const postData = await fetch(`/api/blog/${postId}`);
-        const postDataJson = await postData.json();
-        if (!postDataJson.success) {
-          throw new Error('Error fetching post');
-        }
         setPost(postDataJson.data);
       } catch (error) {
         console.error(error);

@@ -7,6 +7,7 @@ import styles from './Bundles.module.scss';
 // eslint-disable-next-line import/no-cycle
 import RoamingCountries from './RoamingCountries';
 import { gtagEvent } from '../../lib/gtag';
+import { fbpEvent } from '../../lib/fbpixel';
 
 export type BundlesList = PlanModel &
   Prisma.PlanModelGetPayload<{
@@ -163,6 +164,10 @@ const Bundles = ({
   }, [selectedBundleVolume]);
 
   const handleBundleVolumeSelect = (value: string) => {
+    fbpEvent('ViewContent', {
+      content_category: 'bundle_volume',
+      content_name: value,
+    });
     gtagEvent({
       action: 'select_content',
       parameters: {
@@ -174,6 +179,10 @@ const Bundles = ({
   };
 
   const handleBundleDaysSelect = (value: string) => {
+    fbpEvent('ViewContent', {
+      content_category: 'bundle_days',
+      content_name: value,
+    });
     gtagEvent({
       action: 'select_content',
       parameters: {

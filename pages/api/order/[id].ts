@@ -7,7 +7,7 @@ import Invoice4UClearing from '../../../utils/api/services/i4u/api';
 import { authOptions } from '../auth/[...nextauth]';
 import createLine, { LineStatus } from '../../../utils/createLine';
 
-type Item = {
+export type Item = {
   id: string;
   name: string;
   description?: string;

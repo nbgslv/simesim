@@ -13,6 +13,7 @@ import SearchAutocomplete, {
 } from '../SearchAutocomplete/SearchAutocomplete';
 import SectionComponent from '../Section/Section';
 import { gtagEvent } from '../../lib/gtag';
+import { fbpEvent } from '../../lib/fbpixel';
 
 type Brand = {
   exceptions: string[];
@@ -160,6 +161,10 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   }, [selectedBrand, phones]);
 
   const handleBrandSelect = (brand: BrandListItem) => {
+    fbpEvent('Search', {
+      content_category: 'phone_brand_search',
+      search_string: brand.displayValue,
+    });
     gtagEvent({
       action: 'search',
       parameters: {
@@ -179,6 +184,10 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   };
 
   const handlePhoneSelect = (phone: PhoneListItem) => {
+    fbpEvent('Search', {
+      content_category: 'phone_model',
+      search_string: phone.displayValue,
+    });
     gtagEvent({
       action: 'search',
       parameters: {

@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import styles from './PaymentGate.module.scss';
 import { gtagEvent } from '../../../lib/gtag';
 import { OrderData } from '../../../pages/api/order/[id]';
+import { fbpEvent } from '../../../lib/fbpixel';
 
 enum PaymentType {
   PAYPAL = 'PAYPAL',
@@ -37,6 +38,18 @@ const PaymentGate = () => {
 
   useEffect(() => {
     if (router.query.orderId && !isPending && orderData) {
+      fbpEvent('InitiateCheckout', {
+        content_category: 'product',
+        content_ids: orderData.items.map((item) => item.id),
+        contents: orderData.items.map((item) => ({
+          id: item.id,
+          quantity: item.quantity,
+          item_price: item.price,
+        })),
+        currency: 'ILS',
+        value: orderData.price,
+        num_items: orderData.items.length,
+      });
       gtagEvent({
         action: 'begin_checkout',
         parameters: {
