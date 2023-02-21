@@ -20,6 +20,5 @@ Sentry.init({
   // sessions when an error occurs.
   replaysOnErrorSampleRate: process.env.NODE_ENV === 'production' ? 1.0 : 0.1,
 
-  // @ts-ignore
   integrations: [new Sentry.Replay()],
 });
