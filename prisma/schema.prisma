@@ -325,3 +325,18 @@ model ChangeDetails {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+model Campaign {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  active      Boolean  @default(false)
+  startDate   DateTime
+  endDate     DateTime
+  coupon      Coupon   @relation(fields: [couponId], references: [id])
+  couponId    String
+  header Boolean @default(false)
+  popup  Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -6,6 +6,8 @@
 
 const { withSentryConfig } = require("@sentry/nextjs");
 
+const withTM = require('next-transpile-modules')(['@piwikpro/next-piwik-pro'])
+
 const nextConfig = {
   experimental: {
     scrollRestoration: true,
@@ -69,4 +71,4 @@ const sentryWebpackPluginOptions = {
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 };
 
-module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+module.exports = withSentryConfig(withTM(nextConfig), sentryWebpackPluginOptions);
