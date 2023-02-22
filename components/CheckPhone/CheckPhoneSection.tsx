@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useEffect, useRef } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -232,15 +232,6 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
     return null;
   };
 
-  const getRandomTransformOrigin = useCallback(() => {
-    const value = (16 + 40 * Math.random()) / 100;
-    const value2 = (15 + 36 * Math.random()) / 100;
-    return {
-      originX: value,
-      originY: value2,
-    };
-  }, []);
-
   const getRandomDelay = () => -(Math.random() * 0.7 + 0.05);
 
   const randomDuration = () => Math.random() * 0.07 + 0.23;
@@ -329,9 +320,6 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
         {!isMobile && (
           <Col className="w-100 h-100 p-6">
             <motion.div
-              style={{
-                ...getRandomTransformOrigin(),
-              }}
               variants={variants}
               animate={controls}
               onAnimationComplete={handleAnimationComplete}
