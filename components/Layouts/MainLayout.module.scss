@@ -10,3 +10,21 @@
   width: 80px !important;
   font-size: 1rem !important;
 }
+
+.promo {
+  height: 5vh;
+  background-color: map-get($theme-colors, 'warning');
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.textPromo {
+  color: #505750 !important;
+  font-size: 0.875rem;
+
+  :global u {
+    color: #505750 !important;
+    font-size: 0.875rem;
+  }
+}

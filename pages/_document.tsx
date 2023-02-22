@@ -71,9 +71,8 @@ export default function Document() {
         <Main />
         <NextScript />
         <Script
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
           src="//code.tidio.co/mpdxbn0v9arhag3ffbbicuxm4tzftnih.js"
-          async
         />
       </body>
     </Html>

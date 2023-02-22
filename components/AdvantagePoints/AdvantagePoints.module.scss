@@ -1,7 +1,6 @@
 @import "styles/variables";
 
 .main {
-  display: flex;
   margin-top: 2rem;
   height: 20%;
 
@@ -11,7 +10,7 @@
   }
 
   :global * {
-    font-size: 0.7rem;
+    font-size: 0.875rem;
   }
 }
 
@@ -27,15 +26,10 @@
 
 .column {
   width: 25%;
-
 }
 
 .empty {
-  content: '';
   width: 100%;
-  height: 130px;
-
-  @media (max-width: map-get($grid-breakpoints, 'md')) {
-    height: 150px;
-  }
+  height: 0;
+  opacity: 0;
 }

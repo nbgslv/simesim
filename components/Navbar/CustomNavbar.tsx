@@ -4,22 +4,13 @@ import Image from 'next/image';
 import { getSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import logoImageWhiteText from '../../public/logoWhite.png';
 import logoImageBlackText from '../../public/logo.png';
 import styles from './CustomNavbar.module.scss';
 import text from '../../lib/content/text.json';
 import { Context, useUserStore } from '../../lib/context/UserStore';
 import { Action } from '../../lib/reducer/reducer';
 
-function CustomNavbar({
-  background,
-  height,
-  hideJumbotron = false,
-}: {
-  background: string | null;
-  height: string;
-  hideJumbotron: boolean;
-}) {
+function CustomNavbar() {
   const [loggedIn, setLoggedIn] = React.useState<boolean>(false);
   const { dispatch } = useUserStore() as Context<Action>;
   const navbarRef: RefObject<HTMLElement> = useRef(null);
@@ -38,54 +29,11 @@ function CustomNavbar({
     })();
   }, []);
 
-  useEffect(() => {
-    if (navbarRef.current) {
-      const navLinks: HTMLCollectionOf<HTMLElement> = (Array.from(
-        navbarRef.current.querySelectorAll('a.nav-link')
-      ) as unknown) as HTMLCollectionOf<HTMLElement>;
-      const dropdowns: HTMLCollectionOf<HTMLElement> = (Array.from(
-        navbarRef.current.querySelectorAll('a.dropdown-toggle')
-      ) as unknown) as HTMLCollectionOf<HTMLElement>;
-      if (background) {
-        navbarRef.current.classList.add('bg-light');
-        navbarRef.current.classList.remove(styles.withPromo);
-        if (Array.isArray(navLinks) && navLinks.length) {
-          navLinks.forEach((link: HTMLElement) => {
-            link.classList.add(styles.navLinkTextDark);
-            link.classList.remove(styles.navLinkTextLight);
-          });
-        }
-        if (Array.isArray(dropdowns) && dropdowns.length) {
-          dropdowns.forEach((dropdown: HTMLElement) => {
-            dropdown.classList.add(styles.navLinkTextDark);
-            dropdown.classList.remove(styles.navLinkTextLight);
-          });
-        }
-      } else {
-        navbarRef.current.classList.remove('bg-light');
-        navbarRef.current.classList.add(styles.withPromo);
-        if (Array.isArray(navLinks) && navLinks.length) {
-          navLinks.forEach((link: HTMLElement) => {
-            link.classList.add(styles.navLinkTextLight);
-            link.classList.remove(styles.navLinkTextDark);
-          });
-        }
-        if (Array.isArray(dropdowns) && dropdowns.length) {
-          dropdowns.forEach((dropdown: HTMLElement) => {
-            dropdown.classList.add(styles.navLinkTextLight);
-            dropdown.classList.remove(styles.navLinkTextDark);
-          });
-        }
-      }
-      navbarRef.current.style.height = height;
-    }
-  }, [background, height, loggedIn]);
-
   return (
     <Navbar
       expand="lg"
-      className={styles.navbar}
-      fixed={hideJumbotron ? undefined : 'top'}
+      className={`${styles.navbar} bg-light`}
+      sticky="top"
       ref={navbarRef}
       collapseOnSelect
     >
@@ -146,10 +94,10 @@ function CustomNavbar({
             style={{ marginLeft: '0' }}
           >
             <Image
-              src={background ? logoImageBlackText : logoImageWhiteText}
+              src={logoImageBlackText}
               alt="Logo image"
               layout="fixed"
-              width={background ? 53.4 : 65}
+              width={53.4}
               height={32}
             />
           </Navbar.Brand>
