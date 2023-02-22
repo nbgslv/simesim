@@ -11,6 +11,7 @@ const Guide = () => (
   <MainLayout
     title="מדריך eSim"
     metaDescription={'מדריך שימוש והתקנה של כרטיס eSim בפשטות ובמהירות'}
+    metaCanonical={`${process.env.NEXT_PUBLIC_BASE_URL}/guide`}
     hideJumbotron
   >
     <div className={styles.wrapper}>

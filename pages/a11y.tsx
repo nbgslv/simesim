@@ -4,7 +4,11 @@ import MainLayout from '../components/Layouts/MainLayout';
 import styles from '../styles/terms.module.scss';
 
 const Terms = () => (
-  <MainLayout title="הצהרת נגישות" hideJumbotron>
+  <MainLayout
+    title="הצהרת נגישות"
+    metaCanonical={`${process.env.NEXT_PUBLIC_BASE_URL}/a11y`}
+    hideJumbotron
+  >
     <div className={styles.wrapper}>
       <Container className={styles.container}>
         <h1 className="text-center p-2">הצהרת נגישות &quot;שים eSim&quot;</h1>
