@@ -161,16 +161,18 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   }, [selectedBrand, phones]);
 
   const handleBrandSelect = (brand: BrandListItem) => {
-    fbpEvent('Search', {
-      content_category: 'phone_brand_search',
-      search_string: brand.displayValue,
-    });
-    gtagEvent({
-      action: 'search',
-      parameters: {
-        search_term: brand.displayValue,
-      },
-    });
+    if (brand && brand.displayValue) {
+      fbpEvent('Search', {
+        content_category: 'phone_brand_search',
+        search_string: brand.displayValue,
+      });
+      gtagEvent({
+        action: 'search',
+        parameters: {
+          search_term: brand.displayValue,
+        },
+      });
+    }
     setSelectedBrand(brand);
   };
 
@@ -184,16 +186,18 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   };
 
   const handlePhoneSelect = (phone: PhoneListItem) => {
-    fbpEvent('Search', {
-      content_category: 'phone_model',
-      search_string: phone.displayValue,
-    });
-    gtagEvent({
-      action: 'search',
-      parameters: {
-        search_term: phone.displayValue,
-      },
-    });
+    if (phone && phone.displayValue) {
+      fbpEvent('Search', {
+        content_category: 'phone_model',
+        search_string: phone.displayValue,
+      });
+      gtagEvent({
+        action: 'search',
+        parameters: {
+          search_term: phone.displayValue,
+        },
+      });
+    }
     setSelectedPhone(phone);
   };
 
