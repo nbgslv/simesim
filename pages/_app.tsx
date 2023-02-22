@@ -2,6 +2,7 @@ import '../styles/global.scss';
 import type { AppProps } from 'next/app';
 import Script from 'next/script';
 import { SSRProvider, ThemeProvider } from 'react-bootstrap';
+import { Context as ResponsiveContext } from 'react-responsive';
 import NiceModal from '@ebay/nice-modal-react';
 import { SessionProvider } from 'next-auth/react';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
@@ -61,32 +62,34 @@ function MyApp({ Component, pageProps }: AppProps) {
         }}
       />
       <SSRProvider>
-        <GoogleReCaptchaProvider
-          reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string}
-          language={'iw'}
-        >
-          {/* @ts-ignore */}
-          <SessionProvider session={pageProps.session}>
-            <UserStoreProvider
-              initialState={{ user: initialState.user }}
-              reducer={reducer}
-            >
-              <ThemeProvider dir="rtl">
-                <PayPalScriptProvider
-                  options={{
-                    'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
-                    currency: 'ILS',
-                    'disable-funding': 'credit,card,paylater',
-                  }}
-                >
-                  <NiceModal.Provider>
-                    <Component {...pageProps} />
-                  </NiceModal.Provider>
-                </PayPalScriptProvider>
-              </ThemeProvider>
-            </UserStoreProvider>
-          </SessionProvider>
-        </GoogleReCaptchaProvider>
+        <ResponsiveContext.Provider value={{ maxWidth: 767 }}>
+          <GoogleReCaptchaProvider
+            reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string}
+            language={'iw'}
+          >
+            {/* @ts-ignore */}
+            <SessionProvider session={pageProps.session}>
+              <UserStoreProvider
+                initialState={{ user: initialState.user }}
+                reducer={reducer}
+              >
+                <ThemeProvider dir="rtl">
+                  <PayPalScriptProvider
+                    options={{
+                      'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+                      currency: 'ILS',
+                      'disable-funding': 'credit,card,paylater',
+                    }}
+                  >
+                    <NiceModal.Provider>
+                      <Component {...pageProps} />
+                    </NiceModal.Provider>
+                  </PayPalScriptProvider>
+                </ThemeProvider>
+              </UserStoreProvider>
+            </SessionProvider>
+          </GoogleReCaptchaProvider>
+        </ResponsiveContext.Provider>
       </SSRProvider>
     </>
   );

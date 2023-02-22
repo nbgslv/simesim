@@ -17,6 +17,7 @@ const Header = ({ hideJumbotron = false }: { hideJumbotron?: boolean }) => (
         <Container className="d-flex mt-auto mb-auto text-center">
           <Row
             className={`d-flex mr-auto justify-content-between align-items-center ${styles.container}`}
+            layout="position"
           >
             <Col>
               <Image
