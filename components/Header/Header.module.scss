@@ -53,27 +53,6 @@
   }
 }
 
-.promo {
-  height: 5vh;
-  background-color: map-get($theme-colors, 'warning');
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-
-
-.textPromo {
-  color: #505750 !important;
-  font-size: 0.875rem;
-
-  :global u {
-    color: #505750 !important;
-    font-size: 0.875rem;
-  }
-}
-
 .callToAction {
   display: flex;
   justify-content: center;
