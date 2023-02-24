@@ -227,7 +227,7 @@ const Countries = ({
   };
 
   return (
-    <AdminLayout title="Countries">
+    <AdminLayout title="Supported Phones">
       <AdminTable<SupportedPhones>
         columns={columns}
         data={supportedPhonesRows}
