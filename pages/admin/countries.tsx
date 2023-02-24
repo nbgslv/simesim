@@ -37,23 +37,17 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     setCountriesRows(countries);
   }, [countries]);
 
-  const updateRow = 
-    async (data: Partial<Country>) => 
-      adminApi.callApi<
-        Country,
-          'update'
-      >({
-        method: 'PUT',
-        model: 'Country',
-        input: {
-          where: {
-            id: data.id,
-          },
-          data,
-        }
-      });
-    
-
+  const updateRow = async (data: Partial<Country>) =>
+    adminApi.callApi<Country, 'update'>({
+      method: 'PUT',
+      model: 'Country',
+      input: {
+        where: {
+          id: data.id,
+        },
+        data,
+      },
+    });
 
   const handleLockTranslationToggle = async (
     checked: boolean,
@@ -61,16 +55,12 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
   ) => {
     try {
       setChangeLockTranslationLoading(rowId);
-      const update = await updateRow(
-        {
-          lockTranslation: checked,
-          id: rowId as string,
-        }
-      );
+      const update = await updateRow({
+        lockTranslation: checked,
+        id: rowId as string,
+      });
       setCountriesRows((oldCountries) =>
-        oldCountries.map((country) =>
-          country.id === rowId ? update : country
-        )
+        oldCountries.map((country) => (country.id === rowId ? update : country))
       );
     } catch (e) {
       console.error(e);
@@ -79,22 +69,15 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     }
   };
 
-  const handleShowToggle = async (
-    checked: boolean,
-    rowId: GridRowId
-  ) => {
+  const handleShowToggle = async (checked: boolean, rowId: GridRowId) => {
     try {
       setChangeShowLoading(rowId);
-      const update = await updateRow(
-        {
-          show: checked,
-          id: rowId as string,
-        }
-      );
+      const update = await updateRow({
+        show: checked,
+        id: rowId as string,
+      });
       setCountriesRows((oldCountries) =>
-        oldCountries.map((country) =>
-          country.id === rowId ? update : country
-        )
+        oldCountries.map((country) => (country.id === rowId ? update : country))
       );
     } catch (e) {
       console.error(e);

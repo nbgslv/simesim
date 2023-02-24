@@ -1,14 +1,16 @@
 import React from 'react';
-import { Country, PlanModel, Prisma } from '@prisma/client';
+import {
+  Country,
+  PhoneBrand,
+  PlanModel,
+  Prisma,
+  SupportedPhones,
+} from '@prisma/client';
 import TimelineSection from '../components/Timeline/TimelineSection';
 import prisma from '../lib/prisma';
-import KeepGoApi from '../utils/api/services/keepGo/api';
-import { KeepGoResponse } from '../utils/api/services/keepGo/types';
 import BundlesSection from '../components/Bundles/BundlesSection';
 import QnaSection from '../components/QnA/QnaSection';
-import CheckPhoneSection, {
-  PhonesList,
-} from '../components/CheckPhone/CheckPhoneSection';
+import CheckPhoneSection from '../components/CheckPhone/CheckPhoneSection';
 import MainLayout from '../components/Layouts/MainLayout';
 
 type HomeProps = {
@@ -17,7 +19,7 @@ type HomeProps = {
     Prisma.PlanModelGetPayload<{
       include: { refill: { include: { bundle: true } } };
     }>)[];
-  phonesList: PhonesList[];
+  phonesList: (SupportedPhones & { brand: PhoneBrand })[];
 };
 
 export default function Home({
@@ -40,11 +42,6 @@ export default function Home({
 }
 
 export async function getStaticProps() {
-  const keepGoApi = new KeepGoApi(
-    process.env.KEEPGO_BASE_URL || '',
-    process.env.KEEPGO_API_KEY || '',
-    process.env.KEEPGO_ACCESS_TOKEN || ''
-  );
   const countriesListResponse = await prisma.country.findMany({
     where: {
       show: true,
@@ -76,13 +73,37 @@ export async function getStaticProps() {
       vat: true,
     },
   });
-  const phonesList: KeepGoResponse | Error = await keepGoApi.getEsimDevices();
+  const phonesList: Prisma.SupportedPhonesGetPayload<{
+    select: {
+      id: true;
+      phoneModel: true;
+      brand: {
+        select: {
+          id: true;
+          name: true;
+          exceptions: true;
+        };
+      };
+    };
+  }>[] = await prisma.supportedPhones.findMany({
+    select: {
+      id: true,
+      phoneModel: true,
+      brand: {
+        select: {
+          id: true,
+          name: true,
+          exceptions: true,
+        },
+      },
+    },
+  });
 
   return {
     props: {
       countriesList: countriesListResponse,
       bundlesList,
-      phonesList: (phonesList as KeepGoResponse)?.data,
+      phonesList,
     },
   };
 }

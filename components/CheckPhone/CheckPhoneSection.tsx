@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useAnimation, Variants } from 'framer-motion';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMediaQuery } from 'react-responsive';
+import { PhoneBrand, SupportedPhones } from '@prisma/client';
 import styles from './CheckPhoneSection.module.scss';
 import SearchAutocomplete, {
   DefaultCountrySearchItemProps,
@@ -36,10 +37,14 @@ type BrandListItem = ListItem & {
 };
 
 type PhoneListItem = ListItem & {
-  brand: string;
+  brand: PhoneBrand;
 };
 
-const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
+const CheckPhoneSection = ({
+  phonesList,
+}: {
+  phonesList: (SupportedPhones & { brand: PhoneBrand })[];
+}) => {
   const [phonesBrands, setPhonesBrands] = React.useState<BrandListItem[]>([]);
   const [phones, setPhones] = React.useState<PhoneListItem[]>([]);
   const [filteredPhones, setFilteredPhones] = React.useState<PhoneListItem[]>(
@@ -131,23 +136,23 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   useEffect(() => {
     const brandsArray: BrandListItem[] = [];
     const phonesArray: PhoneListItem[] = [];
-    const index = 0;
-    phonesList.forEach((list) => {
-      list.brands.forEach((brand, id) => {
+    phonesList.forEach((phone) => {
+      if (!brandsArray.find((brand) => brand.id === phone.brand.id)) {
         brandsArray.push({
-          id: id.toString(),
-          displayValue: brand.title,
-          exceptions: brand.exceptions ? brand.exceptions.toString() : '',
+          id: phone.brand.id,
+          displayValue: phone.brand.name,
+          exceptions: phone.brand.exceptions.length
+            ? phone.brand.exceptions.toString()
+            : '',
         });
-        brand.models.forEach((model) => {
-          phonesArray.push({
-            id: (index + 1).toString(),
-            displayValue: model,
-            brand: brand.title,
-          });
-        });
+      }
+      phonesArray.push({
+        id: phone.id,
+        displayValue: phone.phoneModel,
+        brand: phone.brand,
       });
     });
+
     setPhonesBrands(brandsArray);
     setPhones(phonesArray);
   }, [phonesList]);
@@ -155,7 +160,7 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   useEffect(() => {
     if (selectedBrand) {
       setFilteredPhones(
-        phones.filter((phone) => phone.brand === selectedBrand.displayValue)
+        phones.filter((phone) => phone.brand.id === selectedBrand.id)
       );
     }
   }, [selectedBrand, phones]);
@@ -331,12 +336,21 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
         )}
       </Row>
       <Row>
-        <Col className="d-flex justify-content-center">
-          <Link href="/supported_devices" passHref legacyBehavior>
-            <Button className={styles.moreButton} variant="primary">
-              לרשימה המלאה
-            </Button>
-          </Link>
+        <Col>
+          <Row>
+            <Col className={styles.moreButtonText}>
+              לא מצאתם את הטלפון שלכם?
+            </Col>
+          </Row>
+          <Row>
+            <Col className="d-flex justify-content-center">
+              <Link href="/supported_devices" passHref legacyBehavior>
+                <Button className={styles.moreButton} variant="primary">
+                  לרשימה המלאה
+                </Button>
+              </Link>
+            </Col>
+          </Row>
         </Col>
       </Row>
     </SectionComponent>

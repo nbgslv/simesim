@@ -28,7 +28,7 @@ const syncTransactions = async () => {
               amount: transaction.amount,
               currency: transaction.currency,
               type: transaction.type,
-              invoiceHash: transaction.invoice_hash,
+              invoiceHash: transaction.invoice_hash || undefined,
               refillAmountMb: transaction.refill_amount_mb,
               reason: transaction.reason,
               transactionId: transaction.transaction_id,
