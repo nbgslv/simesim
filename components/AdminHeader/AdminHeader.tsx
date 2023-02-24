@@ -36,6 +36,12 @@ const AdminHeader = () => (
         <Nav.Link eventKey="/admin/users" href="/admin/users">
           משתמשים
         </Nav.Link>
+        <Nav.Link
+          eventKey="/admin/supportedphones"
+          href="/admin/supportedphones"
+        >
+          טלפונים נתמכים
+        </Nav.Link>
         <Nav.Link eventKey="/admin/blog" href="/admin/blog">
           בלוג
         </Nav.Link>
