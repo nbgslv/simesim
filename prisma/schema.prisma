@@ -325,3 +325,21 @@ model ChangeDetails {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+model PhoneBrand {
+  id              String            @id @default(cuid())
+  name            String            @unique
+  exceptions      String[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  SupportedPhones SupportedPhones[]
+}
+
+model SupportedPhones {
+  id         String     @id @default(cuid())
+  brand      PhoneBrand @relation(fields: [brandId], references: [id])
+  brandId    String
+  phoneModel String     @unique
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
