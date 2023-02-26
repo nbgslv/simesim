@@ -1,5 +1,6 @@
 import React from 'react';
 import { Nav, Navbar } from 'react-bootstrap';
+import * as Sentry from '@sentry/nextjs';
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import styles from './AdminHeader.module.scss';
@@ -56,7 +57,14 @@ const AdminHeader = () => (
         </Nav.Link>
       </Nav>
       <Nav className="me-auto">
-        <Nav.Link onClick={() => signOut()}>התנתק</Nav.Link>
+        <Nav.Link
+          onClick={() => {
+            Sentry.setUser(null);
+            signOut();
+          }}
+        >
+          התנתק
+        </Nav.Link>
         <Nav.Link href="/">חזרה לאתר</Nav.Link>
       </Nav>
     </Navbar.Collapse>

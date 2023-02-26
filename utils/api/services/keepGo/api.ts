@@ -343,4 +343,29 @@ export default class KeepGoApi {
       return getErrorMessage(error);
     }
   }
+
+  public async updateLineNotes(
+    iccid: string,
+    notes: string
+  ): Promise<Record<any, any>> {
+    try {
+      const response = await fetch(
+        `${this.baseUrl}/line/${iccid}/update_notes`,
+        {
+          method: 'PUT',
+          headers: {
+            ...this.authHeaders,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            notes,
+          }),
+        }
+      );
+      return await response.json();
+    } catch (error) {
+      console.error(error);
+      return getErrorMessage(error);
+    }
+  }
 }

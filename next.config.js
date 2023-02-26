@@ -24,6 +24,8 @@ const nextConfig = {
   },
   sentry: {
     hideSourceMaps: true,
+    widenClientFileUpload: true,
+    debug: true,
   },
   webpack(config) {
     config.experiments = config.experiments || {};
