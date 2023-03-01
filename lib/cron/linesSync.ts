@@ -1,3 +1,4 @@
+import { parse } from 'date-fns';
 import KeepGoApi from '../../utils/api/services/keepGo/api';
 import prisma from '../prisma';
 import { Line as ApiLineType } from '../../utils/api/services/keepGo/types';
@@ -42,8 +43,16 @@ const syncLines = async () => {
         allLines.map((line: ApiLineType) =>
           prisma.line.upsert({
             update: {
-              deactivationDate: line.deactivation_date || null,
-              expiredAt: line.expired_at,
+              deactivationDate: line.deactivation_date
+                ? parse(
+                    line.deactivation_date,
+                    'yyyy-MM-dd HH:mm:ss',
+                    new Date()
+                  )
+                : null,
+              expiredAt: line.expired_at
+                ? parse(line.expired_at, 'yyyy-MM-dd HH:mm:ss', new Date())
+                : null,
               remainingUsageKb: line.remaining_usage_kb,
               remainingDays: line.remaining_days,
               status: line.status,
@@ -57,8 +66,16 @@ const syncLines = async () => {
               notes: line.notes,
               qrCode: '',
               lpaCode: '',
-              deactivationDate: line.deactivation_date || null,
-              expiredAt: line.expired_at,
+              deactivationDate: line.deactivation_date
+                ? parse(
+                    line.deactivation_date,
+                    'yyyy-MM-dd HH:mm:ss',
+                    new Date()
+                  )
+                : null,
+              expiredAt: line.expired_at
+                ? parse(line.expired_at, 'yyyy-MM-dd HH:mm:ss', new Date())
+                : null,
               remainingUsageKb: line.remaining_usage_kb,
               remainingDays: line.remaining_days,
               status: line.status,

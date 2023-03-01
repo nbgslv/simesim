@@ -20,34 +20,38 @@ const syncTransactions = async () => {
 
     if (transactions.transactions?.data?.length) {
       await prisma.$transaction(
-        transactions.transactions.data.map((transaction: ApiTransactionType) =>
-          prisma.transaction.upsert({
-            update: {
-              createdAtExternal: transaction.created_at,
-              status: transaction.status,
-              amount: transaction.amount,
-              currency: transaction.currency,
-              type: transaction.type,
-              invoiceHash: transaction.invoice_hash || undefined,
-              refillAmountMb: transaction.refill_amount_mb,
-              reason: transaction.reason,
-              transactionId: transaction.transaction_id,
-            },
-            create: {
-              createdAtExternal: transaction.created_at,
-              status: transaction.status,
-              amount: transaction.amount,
-              currency: transaction.currency,
-              type: transaction.type,
-              invoiceHash: transaction.invoice_hash,
-              refillAmountMb: transaction.refill_amount_mb,
-              reason: transaction.reason,
-              transactionId: transaction.transaction_id,
-            },
-            where: {
-              transactionId: transaction.transaction_id,
-            },
-          })
+        transactions.transactions.data.map(
+          (transaction: ApiTransactionType) => {
+            // eslint-disable-next-line no-console
+            console.log(transaction);
+            return prisma.transaction.upsert({
+              update: {
+                createdAtExternal: transaction.created_at,
+                status: transaction.status,
+                amount: transaction.amount,
+                currency: transaction.currency,
+                type: transaction.type,
+                invoiceHash: transaction.invoice_hash || undefined,
+                refillAmountMb: transaction.refill_amount_mb,
+                reason: transaction.reason,
+                transactionId: transaction.transaction_id,
+              },
+              create: {
+                createdAtExternal: transaction.created_at,
+                status: transaction.status,
+                amount: transaction.amount,
+                currency: transaction.currency,
+                type: transaction.type,
+                invoiceHash: transaction.invoice_hash,
+                refillAmountMb: transaction.refill_amount_mb,
+                reason: transaction.reason,
+                transactionId: transaction.transaction_id,
+              },
+              where: {
+                transactionId: transaction.transaction_id,
+              },
+            });
+          }
         )
       );
     } else {
