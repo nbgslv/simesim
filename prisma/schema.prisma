@@ -306,8 +306,8 @@ model Post {
   description String   @default("")
   slug        String   @unique
   content     String
-  coverImage  String
-  thumbnail   String   @default("")
+  coverImage  String?
+  thumbnail   String?  @default("")
   show        Boolean  @default(false)
   views       Int      @default(0)
   createdAt   DateTime @default(now())
