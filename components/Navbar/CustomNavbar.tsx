@@ -1,6 +1,6 @@
 import React, { RefObject, useEffect, useRef } from 'react';
 import { Container, Nav, NavDropdown, Navbar } from 'react-bootstrap';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { getSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';

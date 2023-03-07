@@ -105,7 +105,7 @@ const PostData = ({
         },
         {
           title: 'Cover Image',
-          value: postData.coverImage,
+          value: postData.coverImage ?? '',
           type: 'text',
           RenderData: (coverImage) => (
             <div className="d-flex flex-column align-items-center">

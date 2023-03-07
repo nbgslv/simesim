@@ -1,7 +1,7 @@
 import React from 'react';
 import { Nav, Navbar } from 'react-bootstrap';
 import * as Sentry from '@sentry/nextjs';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { signOut } from 'next-auth/react';
 import styles from './AdminHeader.module.scss';
 
