@@ -10,8 +10,14 @@ type UploadBlogImagesToDigitalocean = {
   };
 };
 
+type SyncCountries = {
+  name: 'countries.sync';
+  data: {};
+};
+
 type Events = {
   'blog.upload': UploadBlogImagesToDigitalocean;
+  'countries.sync': SyncCountries;
 };
 
 const inngest = new Inngest<Events>({ name: 'simesim' });
