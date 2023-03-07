@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import { AnimatePresence, motion, useAnimation, Variants } from 'framer-motion';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';

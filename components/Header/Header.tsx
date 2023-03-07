@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Col, Container, Row } from 'react-bootstrap';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import styles from './Header.module.scss';
 import coverImage from '../../public/esimOne.png';
 import logoTextWhite from '../../public/logoTextWhite.png';
