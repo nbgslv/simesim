@@ -1,7 +1,7 @@
 import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import {
   GridCellParams,
   GridColumns,
@@ -165,7 +165,7 @@ const Blog = ({ posts }: BlogProps) => {
     body.append('slug', data.slug);
     body.append('content', data.content);
     body.append('description', data.description);
-    body.append('coverImage', data.coverImage[0]);
+    body.append('coverImage', data.coverImage?.[0] ?? '');
     const newPost = await fetch('/api/blog', {
       method: 'POST',
       body,

@@ -172,6 +172,17 @@ async function createLine({
     throw new Error('No line details');
   }
 
+  await keepGoApi.updateLineNotes(
+    (newLineDetails.sim_card as CreateLine).iccid,
+    JSON.stringify({
+      planId,
+      planFriendlyId,
+      userEmail,
+      userFirstName,
+      userLastName,
+    })
+  );
+
   const qrCode = await QRCode.toDataURL(
     (newLineDetails.sim_card as CreateLine)?.lpa_code
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { Col, Container, Modal, Row } from 'react-bootstrap';
 import styles from '../AdminTable/FormModal.module.scss';
 

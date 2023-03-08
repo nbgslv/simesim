@@ -1,9 +1,10 @@
 import React, { RefObject, useEffect, useRef } from 'react';
 import { Container, Nav, NavDropdown, Navbar } from 'react-bootstrap';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { getSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import * as Sentry from '@sentry/nextjs';
 import logoImageBlackText from '../../public/logo.png';
 import styles from './CustomNavbar.module.scss';
 import text from '../../lib/content/text.json';
@@ -20,6 +21,11 @@ function CustomNavbar() {
     (async () => {
       const session = await getSession();
       if (session && session.user) {
+        Sentry.setUser({
+          id: session.user.id,
+          username: session.user.email,
+          email: session.user.emailEmail,
+        });
         dispatch({ type: 'SET_USER', payload: { user: session.user } });
         setLoggedIn(true);
       } else {
@@ -77,7 +83,12 @@ function CustomNavbar() {
                   עדכון פרטים
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item onClick={() => signOut()}>
+                <NavDropdown.Item
+                  onClick={() => {
+                    Sentry.setUser(null);
+                    signOut();
+                  }}
+                >
                   התנתק
                 </NavDropdown.Item>
               </NavDropdown>

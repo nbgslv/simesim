@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Button, Col, Form, Row, Spinner } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { User } from '@prisma/client';
+import * as Sentry from '@sentry/nextjs';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { signOut } from 'next-auth/react';
@@ -49,6 +50,7 @@ const ChangeDetailsForm = ({ user }: { user: Partial<User> }) => {
     });
     const changeDetailsDataJson = await changeDetailsData.json();
     if (changeDetailsDataJson.success) {
+      Sentry.setUser(null);
       await signOut({
         callbackUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/login?phone=${data.email}&changeDetailsId=${changeDetailsDataJson.data.id}`,
       });
