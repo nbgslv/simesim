@@ -14,7 +14,7 @@ const LineData = ({
   const [adminApi] = React.useState<AdminApi>(new AdminApi());
   const [loading, setLoading] = React.useState<boolean>(false);
 
-  if (!line) return null;
+  if (!line || !line.id) return 'N/A';
 
   const data: SectionType<Line>[] = [
     {
@@ -51,7 +51,9 @@ const LineData = ({
                 striped
                 variant="info"
                 now={value as number}
-                label={`${(value as number).toFixed(2)}%`}
+                label={
+                  value !== 'N/A' ? `${(value as number).toFixed(2)}%` : value
+                }
               />
               {line.allowedUsageKb &&
                 new Intl.NumberFormat('he-IL').format(
