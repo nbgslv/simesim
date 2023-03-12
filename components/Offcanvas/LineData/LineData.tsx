@@ -14,7 +14,7 @@ const LineData = ({
   const [adminApi] = React.useState<AdminApi>(new AdminApi());
   const [loading, setLoading] = React.useState<boolean>(false);
 
-  if (!line || !line.id) return 'N/A';
+  if (!line || !line.id) return <>{'N/A'}</>;
 
   const data: SectionType<Line>[] = [
     {
