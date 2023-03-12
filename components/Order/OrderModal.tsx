@@ -414,7 +414,7 @@ const OrderModal = ({
           </Row>
         </Modal.Body>
         <Modal.Footer className={styles.modalFooter}>
-          <div>
+          <div className={styles.agreementCheckbox}>
             <Controller
               name="terms"
               control={control}
