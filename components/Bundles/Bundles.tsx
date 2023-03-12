@@ -274,8 +274,8 @@ const Bundles = ({
                     {bundlesList
                       .find((bundle) => bundle.id === selectedBundle)
                       ?.refill.bundle.coverage.map((country: string, i) => (
-                        <>
-                          <Col key={country}>
+                        <React.Fragment key={country}>
+                          <Col>
                             {
                               countriesList.find(
                                 (countryOfCountriesList) =>
@@ -288,7 +288,7 @@ const Bundles = ({
                               (bundle) => bundle.id === selectedBundle
                             )!.refill.bundle.coverage.length -
                               1 && <Col>{'\u2022'}</Col>}
-                        </>
+                        </React.Fragment>
                       ))}
                   </Row>
                 </Col>
