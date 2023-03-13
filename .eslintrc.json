@@ -3,6 +3,7 @@
   "rules": {
     "quotes": "off",
     "no-console": ["error", { "allow": ["warn", "error"] }],
-    "react-hooks/exhaustive-deps": "off"
+    "react-hooks/exhaustive-deps": "off",
+    "no-await-in-loop": "off"
   }
 }
