@@ -44,25 +44,33 @@ export default inngest.createFunction(
             };
           })
         );
-        await prisma.$transaction(
-          Object.values(translatedCountries).map((country) =>
-            prisma.country.upsert({
-              update: {
-                name: country.name,
-                translation: country.translation,
-              },
-              create: {
-                name: country.name,
-                translation: country.translation,
+        for (let i = 0; i < translatedCountries.length; i += 1) {
+          const existingCountry = await prisma.country.findUnique({
+            where: {
+              name: translatedCountries[i].name,
+            },
+          });
+          if (existingCountry) {
+            if (!existingCountry.lockTranslation) {
+              await prisma.country.update({
+                where: {
+                  name: translatedCountries[i].name,
+                },
+                data: {
+                  translation: translatedCountries[i].translation,
+                },
+              });
+            }
+          } else {
+            await prisma.country.create({
+              data: {
+                name: translatedCountries[i].name,
+                translation: translatedCountries[i].translation,
                 show: false,
               },
-              where: {
-                name: country.name,
-                lockTranslation: false,
-              },
-            })
-          )
-        );
+            });
+          }
+        }
       } else {
         throw new Error('No countries were received from KeepGo');
       }
