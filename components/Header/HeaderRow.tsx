@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { parse } from 'date-fns';
 import { Context, useSettingsStore } from '../../lib/context/SettingsStore';
 import { Action } from '../../lib/reducer/settingsReducer';
 
@@ -13,6 +14,12 @@ const HeaderRow = () => {
       const settings = JSON.parse(HeaderRowSettings);
       setContent(settings.content);
       setShow(ShowHeaderRow === 'true');
+      const validFrom = parse(settings.validFrom, 'dd/MM/yyyy', new Date());
+      const validTo = parse(settings.validTo, 'dd/MM/yyyy', new Date());
+      const today = new Date();
+      if (today < validFrom || today > validTo) {
+        setShow(false);
+      }
       if (document !== undefined) {
         const style = document.createElement('style');
         style.append(document.createTextNode(settings.styles));
