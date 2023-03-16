@@ -10,9 +10,14 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import UserStoreProvider from '../lib/context/UserStore';
-import { initialState, reducer } from '../lib/reducer/reducer';
+import {
+  initialState as userInitialState,
+  userReducer,
+} from '../lib/reducer/userReducer';
 import * as gtag from '../lib/gtag';
 import * as fbq from '../lib/fbpixel';
+import SettingsStoreProvider from '../lib/context/SettingsStore';
+import { initialState, settingsReducer } from '../lib/reducer/settingsReducer';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -69,24 +74,29 @@ function MyApp({ Component, pageProps }: AppProps) {
           >
             {/* @ts-ignore */}
             <SessionProvider session={pageProps.session}>
-              <UserStoreProvider
-                initialState={{ user: initialState.user }}
-                reducer={reducer}
+              <SettingsStoreProvider
+                initialState={{ settings: initialState.settings }}
+                reducer={settingsReducer}
               >
-                <ThemeProvider dir="rtl">
-                  <PayPalScriptProvider
-                    options={{
-                      'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
-                      currency: 'ILS',
-                      'disable-funding': 'credit,card,paylater',
-                    }}
-                  >
-                    <NiceModal.Provider>
-                      <Component {...pageProps} />
-                    </NiceModal.Provider>
-                  </PayPalScriptProvider>
-                </ThemeProvider>
-              </UserStoreProvider>
+                <UserStoreProvider
+                  initialState={{ user: userInitialState.user }}
+                  reducer={userReducer}
+                >
+                  <ThemeProvider dir="rtl">
+                    <PayPalScriptProvider
+                      options={{
+                        'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+                        currency: 'ILS',
+                        'disable-funding': 'credit,card,paylater',
+                      }}
+                    >
+                      <NiceModal.Provider>
+                        <Component {...pageProps} />
+                      </NiceModal.Provider>
+                    </PayPalScriptProvider>
+                  </ThemeProvider>
+                </UserStoreProvider>
+              </SettingsStoreProvider>
             </SessionProvider>
           </GoogleReCaptchaProvider>
         </ResponsiveContext.Provider>

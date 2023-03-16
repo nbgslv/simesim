@@ -5,7 +5,7 @@ import {
   useContext,
   useReducer,
 } from 'react';
-import { Action, State } from '../reducer/reducer';
+import { Action, State } from '../reducer/userReducer';
 
 export type Context<A> = {
   state: State;

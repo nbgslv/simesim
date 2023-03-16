@@ -3,10 +3,14 @@ import Head from 'next/head';
 import { Fab } from '@mui/material';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
+import { Settings } from '@prisma/client';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 import styles from './MainLayout.module.scss';
 import CustomNavbar from '../Navbar/CustomNavbar';
+import { Context, useSettingsStore } from '../../lib/context/SettingsStore';
+import { Action } from '../../lib/reducer/settingsReducer';
+import HeaderRow from '../Header/HeaderRow';
 
 const MainLayout = ({
   title,
@@ -22,6 +26,7 @@ const MainLayout = ({
   metaCanonical?: string;
 }) => {
   const [showOrderButton, setShowOrderButton] = React.useState<boolean>(false);
+  const { dispatch } = useSettingsStore() as Context<Action>;
   const router = useRouter();
 
   const handleScroll = useCallback(() => {
@@ -32,9 +37,30 @@ const MainLayout = ({
     }
   }, []);
 
+  const getSettings = useCallback(async () => {
+    const res = await fetch('/api/settings');
+    const settings: { data: Settings[] } = await res.json();
+    dispatch({
+      type: 'SET_SETTINGS',
+      payload: {
+        settings: settings.data.reduce(
+          (acc, setting) => ({
+            ...acc,
+            [setting.name]: setting.value,
+          }),
+          {}
+        ),
+      },
+    });
+  }, []);
+
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     handleScroll();
+
+    // set and get settings
+    getSettings();
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
@@ -49,11 +75,7 @@ const MainLayout = ({
         )}
         {metaCanonical && <link rel="canonical" href={metaCanonical} />}
       </Head>
-      <div className={styles.promo}>
-        <div className={styles.textPromo}>
-          לזמן מוגבל! 20% הנחה. השתמשו בקופון <u>NEW20</u>
-        </div>
-      </div>
+      <HeaderRow />
       <CustomNavbar />
       <Header hideJumbotron={hideJumbotron} />
       <main>{children}</main>
