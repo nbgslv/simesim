@@ -30,7 +30,6 @@
     "@prisma/client": "^4.6.0",
     "@sentry/nextjs": "^7.38.0",
     "bootstrap": "^5.2.2",
-    "bottleneck": "^2.19.5",
     "buffer": "^6.0.3",
     "country-code-lookup": "^0.0.20",
     "cuid": "^2.1.8",
