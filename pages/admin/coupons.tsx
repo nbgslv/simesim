@@ -184,16 +184,12 @@ const Coupons = ({
           }))}
           isMulti
           onSelect={(option) => {
-            console.log({ option });
             params.api.setEditCellValue({ ...params, value: option });
           }}
-          defaultValue={params.value.map((planModel: PlanModel) => {
-            console.log(params.value);
-            return {
-              value: planModel.id,
-              label: planModel.name,
-            };
-          })}
+          defaultValue={params.value.map((planModel: PlanModel) => ({
+            value: planModel.id,
+            label: planModel.name,
+          }))}
         />
       ),
       width: 200,

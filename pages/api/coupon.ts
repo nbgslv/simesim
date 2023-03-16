@@ -112,28 +112,28 @@ export default async function handler(
         return;
       }
 
-      let update = {};
+      let update: {};
       if (input.data.planModels) {
+        const { planModels } = input.data;
+        delete input.data.planModels;
         update = await prisma.coupon.update({
           ...input,
           data: {
             planModels: {
-              set: input.data.planModels.map(
-                (planModel: { value: string; label: string }) => ({
-                  id: planModel.value,
+              set: planModels.map(
+                (planModel: { value?: string; label: string; id: string }) => ({
+                  id: planModel.value ?? planModel.id,
                 })
               ),
             },
+            ...input.data,
           },
         });
-        delete input.data.planModels;
+      } else {
+        update = await prisma.coupon.update({
+          ...input,
+        });
       }
-      update = await prisma.coupon.update({
-        ...input,
-        data: {
-          ...input.data,
-        },
-      });
 
       res.status(200).json({ success: true, data: update });
     } else if (method === 'DELETE') {
