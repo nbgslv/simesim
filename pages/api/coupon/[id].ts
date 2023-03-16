@@ -1,23 +1,22 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { CouponUser, Coupon } from '@prisma/client';
 import * as yup from 'yup';
-import prisma from '../../../../lib/prisma';
-import { ApiResponse } from '../../../../lib/types/api';
+import prisma from '../../../lib/prisma';
+import { ApiResponse } from '../../../lib/types/api';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Partial<ApiResponse<Partial<Coupon>>>>
 ) {
-  const {
-    query: { id, phoneNumber },
-    method,
-  } = req;
+  const { method } = req;
   if (method === 'GET') {
+    const { id, phoneNumber, planModel } = req.query;
     const getSchema = yup.object({
       id: yup.string().required(),
       phoneNumber: yup.string().length(10).required(),
+      planModel: yup.string().required(),
     });
-    await getSchema.validate({ id, phoneNumber });
+    await getSchema.validate({ id, phoneNumber, planModel });
     const existingUser = await prisma.user.findUnique({
       where: {
         email: phoneNumber as string,
@@ -26,11 +25,33 @@ export default async function handler(
     const coupon = await prisma.coupon.findUnique({
       where: {
         code: id as string,
+        OR: [
+          {
+            planModels: {
+              some: {
+                id: {
+                  equals: planModel as string,
+                },
+              },
+            },
+          },
+          {
+            planModels: {
+              none: {},
+            },
+          },
+        ],
       },
       include: {
         users: true,
+        planModels: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
+    console.log({ planModel, coupon });
     if (
       coupon &&
       coupon.validFrom < new Date() &&

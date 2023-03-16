@@ -1,10 +1,5 @@
-import React, { useEffect } from 'react';
-import Select, {
-  Props,
-  MultiValue,
-  OptionsOrGroups,
-  GroupBase,
-} from 'react-select';
+import React from 'react';
+import Select, { Props, OptionsOrGroups, GroupBase } from 'react-select';
 import { OnChangeValue } from 'react-select/dist/declarations/src/types';
 
 export type AdminSelectOption = {
@@ -33,26 +28,14 @@ const AdminSelect = <
   isMulti,
   menuPosition = 'fixed',
 }: AdminSelectProps<IsMulti, Group>) => {
-  const [selected, setSelected] = React.useState<
-    AdminSelectOption | MultiValue<AdminSelectOption> | null
-  >(null);
-
-  useEffect(() => {
-    if (defaultValue) {
-      setSelected(defaultValue);
-    }
-  }, [defaultValue]);
-
   const handleSelect = (
     newValue: OnChangeValue<AdminSelectOption, IsMulti>
   ) => {
-    setSelected(newValue);
     onSelect(newValue);
   };
 
   return (
     <Select
-      value={selected}
       options={options as OptionsOrGroups<AdminSelectOption, any>}
       onChange={handleSelect}
       aria-label={ariaLabel}
@@ -78,6 +61,7 @@ const AdminSelect = <
       isMulti={isMulti}
       menuPortalTarget={document.body}
       menuPosition={menuPosition}
+      defaultValue={defaultValue}
     />
   );
 };
