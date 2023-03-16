@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import { motion } from 'framer-motion';
 import lookup from 'country-code-lookup';
 import { Country } from '@prisma/client';
@@ -68,8 +68,8 @@ const CountrySearchItem = ({
           placeholder="blur"
           blurDataURL={blurDataPlaceholder}
           layout="intrinsic"
-          width="30px"
-          height="30px"
+          width="30"
+          height="30"
           alt={item.displayValue}
           loading="eager"
           priority

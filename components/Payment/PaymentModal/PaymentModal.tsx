@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import React, { useEffect } from 'react';
 import { Modal, Spinner } from 'react-bootstrap';
 import { useRouter } from 'next/router';

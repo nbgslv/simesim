@@ -1,17 +1,20 @@
-import React, { ReactNode, useCallback, useEffect, useRef } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import { AnimatePresence, motion, useAnimation, Variants } from 'framer-motion';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useMediaQuery } from 'react-responsive';
+import { PhoneBrand, SupportedPhones } from '@prisma/client';
 import styles from './CheckPhoneSection.module.scss';
 import SearchAutocomplete, {
   DefaultCountrySearchItemProps,
   Item,
 } from '../SearchAutocomplete/SearchAutocomplete';
 import SectionComponent from '../Section/Section';
+import { gtagEvent } from '../../lib/gtag';
+import { fbpEvent } from '../../lib/fbpixel';
 
 type Brand = {
   exceptions: string[];
@@ -34,10 +37,14 @@ type BrandListItem = ListItem & {
 };
 
 type PhoneListItem = ListItem & {
-  brand: string;
+  brand: PhoneBrand;
 };
 
-const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
+const CheckPhoneSection = ({
+  phonesList,
+}: {
+  phonesList: (SupportedPhones & { brand: PhoneBrand })[];
+}) => {
   const [phonesBrands, setPhonesBrands] = React.useState<BrandListItem[]>([]);
   const [phones, setPhones] = React.useState<PhoneListItem[]>([]);
   const [filteredPhones, setFilteredPhones] = React.useState<PhoneListItem[]>(
@@ -129,23 +136,23 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   useEffect(() => {
     const brandsArray: BrandListItem[] = [];
     const phonesArray: PhoneListItem[] = [];
-    const index = 0;
-    phonesList.forEach((list) => {
-      list.brands.forEach((brand, id) => {
+    phonesList.forEach((phone) => {
+      if (!brandsArray.find((brand) => brand.id === phone.brand.id)) {
         brandsArray.push({
-          id: id.toString(),
-          displayValue: brand.title,
-          exceptions: brand.exceptions ? brand.exceptions.toString() : '',
+          id: phone.brand.id,
+          displayValue: phone.brand.name,
+          exceptions: phone.brand.exceptions.length
+            ? phone.brand.exceptions.toString()
+            : '',
         });
-        brand.models.forEach((model) => {
-          phonesArray.push({
-            id: (index + 1).toString(),
-            displayValue: model,
-            brand: brand.title,
-          });
-        });
+      }
+      phonesArray.push({
+        id: phone.id,
+        displayValue: phone.phoneModel,
+        brand: phone.brand,
       });
     });
+
     setPhonesBrands(brandsArray);
     setPhones(phonesArray);
   }, [phonesList]);
@@ -153,12 +160,24 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   useEffect(() => {
     if (selectedBrand) {
       setFilteredPhones(
-        phones.filter((phone) => phone.brand === selectedBrand.displayValue)
+        phones.filter((phone) => phone.brand.id === selectedBrand.id)
       );
     }
   }, [selectedBrand, phones]);
 
   const handleBrandSelect = (brand: BrandListItem) => {
+    if (brand && brand.displayValue) {
+      fbpEvent('Search', {
+        content_category: 'phone_brand_search',
+        search_string: brand.displayValue,
+      });
+      gtagEvent({
+        action: 'search',
+        parameters: {
+          search_term: brand.displayValue,
+        },
+      });
+    }
     setSelectedBrand(brand);
   };
 
@@ -172,6 +191,18 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
   };
 
   const handlePhoneSelect = (phone: PhoneListItem) => {
+    if (phone && phone.displayValue) {
+      fbpEvent('Search', {
+        content_category: 'phone_model',
+        search_string: phone.displayValue,
+      });
+      gtagEvent({
+        action: 'search',
+        parameters: {
+          search_term: phone.displayValue,
+        },
+      });
+    }
     setSelectedPhone(phone);
   };
 
@@ -205,15 +236,6 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
     }
     return null;
   };
-
-  const getRandomTransformOrigin = useCallback(() => {
-    const value = (16 + 40 * Math.random()) / 100;
-    const value2 = (15 + 36 * Math.random()) / 100;
-    return {
-      originX: value,
-      originY: value2,
-    };
-  }, []);
 
   const getRandomDelay = () => -(Math.random() * 0.7 + 0.05);
 
@@ -303,9 +325,6 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
         {!isMobile && (
           <Col className="w-100 h-100 p-6">
             <motion.div
-              style={{
-                ...getRandomTransformOrigin(),
-              }}
               variants={variants}
               animate={controls}
               onAnimationComplete={handleAnimationComplete}
@@ -317,12 +336,21 @@ const CheckPhoneSection = ({ phonesList }: { phonesList: PhonesList[] }) => {
         )}
       </Row>
       <Row>
-        <Col className="d-flex justify-content-center">
-          <Link href="/supported_devices" passHref legacyBehavior>
-            <Button className={styles.moreButton} variant="primary">
-              לרשימה המלאה
-            </Button>
-          </Link>
+        <Col>
+          <Row>
+            <Col className={styles.moreButtonText}>
+              לא מצאתם את הטלפון שלכם?
+            </Col>
+          </Row>
+          <Row>
+            <Col className="d-flex justify-content-center">
+              <Link href="/supported_devices" passHref legacyBehavior>
+                <Button className={styles.moreButton} variant="primary">
+                  לרשימה המלאה
+                </Button>
+              </Link>
+            </Col>
+          </Row>
         </Col>
       </Row>
     </SectionComponent>

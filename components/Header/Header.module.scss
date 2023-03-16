@@ -53,23 +53,17 @@
   }
 }
 
-.promo {
-  height: 5vh;
-  background-color: map-get($theme-colors, 'warning');
+.callToAction {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 1rem;
-}
+  flex-direction: column;
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+  height: 80%;
 
-
-
-.textPromo {
-  color: #505750 !important;
-  font-size: 0.875rem;
-
-  :global u {
-    color: #505750 !important;
-    font-size: 0.875rem;
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    margin-bottom: 1rem;
+    height: 53%;
   }
 }

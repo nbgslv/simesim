@@ -6,6 +6,8 @@ import BundleCard from './BundleCard';
 import styles from './Bundles.module.scss';
 // eslint-disable-next-line import/no-cycle
 import RoamingCountries from './RoamingCountries';
+import { gtagEvent } from '../../lib/gtag';
+import { fbpEvent } from '../../lib/fbpixel';
 
 export type BundlesList = PlanModel &
   Prisma.PlanModelGetPayload<{
@@ -161,6 +163,36 @@ const Bundles = ({
     }
   }, [selectedBundleVolume]);
 
+  const handleBundleVolumeSelect = (value: string) => {
+    fbpEvent('ViewContent', {
+      content_category: 'bundle_volume',
+      content_name: value,
+    });
+    gtagEvent({
+      action: 'select_content',
+      parameters: {
+        content_type: 'bundle_volume',
+        content_id: value,
+      },
+    });
+    setSelectedBundleVolume(value);
+  };
+
+  const handleBundleDaysSelect = (value: string) => {
+    fbpEvent('ViewContent', {
+      content_category: 'bundle_days',
+      content_name: value,
+    });
+    gtagEvent({
+      action: 'select_content',
+      parameters: {
+        content_type: 'bundle_days',
+        content_id: value,
+      },
+    });
+    setSelectedBundleDays(value);
+  };
+
   return (
     <div>
       <Row className="d-flex justify-content-center align-items-center">
@@ -178,7 +210,7 @@ const Bundles = ({
                     selected={
                       volumeOption.option.toString() === selectedBundleVolume
                     }
-                    onSelect={(value) => setSelectedBundleVolume(value)}
+                    onSelect={handleBundleVolumeSelect}
                     disabled={volumeOption.disabled}
                   />
                 </Col>
@@ -203,7 +235,7 @@ const Bundles = ({
                         (daysOption.option?.toString() || '365') ===
                         selectedBundleDays
                       }
-                      onSelect={(value) => setSelectedBundleDays(value)}
+                      onSelect={handleBundleDaysSelect}
                       disabled={daysOption.disabled}
                     />
                   </Col>
@@ -242,8 +274,8 @@ const Bundles = ({
                     {bundlesList
                       .find((bundle) => bundle.id === selectedBundle)
                       ?.refill.bundle.coverage.map((country: string, i) => (
-                        <>
-                          <Col key={country}>
+                        <React.Fragment key={country}>
+                          <Col>
                             {
                               countriesList.find(
                                 (countryOfCountriesList) =>
@@ -256,7 +288,7 @@ const Bundles = ({
                               (bundle) => bundle.id === selectedBundle
                             )!.refill.bundle.coverage.length -
                               1 && <Col>{'\u2022'}</Col>}
-                        </>
+                        </React.Fragment>
                       ))}
                   </Row>
                 </Col>

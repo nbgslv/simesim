@@ -2,26 +2,23 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { Post, Prisma } from '@prisma/client';
 import * as yup from 'yup';
 import { unstable_getServerSession } from 'next-auth';
-import { DeleteObjectsCommand, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
-import * as fs from 'fs';
+import { DeleteObjectsCommand, S3 } from '@aws-sdk/client-s3';
 import formidable, {
   Fields,
   Files,
   FormidableError,
   // @ts-ignore
 } from 'formidable-serverless';
-import cuid from 'cuid';
-import { format } from 'date-fns';
 import { Readable } from 'stream';
 import sanitizeHtml from 'sanitize-html';
 import DOMParser from 'dom-parser';
-import imageThumbnail from 'image-thumbnail';
 import prisma from '../../lib/prisma';
 import { ApiResponse } from '../../lib/types/api';
 import { authOptions } from './auth/[...nextauth]';
 import { Input } from '../../utils/api/services/adminApi';
 import { deleteSchema } from '../../utils/api/validation';
 import { PaginationApiResponse } from '../../utils/api/pagination/usePagination';
+import inngest from '../../utils/inngest/client';
 
 async function buffer(readable: Readable) {
   const chunks = [];
@@ -92,16 +89,6 @@ export default async function handler(
         throw new Error('Unauthorized');
       }
 
-      // Upload to digital ocean spaces
-      const s3 = new S3({
-        forcePathStyle: false, // Configures to use subdomain/virtual calling format.
-        endpoint: process.env.DO_SPACE_ENDPOINT,
-        region: 'fra1',
-        credentials: {
-          accessKeyId: process.env.DO_SPACE_KEY as string,
-          secretAccessKey: process.env.DO_SPACE_SECRET as string,
-        },
-      });
       const form = new formidable.IncomingForm();
       form.keepExtensions = true;
       form.parse(
@@ -138,77 +125,53 @@ export default async function handler(
             });
 
             const file = files.coverImage as formidable.File;
-            const fileCode = cuid();
-            const fileName = `${format(Date.now(), 'yyyy-M-d')}-${
-              fields.slug
-            }-${fileCode}.${file.name.split('.').pop()}`;
-            const bucketParams = {
-              Bucket: 'simesim-staging',
-              Key: fileName,
-              Body: fs.readFileSync(file.path),
-              ACL: 'public-read',
-            };
-            const data = await s3.send(new PutObjectCommand(bucketParams));
-            if (data.$metadata.httpStatusCode === 200) {
-              // If no error - create new post record
 
-              // Create image thumbnail
-              const coverImageThumbnail = await imageThumbnail(file.path);
-              const thumbnailFileName = `${format(Date.now(), 'yyyy-M-d')}-${
-                fields.slug
-              }-${fileCode}-thumbnail.${file.name.split('.').pop()}`;
+            // Add style tag to img tags
+            const content = fields.content.replace(
+              /<img/g,
+              '<img style="max-width: 100%; width: 100%; height: auto;"'
+            );
 
-              const thumbnailBucketParams = {
-                Bucket: 'simesim-staging',
-                Key: thumbnailFileName,
-                Body: coverImageThumbnail,
-                ACL: 'public-read',
-              };
+            // Create blog description
 
-              await s3.send(new PutObjectCommand(thumbnailBucketParams));
+            const tempDom = new DOMParser();
+            const tempDoc = tempDom.parseFromString(content);
+            const description =
+              tempDoc && tempDoc.getElementsByTagName('p')?.length
+                ? sanitizeHtml(
+                    // @ts-ignore
+                    tempDoc
+                      .getElementsByTagName('p')
+                      .map((p) => p.innerHTML)
+                      .join(' '),
+                    {
+                      allowedTags: [],
+                      allowedAttributes: {},
+                    }
+                  )
+                    .split(' ')
+                    .slice(0, 10)
+                    .join(' ')
+                : null;
 
-              // Add style tag to img tags
-              const content = fields.content.replace(
-                /<img/g,
-                '<img style="max-width: 100%; width: 100%; height: auto;"'
-              );
+            const newPost = await prisma.post.create({
+              data: {
+                title: fields.title,
+                slug: fields.slug,
+                description: description ?? undefined,
+                content,
+              },
+            });
 
-              // Create blog description
+            await inngest.send({
+              name: 'blog.upload',
+              data: {
+                file,
+                slug: fields.slug,
+              },
+            });
 
-              const tempDom = new DOMParser();
-              const tempDoc = tempDom.parseFromString(content);
-              const description =
-                tempDoc && tempDoc.getElementsByTagName('p')?.length
-                  ? sanitizeHtml(
-                      // @ts-ignore
-                      tempDoc
-                        .getElementsByTagName('p')
-                        .map((p) => p.innerHTML)
-                        .join(' '),
-                      {
-                        allowedTags: [],
-                        allowedAttributes: {},
-                      }
-                    )
-                      .split(' ')
-                      .slice(0, 10)
-                      .join(' ')
-                  : null;
-
-              const newPost = await prisma.post.create({
-                data: {
-                  title: fields.title,
-                  slug: fields.slug,
-                  description: description ?? undefined,
-                  content,
-                  coverImage: fileName,
-                  thumbnail: thumbnailFileName,
-                },
-              });
-              res.status(201).json({ success: true, data: newPost });
-            } else {
-              throw new Error('Error uploading file');
-            }
+            res.status(201).json({ success: true, data: newPost });
           } catch (error: unknown) {
             console.error(error);
             res.status(400).json({
@@ -309,18 +272,19 @@ export default async function handler(
             },
           },
         });
-        const deleteKeys = posts.reduce<{ Key: string }[]>(
-          (acc, post) => [
-            ...acc,
-            {
-              Key: post.coverImage,
-            },
-            {
-              Key: post.thumbnail,
-            },
-          ],
-          []
-        );
+        const deleteKeys = posts.reduce<{ Key: string }[]>((acc, post) => {
+          if (post.coverImage && post.thumbnail)
+            return [
+              ...acc,
+              {
+                Key: post.coverImage,
+              },
+              {
+                Key: post.thumbnail,
+              },
+            ];
+          return acc;
+        }, []);
 
         const deleteParams = {
           Bucket: 'simesim-staging',
@@ -343,30 +307,31 @@ export default async function handler(
             id: input.where.id,
           },
         });
-        const deleteKeys = [
-          {
-            Key: post?.coverImage,
-          },
-          {
-            Key: post?.thumbnail,
-          },
-        ];
+        if (post && post.coverImage && post.thumbnail) {
+          const deleteKeys = [
+            {
+              Key: post.coverImage,
+            },
+            {
+              Key: post.thumbnail,
+            },
+          ];
 
-        const deleteParams = {
-          Bucket: 'simesim-staging',
-          Delete: {
-            Objects: deleteKeys,
-          },
-        };
-        const data = await s3.send(new DeleteObjectsCommand(deleteParams));
-        if (data.$metadata.httpStatusCode === 204) {
-          const deleteOne: Post = await prisma.post.delete({
-            ...input,
-          });
-          res.status(200).json({ success: true, data: deleteOne });
-        } else {
-          throw new Error('Error deleting file');
+          const deleteParams = {
+            Bucket: 'simesim-staging',
+            Delete: {
+              Objects: deleteKeys,
+            },
+          };
+          const data = await s3.send(new DeleteObjectsCommand(deleteParams));
+          if (data.$metadata.httpStatusCode !== 204) {
+            throw new Error('Error deleting file');
+          }
         }
+        const deleteOne: Post = await prisma.post.delete({
+          ...input,
+        });
+        res.status(200).json({ success: true, data: deleteOne });
       }
     } else {
       res.status(405).json({

@@ -101,7 +101,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
     return (
       <MainLayout
         title="התחברות"
-        metaCanonical={`${process.env.NEXT_PUBLIC_BASE_URL}/login`}
+        metaCanonical={`${process.env.NEXT_PUBLIC_BASE_URL}${router.asPath}`}
         hideJumbotron
       >
         <div className={styles.main}>

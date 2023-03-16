@@ -2,6 +2,7 @@ import '../styles/global.scss';
 import type { AppProps } from 'next/app';
 import Script from 'next/script';
 import { SSRProvider, ThemeProvider } from 'react-bootstrap';
+import { Context as ResponsiveContext } from 'react-responsive';
 import NiceModal from '@ebay/nice-modal-react';
 import { SessionProvider } from 'next-auth/react';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
@@ -11,6 +12,7 @@ import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import UserStoreProvider from '../lib/context/UserStore';
 import { initialState, reducer } from '../lib/reducer/reducer';
 import * as gtag from '../lib/gtag';
+import * as fbq from '../lib/fbpixel';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -18,6 +20,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     const handleRouteChange = (url: any) => {
       gtag.pageview(url);
+      fbq.pageview();
     };
 
     router.events.on('routeChangeComplete', handleRouteChange);
@@ -59,32 +62,34 @@ function MyApp({ Component, pageProps }: AppProps) {
         }}
       />
       <SSRProvider>
-        <GoogleReCaptchaProvider
-          reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string}
-          language={'iw'}
-        >
-          {/* @ts-ignore */}
-          <SessionProvider session={pageProps.session}>
-            <UserStoreProvider
-              initialState={{ user: initialState.user }}
-              reducer={reducer}
-            >
-              <ThemeProvider dir="rtl">
-                <PayPalScriptProvider
-                  options={{
-                    'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
-                    currency: 'ILS',
-                    'disable-funding': 'credit,card,paylater',
-                  }}
-                >
-                  <NiceModal.Provider>
-                    <Component {...pageProps} />
-                  </NiceModal.Provider>
-                </PayPalScriptProvider>
-              </ThemeProvider>
-            </UserStoreProvider>
-          </SessionProvider>
-        </GoogleReCaptchaProvider>
+        <ResponsiveContext.Provider value={{ maxWidth: 767 }}>
+          <GoogleReCaptchaProvider
+            reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string}
+            language={'iw'}
+          >
+            {/* @ts-ignore */}
+            <SessionProvider session={pageProps.session}>
+              <UserStoreProvider
+                initialState={{ user: initialState.user }}
+                reducer={reducer}
+              >
+                <ThemeProvider dir="rtl">
+                  <PayPalScriptProvider
+                    options={{
+                      'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+                      currency: 'ILS',
+                      'disable-funding': 'credit,card,paylater',
+                    }}
+                  >
+                    <NiceModal.Provider>
+                      <Component {...pageProps} />
+                    </NiceModal.Provider>
+                  </PayPalScriptProvider>
+                </ThemeProvider>
+              </UserStoreProvider>
+            </SessionProvider>
+          </GoogleReCaptchaProvider>
+        </ResponsiveContext.Provider>
       </SSRProvider>
     </>
   );

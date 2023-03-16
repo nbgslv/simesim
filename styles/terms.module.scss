@@ -35,4 +35,26 @@
 .container {
   width: 75%;
   height: 100%;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    margin-left: 0.3rem;
+    margin-right: 0.3rem;
+    width: 100%;
+
+    :global ol {
+      padding-inline-start: 10px ;
+    }
+
+    :global .lead {
+      font-size: 1.05rem;
+    }
+
+    :global p {
+      font-size: 0.9rem;
+    }
+
+    :global li {
+      font-size: 0.8rem;
+    }
+  }
 }

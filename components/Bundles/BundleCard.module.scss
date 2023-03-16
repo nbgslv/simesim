@@ -33,7 +33,7 @@
 }
 
 .selected {
-  outline: #000000 solid 4px !important;
+  outline: map-get($theme-colors, 'info') solid 4px !important;
 }
 
 .cardCol {

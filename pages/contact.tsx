@@ -23,6 +23,8 @@ import text from '../lib/content/text.json';
 import styles from '../styles/contact.module.scss';
 import MainLayout from '../components/Layouts/MainLayout';
 import Input from '../components/Input/Input';
+import { fbpEvent } from '../lib/fbpixel';
+import { gtagEvent } from '../lib/gtag';
 
 const schema = yup.object().shape({
   name: yup.string(),
@@ -80,6 +82,21 @@ const Contact = () => {
       );
       const newInquiryJson = await newInquiry.json();
       if (newInquiryJson.success) {
+        fbpEvent('Contact', {
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          message: data.message,
+        });
+        gtagEvent({
+          action: 'contact',
+          parameters: {
+            name: data.name,
+            phone: data.phone,
+            email: data.email,
+            message: data.message,
+          },
+        });
         setSuccess(true);
       }
     } catch (e) {

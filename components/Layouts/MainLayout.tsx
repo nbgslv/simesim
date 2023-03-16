@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 import styles from './MainLayout.module.scss';
+import CustomNavbar from '../Navbar/CustomNavbar';
 
 const MainLayout = ({
   title,
@@ -48,6 +49,12 @@ const MainLayout = ({
         )}
         {metaCanonical && <link rel="canonical" href={metaCanonical} />}
       </Head>
+      <div className={styles.promo}>
+        <div className={styles.textPromo}>
+          לזמן מוגבל! 20% הנחה. השתמשו בקופון <u>NEW20</u>
+        </div>
+      </div>
+      <CustomNavbar />
       <Header hideJumbotron={hideJumbotron} />
       <main>{children}</main>
       <AnimatePresence>

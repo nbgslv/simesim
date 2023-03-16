@@ -153,3 +153,9 @@
       justify-content: center;
   }
 }
+
+.agreementCheckbox {
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    margin-bottom: 1rem;
+  }
+}

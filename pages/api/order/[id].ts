@@ -7,19 +7,44 @@ import Invoice4UClearing from '../../../utils/api/services/i4u/api';
 import { authOptions } from '../auth/[...nextauth]';
 import createLine, { LineStatus } from '../../../utils/createLine';
 
+export type Item = {
+  id: string;
+  name: string;
+  description?: string;
+  coupon?: string;
+  discount: number;
+  price: number;
+  quantity: number;
+};
+
+export type OrderData = {
+  id: string;
+  price: number;
+  coupon?: string;
+  friendlyId: string;
+  items: Item[];
+};
+
 // eslint-disable-next-line consistent-return
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<
     ApiResponse<
-      Partial<
-        Plan &
-          Prisma.PlanGetPayload<{
-            select: {
-              planModel: { select: { name: true; description: true } };
-            };
-          }>
-      >
+      | Partial<
+          Plan &
+            Prisma.PlanGetPayload<{
+              select: {
+                planModel: { select: { name: true; description: true } };
+              };
+            }>
+        >
+      | {
+          id: string;
+          price: number;
+          coupon?: string;
+          friendlyId: string;
+          items: Item[];
+        }
     >
   >
 ) {
@@ -38,11 +63,20 @@ export default async function handler(
           id: orderId as string,
         },
         select: {
+          id: true,
           price: true,
+          friendlyId: true,
           planModel: {
             select: {
+              id: true,
               name: true,
               description: true,
+              price: true,
+            },
+          },
+          payment: {
+            select: {
+              coupon: true,
             },
           },
           user: true,
@@ -66,11 +100,21 @@ export default async function handler(
       res.status(200).json({
         success: true,
         data: {
+          id: plan.id,
           price: plan.price,
-          planModel: {
-            name: plan.planModel.name,
-            description: plan.planModel.description,
-          },
+          friendlyId: plan.friendlyId,
+          coupon: plan.payment?.coupon?.code,
+          items: [
+            {
+              id: plan.planModel.id,
+              name: plan.planModel.name,
+              description: plan.planModel.description || undefined,
+              coupon: plan.payment?.coupon?.code,
+              discount: plan.planModel.price - plan.price,
+              price: plan.planModel.price,
+              quantity: 1,
+            },
+          ],
         },
       });
     } else if (method === 'PUT') {
@@ -95,7 +139,11 @@ export default async function handler(
               },
             },
           },
-          payment: true,
+          payment: {
+            include: {
+              coupon: true,
+            },
+          },
           user: true,
         },
       });
@@ -263,9 +311,25 @@ export default async function handler(
 
             // TODO: add data bundles and refills to line
 
-            res
-              .status(200)
-              .json({ success: true, data: { friendlyId: plan.friendlyId } });
+            res.status(200).json({
+              success: true,
+              data: {
+                id: plan.id,
+                price: plan.price,
+                coupon: plan.payment?.coupon?.code,
+                friendlyId: plan.friendlyId,
+                items: [
+                  {
+                    id: plan.planModel.id,
+                    name: plan.planModel.name,
+                    coupon: plan.payment?.coupon?.code,
+                    discount: plan.planModel.price - plan.price,
+                    price: plan.planModel.price,
+                    quantity: 1,
+                  },
+                ],
+              },
+            });
           }
         } else {
           res.status(200).json({

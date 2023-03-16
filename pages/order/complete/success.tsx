@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Spinner } from 'react-bootstrap';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import styles from '../../../styles/Checkout.module.scss';
 import MainLayout from '../../../components/Layouts/MainLayout';
 

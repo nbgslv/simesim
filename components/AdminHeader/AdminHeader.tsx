@@ -1,6 +1,7 @@
 import React from 'react';
 import { Nav, Navbar } from 'react-bootstrap';
-import Image from 'next/image';
+import * as Sentry from '@sentry/nextjs';
+import Image from 'next/legacy/image';
 import { signOut } from 'next-auth/react';
 import styles from './AdminHeader.module.scss';
 
@@ -36,6 +37,12 @@ const AdminHeader = () => (
         <Nav.Link eventKey="/admin/users" href="/admin/users">
           משתמשים
         </Nav.Link>
+        <Nav.Link
+          eventKey="/admin/supportedphones"
+          href="/admin/supportedphones"
+        >
+          טלפונים נתמכים
+        </Nav.Link>
         <Nav.Link eventKey="/admin/blog" href="/admin/blog">
           בלוג
         </Nav.Link>
@@ -50,7 +57,14 @@ const AdminHeader = () => (
         </Nav.Link>
       </Nav>
       <Nav className="me-auto">
-        <Nav.Link onClick={() => signOut()}>התנתק</Nav.Link>
+        <Nav.Link
+          onClick={() => {
+            Sentry.setUser(null);
+            signOut();
+          }}
+        >
+          התנתק
+        </Nav.Link>
         <Nav.Link href="/">חזרה לאתר</Nav.Link>
       </Nav>
     </Navbar.Collapse>

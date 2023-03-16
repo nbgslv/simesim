@@ -10,6 +10,8 @@ import styles from './BundlesSection.module.scss';
 import * as travelImageData from '../../public/travel.json';
 import OrderModal from '../Order/OrderModal';
 import Bundles from './Bundles';
+import { gtagEvent } from '../../lib/gtag';
+import { fbpEvent } from '../../lib/fbpixel';
 
 type BundlesSectionProps = {
   countriesList: Country[];
@@ -40,6 +42,16 @@ const BundlesSection = ({
   const countrySearchRef = useRef<any>();
 
   const handleCountrySelect = (country: ExtendedCountry | null) => {
+    fbpEvent('Search', {
+      content_category: 'country_search',
+      search_string: country?.name,
+    });
+    gtagEvent({
+      action: 'search',
+      parameters: {
+        search_term: country?.name,
+      },
+    });
     setSelectedCountry(country);
     if (country) {
       setCurrentStep(1);

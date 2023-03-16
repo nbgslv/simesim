@@ -1,10 +1,18 @@
 @import 'styles/variables';
 
 .navbar {
-  height: 4rem;
+  height: 2.5rem;
   transition: all 0.6s;
   opacity: 0.8;
   z-index: 1000;
+
+  :global a.nav-link, :global a.dropdown-toggle {
+    color: rgba(0, 0, 0, 0.8) !important;
+
+    &:hover {
+      color: map-get($theme-colors, 'primary') !important;
+    }
+  }
 
   :global .navbar-nav .nav-link.active {
     font-weight: 800;
@@ -28,30 +36,6 @@
   }
 }
 
-.navLinkTextDark {
-  color: rgba(0, 0, 0, 0.8) !important;
-
-  &:hover {
-    color: map-get($theme-colors, 'primary') !important;
-  }
-}
-
-.navLinkTextLight {
-  color: #ffffff !important;
-
-  @media (max-width: map-get($grid-breakpoints, 'lg')) {
-    color: $primary-color !important;
-  }
-
-  &:hover {
-    color: map-get($theme-colors, 'primary') !important;
-  }
-}
-
 .login {
   margin-left: 2rem;
-}
-
-.withPromo {
-  top: calc(0px + 1vh) !important;
 }
