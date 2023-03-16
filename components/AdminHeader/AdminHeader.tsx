@@ -52,7 +52,7 @@ const AdminHeader = () => (
         <Nav.Link eventKey="/admin/apikeys" href="/admin/apikeys">
           API
         </Nav.Link>
-        <Nav.Link disabled eventKey="/settings" href="/admin/main">
+        <Nav.Link eventKey="/settings" href="/admin/settings">
           הגדרות
         </Nav.Link>
       </Nav>
