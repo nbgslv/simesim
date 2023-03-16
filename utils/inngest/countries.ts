@@ -1,4 +1,3 @@
-import Bottleneck from 'bottleneck';
 import prisma from '../../lib/prisma';
 import inngest from './client';
 import KeepGoApi from '../api/services/keepGo/api';
@@ -18,10 +17,6 @@ export default inngest.createFunction(
       );
       return keepGoApi.getCountries();
     });
-    const limiter = new Bottleneck({
-      maxConcurrent: 1,
-      minTime: 1000,
-    });
     if (countries instanceof Error) {
       throw new Error(countries.message);
     }
@@ -29,56 +24,44 @@ export default inngest.createFunction(
       const countriesArray = Object.values(
         (countries as KeepGoResponse).countries!
       );
-      const translatedCountries = await step.run(
-        'Translate country',
-        async () => {
-          const translations = [];
-          const countryInfoRequestWrapped = limiter.wrap(fetch);
-          for (let i = 0; i < countriesArray.length; i += 1) {
-            const countryInfo = await countryInfoRequestWrapped(
-              `https://translation.googleapis.com/language/translate/v2?q=${countriesArray[i]}&target=he&key=${process.env.GOOGLE_API_KEY}`
-            );
-            const countryInfoJson = await (countryInfo as Response).json();
-            const translatedCountry = countryInfoJson.data.translations[0].translatedText
-              .replace(/[\u0591-\u05C4]/g, '')
-              .replace('&#39;', "'");
-            translations.push({
-              name: countriesArray[i],
-              translation: translatedCountry,
-            });
-          }
-          return translations;
-        }
-      );
-      await step.run('Update countries in db', async () => {
-        for (let i = 0; i < translatedCountries.length; i += 1) {
+      for (let i = 0; i < countriesArray.length; i += 1) {
+        await step.run('Translate country and update in db', async () => {
+          const countryInfo = await fetch(
+            `https://translation.googleapis.com/language/translate/v2?q=${countriesArray[i]}&target=he&key=${process.env.GOOGLE_API_KEY}`
+          );
+          const countryInfoJson = await countryInfo.json();
+          const translatedCountry = countryInfoJson.data.translations[0].translatedText
+            .replace(/[\u0591-\u05C4]/g, '')
+            .replace('&#39;', "'");
+
           const existingCountry = await prisma.country.findUnique({
             where: {
-              name: translatedCountries[i].name,
+              name: countriesArray[i],
             },
           });
           if (existingCountry) {
             if (!existingCountry.lockTranslation) {
               await prisma.country.update({
                 where: {
-                  name: translatedCountries[i].name,
+                  name: countriesArray[i],
                 },
                 data: {
-                  translation: translatedCountries[i].translation,
+                  translation: translatedCountry,
                 },
               });
             }
           } else {
             await prisma.country.create({
               data: {
-                name: translatedCountries[i].name,
-                translation: translatedCountries[i].translation,
+                name: countriesArray[i],
+                translation: translatedCountry,
                 show: false,
               },
             });
           }
-        }
-      });
+        });
+        await step.sleep(1000);
+      }
     } else {
       throw new Error('No countries were received from KeepGo');
     }
