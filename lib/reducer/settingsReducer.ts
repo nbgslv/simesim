@@ -10,6 +10,7 @@ type Setting = {
 export type Settings = {
   ShowHeaderRow?: string;
   HeaderRowSettings?: string;
+  ShowExitIntentModal?: string;
 };
 
 export type State = {

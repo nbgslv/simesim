@@ -54,7 +54,9 @@ const MainLayout = ({
         threshold: 30,
         eventThrottle: 100,
         onExitIntent: () => {
-          setShowPopup(true);
+          if (!router.query.coupon) {
+            setShowPopup(true);
+          }
         },
       });
       return () => {

@@ -133,12 +133,6 @@ const OrderModal = ({
     }
   }, [show]);
 
-  useEffect(() => {
-    if (defaultCoupon) {
-      setCoupon(defaultCoupon);
-    }
-  }, [defaultCoupon]);
-
   const handleCoupon = async () => {
     try {
       if (!phoneNumber) {
@@ -173,6 +167,15 @@ const OrderModal = ({
       setLoadingCoupon(false);
     }
   };
+
+  useEffect(() => {
+    if (defaultCoupon && phoneNumber) {
+      setCoupon(defaultCoupon);
+      handleCoupon();
+    } else if (defaultCoupon && !phoneNumber) {
+      setCouponError('נא להזין מספר טלפון');
+    }
+  }, [defaultCoupon, phoneNumber]);
 
   const getCouponStatus = () => {
     if (loadingCoupon) {

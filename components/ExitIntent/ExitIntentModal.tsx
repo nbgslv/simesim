@@ -60,7 +60,12 @@ const ExitIntentModal = ({
           </div>
         </div>
         <div className="mt-4 w-100 d-flex justify-content-center align-items-center">
-          <Button size="lg" variant="primary" className={styles.button}>
+          <Button
+            href="/?coupon=NEW20"
+            size="lg"
+            variant="primary"
+            className={styles.button}
+          >
             להנחה של 20%
           </Button>
         </div>

@@ -1,5 +1,5 @@
 import { Country, PlanModel, Prisma } from '@prisma/client';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import Lottie from 'react-lottie';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -40,7 +40,17 @@ const BundlesSection = ({
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
   const countrySearchRef = useRef<any>();
+  const couponDivRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.coupon && couponDivRef.current) {
+      couponDivRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [router.query.coupon]);
 
   const handleCountrySelect = (country: ExtendedCountry | null) => {
     fbpEvent('Search', {
@@ -84,10 +94,24 @@ const BundlesSection = ({
 
   const handleOrderModalClose = () => {
     setOrderModalOpen(false);
-    setCurrentStep(1);
+    if (!router.query.coupon) {
+      setCurrentStep(1);
+    }
   };
 
   const handleOrderButtonClick = () => {
+    router.push(
+      {
+        pathname: '/',
+        query: {
+          ...router.query,
+          country: selectedCountry?.name,
+          bundle: selectedBundle,
+        },
+      },
+      undefined,
+      { shallow: true }
+    );
     setOrderModalOpen(true);
   };
 
@@ -100,6 +124,14 @@ const BundlesSection = ({
           <Col
             className={`d-flex justify-content-between flex-column ${styles.bundlesSearch}`}
           >
+            {router.query.coupon && (
+              <div
+                ref={couponDivRef}
+                className={`d-flex justify-content-center ${styles.couponRow}`}
+              >
+                הקופון {router.query.coupon} ימתין לכם בהמשך ההזמנה
+              </div>
+            )}
             {currentStep >= 0 ? (
               <motion.div className={styles.firstStepContainer} layout>
                 <div className={`${styles.infoPlate} p-1 mb-2`}>
