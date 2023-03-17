@@ -19,7 +19,7 @@ export const initialState: State = {
   },
 };
 
-export const reducer = (state: State, action: Action): State => {
+export const userReducer = (state: State, action: Action): State => {
   switch (action.type) {
     case 'SET_USER':
       return {

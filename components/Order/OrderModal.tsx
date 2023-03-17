@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 import { Country, Coupon, PlanModel, Prisma } from '@prisma/client';
 import Link from 'next/link';
 import { Context, useUserStore } from '../../lib/context/UserStore';
-import { Action } from '../../lib/reducer/reducer';
+import { Action } from '../../lib/reducer/userReducer';
 import styles from './OrderModal.module.scss';
 import Input from '../Input/Input';
 import { toFixedNumber } from '../../utils/math';

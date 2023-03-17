@@ -9,7 +9,7 @@ import { authOptions } from './auth/[...nextauth]';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<ApiResponse<Settings | Prisma.BatchPayload>>
+  res: NextApiResponse<ApiResponse<Settings | Settings[] | Prisma.BatchPayload>>
 ) {
   try {
     const session = await unstable_getServerSession(
@@ -18,7 +18,10 @@ export default async function handler(
       authOptions(req as NextApiRequest, res as NextApiResponse)
     );
     const { method } = req;
-    if (method === 'POST') {
+    if (method === 'GET') {
+      const settings = await prisma.settings.findMany();
+      res.status(200).json({ success: true, data: settings });
+    } else if (method === 'POST') {
       if (!session || session.user.role !== 'ADMIN') {
         res.status(401).json({
           name: 'UNAUTHORIZED',

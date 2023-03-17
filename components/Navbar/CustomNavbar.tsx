@@ -9,7 +9,7 @@ import logoImageBlackText from '../../public/logo.png';
 import styles from './CustomNavbar.module.scss';
 import text from '../../lib/content/text.json';
 import { Context, useUserStore } from '../../lib/context/UserStore';
-import { Action } from '../../lib/reducer/reducer';
+import { Action } from '../../lib/reducer/userReducer';
 
 function CustomNavbar() {
   const [loggedIn, setLoggedIn] = React.useState<boolean>(false);
