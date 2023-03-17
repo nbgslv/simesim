@@ -32,6 +32,7 @@ export default function Home({
       title="שים eSim"
       metaDescription={'שים eSim חבילות גלישה זולות לחו"ל בלי להחליף כרטיס sim'}
       metaCanonical={`${process.env.NEXT_PUBLIC_BASE_URL}/`}
+      showExitIntent
     >
       <BundlesSection countriesList={countriesList} bundlesList={bundlesList} />
       <TimelineSection />

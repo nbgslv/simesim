@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
-import { useMediaQuery } from 'react-responsive';
+import { isMobile } from 'react-device-detect';
 import Timeline from './Timeline';
 import TimelineItem from './TimelineItem';
 import text from '../../lib/content/text.json';
@@ -15,7 +15,6 @@ const TimelineSection = () => {
     true,
   ]);
   const [animate, setAnimate] = React.useState<boolean>(true);
-  const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
 
   useEffect(() => {
     setAnimate(!animateArray.some((item) => !item));

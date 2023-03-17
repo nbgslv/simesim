@@ -28,6 +28,7 @@ type BundlesSectionProps = {
       include: { refill: { include: { bundle: true } } };
     }>;
   country?: string;
+  defaultCoupon?: string;
 };
 
 const schema = yup.object().shape({
@@ -44,6 +45,7 @@ const OrderModal = ({
   bundle,
   country,
   countriesList,
+  defaultCoupon,
 }: BundlesSectionProps) => {
   const [price, setPrice] = useState<number>(0);
   const [amountDays, setAmountDays] = useState<number>(0);
@@ -130,6 +132,12 @@ const OrderModal = ({
       });
     }
   }, [show]);
+
+  useEffect(() => {
+    if (defaultCoupon) {
+      setCoupon(defaultCoupon);
+    }
+  }, [defaultCoupon]);
 
   const handleCoupon = async () => {
     try {

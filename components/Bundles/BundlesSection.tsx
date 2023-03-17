@@ -3,7 +3,8 @@ import React, { useRef, useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import Lottie from 'react-lottie';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useMediaQuery } from 'react-responsive';
+import { isMobile } from 'react-device-detect';
+import { useRouter } from 'next/router';
 import SectionComponent from '../Section/Section';
 import CountrySearch, { ExtendedCountry } from '../CountrySearch/CountrySearch';
 import styles from './BundlesSection.module.scss';
@@ -38,8 +39,8 @@ const BundlesSection = ({
   >([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
-  const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
   const countrySearchRef = useRef<any>();
+  const router = useRouter();
 
   const handleCountrySelect = (country: ExtendedCountry | null) => {
     fbpEvent('Search', {
@@ -86,6 +87,10 @@ const BundlesSection = ({
     setCurrentStep(1);
   };
 
+  const handleOrderButtonClick = () => {
+    setOrderModalOpen(true);
+  };
+
   return (
     <AnimatePresence>
       <SectionComponent id="bundles-section" className={styles.bundlesSection}>
@@ -130,7 +135,7 @@ const BundlesSection = ({
                   variant="primary"
                   size="lg"
                   className={`${styles.orderButton}`}
-                  onClick={() => setOrderModalOpen(true)}
+                  onClick={() => handleOrderButtonClick()}
                   disabled={!selectedBundle}
                 >
                   3. מזמינים
@@ -162,6 +167,7 @@ const BundlesSection = ({
                 (bundle) => bundle.id === selectedBundle
               )}
               countriesList={countriesList}
+              defaultCoupon={router.query.coupon as string}
             />
           </Col>
           {!isMobile && !selectedCountry && (

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Country, PlanModel, Prisma } from '@prisma/client';
 import { Col, Row } from 'react-bootstrap';
-import { useMediaQuery } from 'react-responsive';
+import { isMobile } from 'react-device-detect';
 import BundleCard from './BundleCard';
 import styles from './Bundles.module.scss';
 // eslint-disable-next-line import/no-cycle
@@ -45,7 +45,6 @@ const Bundles = ({
   const [daysOptions, setDaysOptions] = React.useState<
     { option: number; disabled: boolean }[]
   >([]);
-  const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
 
   useEffect(() => {
     if (bundlesList.length) {
