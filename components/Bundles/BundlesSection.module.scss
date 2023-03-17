@@ -65,3 +65,12 @@
     width: 30vw !important;
   }
 }
+
+.couponRow {
+  color: map-get($theme-colors, 'danger') !important;
+  font-size: 1.3rem !important;
+
+    @media (max-width: map-get($grid-breakpoints, 'md')) {
+      font-size: 1rem !important;
+    }
+}
