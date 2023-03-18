@@ -1,9 +1,10 @@
 import { Country, PlanModel, Prisma } from '@prisma/client';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import Lottie from 'react-lottie';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useMediaQuery } from 'react-responsive';
+import { isMobile } from 'react-device-detect';
+import { useRouter } from 'next/router';
 import SectionComponent from '../Section/Section';
 import CountrySearch, { ExtendedCountry } from '../CountrySearch/CountrySearch';
 import styles from './BundlesSection.module.scss';
@@ -38,8 +39,18 @@ const BundlesSection = ({
   >([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
-  const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
   const countrySearchRef = useRef<any>();
+  const couponDivRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.coupon && couponDivRef.current) {
+      couponDivRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [router.query.coupon]);
 
   const handleCountrySelect = (country: ExtendedCountry | null) => {
     fbpEvent('Search', {
@@ -83,7 +94,25 @@ const BundlesSection = ({
 
   const handleOrderModalClose = () => {
     setOrderModalOpen(false);
-    setCurrentStep(1);
+    if (!router.query.coupon) {
+      setCurrentStep(1);
+    }
+  };
+
+  const handleOrderButtonClick = () => {
+    router.push(
+      {
+        pathname: '/',
+        query: {
+          ...router.query,
+          country: selectedCountry?.name,
+          bundle: selectedBundle,
+        },
+      },
+      undefined,
+      { shallow: true }
+    );
+    setOrderModalOpen(true);
   };
 
   return (
@@ -95,6 +124,14 @@ const BundlesSection = ({
           <Col
             className={`d-flex justify-content-between flex-column ${styles.bundlesSearch}`}
           >
+            {router.query.coupon && (
+              <div
+                ref={couponDivRef}
+                className={`d-flex justify-content-center ${styles.couponRow}`}
+              >
+                הקופון {router.query.coupon} ימתין לכם בהמשך ההזמנה
+              </div>
+            )}
             {currentStep >= 0 ? (
               <motion.div className={styles.firstStepContainer} layout>
                 <div className={`${styles.infoPlate} p-1 mb-2`}>
@@ -130,7 +167,7 @@ const BundlesSection = ({
                   variant="primary"
                   size="lg"
                   className={`${styles.orderButton}`}
-                  onClick={() => setOrderModalOpen(true)}
+                  onClick={() => handleOrderButtonClick()}
                   disabled={!selectedBundle}
                 >
                   3. מזמינים
@@ -162,6 +199,7 @@ const BundlesSection = ({
                 (bundle) => bundle.id === selectedBundle
               )}
               countriesList={countriesList}
+              defaultCoupon={router.query.coupon as string}
             />
           </Col>
           {!isMobile && !selectedCountry && (

@@ -2,7 +2,6 @@ import '../styles/global.scss';
 import type { AppProps } from 'next/app';
 import Script from 'next/script';
 import { SSRProvider, ThemeProvider } from 'react-bootstrap';
-import { Context as ResponsiveContext } from 'react-responsive';
 import NiceModal from '@ebay/nice-modal-react';
 import { SessionProvider } from 'next-auth/react';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
@@ -10,9 +9,14 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import UserStoreProvider from '../lib/context/UserStore';
-import { initialState, reducer } from '../lib/reducer/reducer';
+import {
+  initialState as userInitialState,
+  userReducer,
+} from '../lib/reducer/userReducer';
 import * as gtag from '../lib/gtag';
 import * as fbq from '../lib/fbpixel';
+import SettingsStoreProvider from '../lib/context/SettingsStore';
+import { initialState, settingsReducer } from '../lib/reducer/settingsReducer';
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -62,34 +66,36 @@ function MyApp({ Component, pageProps }: AppProps) {
         }}
       />
       <SSRProvider>
-        <ResponsiveContext.Provider value={{ maxWidth: 767 }}>
-          <GoogleReCaptchaProvider
-            reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string}
-            language={'iw'}
-          >
-            {/* @ts-ignore */}
-            <SessionProvider session={pageProps.session}>
-              <UserStoreProvider
-                initialState={{ user: initialState.user }}
-                reducer={reducer}
+        <GoogleReCaptchaProvider
+          reCaptchaKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string}
+          language={'iw'}
+        >
+          {/* @ts-ignore */}
+          <SessionProvider session={pageProps.session}>
+            <SettingsStoreProvider
+                initialState={{ settings: initialState.settings }}
+                reducer={settingsReducer}
               >
-                <ThemeProvider dir="rtl">
-                  <PayPalScriptProvider
-                    options={{
-                      'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
-                      currency: 'ILS',
-                      'disable-funding': 'credit,card,paylater',
-                    }}
-                  >
-                    <NiceModal.Provider>
-                      <Component {...pageProps} />
-                    </NiceModal.Provider>
-                  </PayPalScriptProvider>
-                </ThemeProvider>
-              </UserStoreProvider>
-            </SessionProvider>
-          </GoogleReCaptchaProvider>
-        </ResponsiveContext.Provider>
+                <UserStoreProvider
+              initialState={{ user: userInitialState.user }}
+              reducer={userReducer}
+            >
+              <ThemeProvider dir="rtl">
+                <PayPalScriptProvider
+                  options={{
+                    'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+                    currency: 'ILS',
+                    'disable-funding': 'credit,card,paylater',
+                  }}
+                >
+                  <NiceModal.Provider>
+                    <Component {...pageProps} />
+                  </NiceModal.Provider>
+                </PayPalScriptProvider>
+              </ThemeProvider>
+            </UserStoreProvider></SettingsStoreProvider>
+          </SessionProvider>
+        </GoogleReCaptchaProvider>
       </SSRProvider>
     </>
   );

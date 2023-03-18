@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 import { Country, Coupon, PlanModel, Prisma } from '@prisma/client';
 import Link from 'next/link';
 import { Context, useUserStore } from '../../lib/context/UserStore';
-import { Action } from '../../lib/reducer/reducer';
+import { Action } from '../../lib/reducer/userReducer';
 import styles from './OrderModal.module.scss';
 import Input from '../Input/Input';
 import { toFixedNumber } from '../../utils/math';
@@ -28,6 +28,7 @@ type BundlesSectionProps = {
       include: { refill: { include: { bundle: true } } };
     }>;
   country?: string;
+  defaultCoupon?: string;
 };
 
 const schema = yup.object().shape({
@@ -44,6 +45,7 @@ const OrderModal = ({
   bundle,
   country,
   countriesList,
+  defaultCoupon,
 }: BundlesSectionProps) => {
   const [price, setPrice] = useState<number>(0);
   const [amountDays, setAmountDays] = useState<number>(0);
@@ -165,6 +167,15 @@ const OrderModal = ({
       setLoadingCoupon(false);
     }
   };
+
+  useEffect(() => {
+    if (defaultCoupon && phoneNumber) {
+      setCoupon(defaultCoupon);
+      handleCoupon();
+    } else if (defaultCoupon && !phoneNumber) {
+      setCouponError('נא להזין מספר טלפון');
+    }
+  }, [defaultCoupon, phoneNumber]);
 
   const getCouponStatus = () => {
     if (loadingCoupon) {

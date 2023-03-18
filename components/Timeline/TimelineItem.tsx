@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { AnimatePresence, motion, useAnimation } from 'framer-motion';
-import { useMediaQuery } from 'react-responsive';
+import { isMobile } from 'react-device-detect';
 import styles from './TimelineItem.module.scss';
 
 type TimelineItemProps = {
@@ -23,7 +23,6 @@ const TimelineItem = ({
   const [active, setActive] = useState<boolean>(false);
   const [animationActive, setAnimationActive] = useState<boolean>(false);
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
-  const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
   const controls = useAnimation();
 
   useEffect(() => {

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { AnimatePresence, motion, useAnimation, Variants } from 'framer-motion';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useMediaQuery } from 'react-responsive';
+import { isMobile } from 'react-device-detect';
 import { PhoneBrand, SupportedPhones } from '@prisma/client';
 import styles from './CheckPhoneSection.module.scss';
 import SearchAutocomplete, {
@@ -59,7 +59,6 @@ const CheckPhoneSection = ({
     setSelectedPhone,
   ] = React.useState<PhoneListItem | null>(null);
   const phoneSearchRef = useRef<any>(null);
-  const isMobile = useMediaQuery({ query: '(max-width: 767px)' });
   const controls = useAnimation();
 
   const ListBox = ({ children }: { children: ReactNode | ReactNode[] }) => {

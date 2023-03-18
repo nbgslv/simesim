@@ -343,3 +343,11 @@ model SupportedPhones {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
+
+model Settings {
+    id              String   @id @default(cuid())
+    name            String   @unique
+    value           String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+}

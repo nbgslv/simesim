@@ -16,6 +16,7 @@ import {
   ApiKey,
   Post,
   SupportedPhones,
+  Settings,
 } from '@prisma/client';
 import { camelCase } from 'lodash';
 
@@ -249,6 +250,19 @@ type MapPrismaTypes<
       deleteMany: Prisma.SupportedPhonesDeleteManyArgs;
       upsert: Prisma.SupportedPhonesUpsertArgs;
     }
+  ],
+  [
+    Settings,
+    {
+      findFirst: Prisma.SettingsFindFirstArgs;
+      findMany: Prisma.SettingsFindManyArgs;
+      create: Prisma.SettingsCreateArgs;
+      update: Prisma.SettingsUpdateArgs;
+      updateMany: Prisma.SettingsUpdateManyArgs;
+      delete: Prisma.SettingsDeleteArgs;
+      deleteMany: Prisma.SettingsDeleteManyArgs;
+      upsert: Prisma.SettingsUpsertArgs;
+    }
   ]
 ];
 
@@ -310,6 +324,7 @@ export default class AdminApi {
     apiKey: '/auth/api/genkey',
     post: '/blog',
     supportedPhones: '/supportedphones',
+    settings: '/settings',
   };
 
   callApi = async <
