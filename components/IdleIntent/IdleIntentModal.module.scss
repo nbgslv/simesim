@@ -1,0 +1,57 @@
+@import "styles/variables";
+
+.main {
+  :global * {
+    color: $text-color;
+  }
+
+  :global .modal-content {
+    position: relative;
+  }
+
+  :global .btn:hover {
+    background: transparent;
+  }
+}
+
+.body {
+  background-color: map-get($theme-colors, "warning");
+  border-radius: 0.5rem !important;
+  padding: 2rem;
+}
+
+.row {
+  display: flex;
+  margin-bottom: 0.7rem;
+}
+
+.number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: map-get($theme-colors, "primary") 2px solid;
+  border-radius: 50%;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-left: 1rem;
+  color: map-get($theme-colors, "primary") !important;
+  font-size: 2rem !important;
+}
+
+.text {
+  display: flex;
+  align-items: center;
+}
+
+.button {
+  color: #ffffff !important;
+}
+
+.closeButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent;
+  border: none;
+  z-index: 10;
+}

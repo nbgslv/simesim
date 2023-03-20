@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { Settings } from '@prisma/client';
 import { useCookies } from 'react-cookie';
+import { isMobile } from 'react-device-detect';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 import styles from './MainLayout.module.scss';
@@ -14,6 +15,11 @@ import { Action } from '../../lib/reducer/settingsReducer';
 import HeaderRow from '../Header/HeaderRow';
 import ExitIntent from '../ExitIntent/ExitIntent';
 import ExitIntentModal from '../ExitIntent/ExitIntentModal';
+import useMobileExitIntent from '../ExitIntent/MobileExitIntent';
+import ClientOnly from '../ClientOnly/ClientOnly';
+import useIdle from '../../lib/hooks/useIdle';
+import IdleIntentModal from '../IdleIntent/IdleIntentModal';
+import useTitleFlash from '../../lib/hooks/useTitleFlash';
 
 const MainLayout = ({
   title,
@@ -31,10 +37,24 @@ const MainLayout = ({
   showExitIntent?: boolean;
 }) => {
   const [showOrderButton, setShowOrderButton] = React.useState<boolean>(false);
-  const [showPopup, setShowPopup] = useState(false);
+  const [showExitIntentPopup, setShowExitIntentPopup] = useState(false);
+  const [showIdlePopup, setShowIdlePopup] = useState(false);
   // eslint-disable-next-line @typescript-eslint/naming-convention,@typescript-eslint/no-unused-vars
   const [cookies, _, removeCookie] = useCookies(['exitModalSeen']);
   const { dispatch } = useSettingsStore() as Context<Action>;
+  const isIdle = useIdle(10000);
+  const { setFlash, flash } = useTitleFlash('אתם עדיין כאן?');
+  useMobileExitIntent({
+    callback: () => {
+      if (
+        (!cookies.exitModalSeen || cookies.exitModalSeen !== 'true') &&
+        isMobile
+      ) {
+        setShowExitIntentPopup(true);
+      }
+    },
+  });
+
   const router = useRouter();
 
   const handleScroll = useCallback(() => {
@@ -48,14 +68,15 @@ const MainLayout = ({
   useEffect(() => {
     if (
       (!cookies.exitModalSeen || cookies.exitModalSeen !== 'true') &&
+      !isMobile &&
       showExitIntent
     ) {
       const removeExitIntent = ExitIntent({
         threshold: 30,
         eventThrottle: 100,
         onExitIntent: () => {
-          if (!router.query.coupon) {
-            setShowPopup(true);
+          if (!router.query.coupon && !showIdlePopup) {
+            setShowExitIntentPopup(true);
           }
         },
       });
@@ -66,6 +87,23 @@ const MainLayout = ({
 
     return () => {};
   }, [cookies.exitModalSeen]);
+
+  useEffect(() => {
+    if (
+      (!cookies.exitModalSeen || cookies.exitModalSeen !== 'true') &&
+      isIdle &&
+      !showExitIntentPopup
+    ) {
+      setShowIdlePopup(true);
+      setFlash(true);
+    }
+  }, [isIdle]);
+
+  useEffect(() => {
+    if (flash && !showIdlePopup) {
+      setFlash(false);
+    }
+  }, [showIdlePopup, flash]);
 
   const getSettings = useCallback(async () => {
     const res = await fetch('/api/settings');
@@ -106,31 +144,40 @@ const MainLayout = ({
         )}
         {metaCanonical && <link rel="canonical" href={metaCanonical} />}
       </Head>
-      <ExitIntentModal hide={() => setShowPopup(false)} show={showPopup} />
-      <HeaderRow />
-      <CustomNavbar />
-      <Header hideJumbotron={hideJumbotron} />
-      <main>{children}</main>
-      <AnimatePresence>
-        {showOrderButton && router.pathname === '/' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-          >
-            <Fab
-              href="/#bundles-section"
-              color="primary"
-              aria-label="order"
-              className={styles.fabOrder}
+      <ClientOnly>
+        <ExitIntentModal
+          hide={() => setShowExitIntentPopup(false)}
+          show={showExitIntentPopup}
+        />
+        <IdleIntentModal
+          show={showIdlePopup}
+          hide={() => setShowIdlePopup(false)}
+        />
+        <HeaderRow />
+        <CustomNavbar />
+        <Header hideJumbotron={hideJumbotron} />
+        <main>{children}</main>
+        <AnimatePresence>
+          {showOrderButton && router.pathname === '/' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1 }}
             >
-              לחבילות
-            </Fab>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <Footer />
+              <Fab
+                href="/#bundles-section"
+                color="primary"
+                aria-label="order"
+                className={styles.fabOrder}
+              >
+                לחבילות
+              </Fab>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <Footer />
+      </ClientOnly>
     </>
   );
 };
