@@ -50,7 +50,7 @@ const MainLayout = ({
         (!cookies.exitModalSeen || cookies.exitModalSeen !== 'true') &&
         isMobile
       ) {
-        setShowPopup(true);
+        setShowExitIntentPopup(true);
       }
     },
   });
@@ -142,13 +142,13 @@ const MainLayout = ({
       </Head>
       <ClientOnly>
         <ExitIntentModal
-        hide={() => setShowExitIntentPopup(false)}
-        show={showExitIntentPopup}
-      />
-      <IdleIntentModal
-        show={showIdlePopup}
-        hide={() => setShowIdlePopup(false)}
-      />
+          hide={() => setShowExitIntentPopup(false)}
+          show={showExitIntentPopup}
+        />
+        <IdleIntentModal
+          show={showIdlePopup}
+          hide={() => setShowIdlePopup(false)}
+        />
         <HeaderRow />
         <CustomNavbar />
         <Header hideJumbotron={hideJumbotron} />

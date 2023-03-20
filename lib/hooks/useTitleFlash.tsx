@@ -1,41 +1,37 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const useTitleFlash = (message: string) => {
-  const timesFlashed = useRef(0);
-  const [title, setTitle] = useState(message);
-  const [flash, setFlash] = useState(false);
+function useFlashTitle(title: string) {
+  const [count, setCount] = useState(0);
   const [originalTitle, setOriginalTitle] = useState('');
+  const [flash, setFlash] = useState(false);
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setOriginalTitle(document.title);
   }, []);
 
   useEffect(() => {
-    setTitle(message);
-  }, [message]);
+    setIntervalId(
+      setInterval(() => {
+        setCount((lastCount) => lastCount + 1);
+      }, 1000)
+    );
 
-  const flashTitle = useCallback(() => {
-    if (!document.hidden && flash) {
-      document.title = document.title === originalTitle ? title : originalTitle;
-      timesFlashed.current += 1;
-    } else {
-      timesFlashed.current = 0;
-    }
-  }, [flash]);
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, []);
 
   useEffect(() => {
-    if (flash && timesFlashed.current === 0) {
-      flashTitle();
-    }
-    return () => {
+    if (flash && originalTitle) {
+      document.title = count % 2 === 0 ? title : originalTitle;
+    } else {
       document.title = originalTitle;
-    };
-  }, [flash]);
+      clearInterval(intervalId as NodeJS.Timeout);
+    }
+  }, [count, title]);
 
-  return {
-    setFlash,
-    flash,
-  };
-};
+  return { setFlash, flash };
+}
 
-export default useTitleFlash;
+export default useFlashTitle;
