@@ -89,7 +89,11 @@ const MainLayout = ({
   }, [cookies.exitModalSeen]);
 
   useEffect(() => {
-    if (isIdle && !showExitIntentPopup) {
+    if (
+      (!cookies.exitModalSeen || cookies.exitModalSeen !== 'true') &&
+      isIdle &&
+      !showExitIntentPopup
+    ) {
       setShowIdlePopup(true);
       setFlash(true);
     }
