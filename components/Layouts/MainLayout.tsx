@@ -17,6 +17,9 @@ import ExitIntent from '../ExitIntent/ExitIntent';
 import ExitIntentModal from '../ExitIntent/ExitIntentModal';
 import useMobileExitIntent from '../ExitIntent/MobileExitIntent';
 import ClientOnly from '../ClientOnly/ClientOnly';
+import useIdle from '../../lib/hooks/useIdle';
+import IdleIntentModal from '../IdleIntent/IdleIntentModal';
+import useTitleFlash from '../../lib/hooks/useTitleFlash';
 
 const MainLayout = ({
   title,
@@ -34,20 +37,24 @@ const MainLayout = ({
   showExitIntent?: boolean;
 }) => {
   const [showOrderButton, setShowOrderButton] = React.useState<boolean>(false);
-  const [showPopup, setShowPopup] = useState(false);
+  const [showExitIntentPopup, setShowExitIntentPopup] = useState(false);
+  const [showIdlePopup, setShowIdlePopup] = useState(false);
   // eslint-disable-next-line @typescript-eslint/naming-convention,@typescript-eslint/no-unused-vars
   const [cookies, _, removeCookie] = useCookies(['exitModalSeen']);
   const { dispatch } = useSettingsStore() as Context<Action>;
+  const isIdle = useIdle(10000);
+  const { setFlash, flash } = useTitleFlash('אתם עדיין כאן?');
   useMobileExitIntent({
     callback: () => {
       if (
         (!cookies.exitModalSeen || cookies.exitModalSeen !== 'true') &&
         isMobile
       ) {
-        setShowPopup(true);
+        setShowExitIntentPopup(true);
       }
     },
   });
+
   const router = useRouter();
 
   const handleScroll = useCallback(() => {
@@ -68,8 +75,8 @@ const MainLayout = ({
         threshold: 30,
         eventThrottle: 100,
         onExitIntent: () => {
-          if (!router.query.coupon) {
-            setShowPopup(true);
+          if (!router.query.coupon && !showIdlePopup) {
+            setShowExitIntentPopup(true);
           }
         },
       });
@@ -80,6 +87,19 @@ const MainLayout = ({
 
     return () => {};
   }, [cookies.exitModalSeen]);
+
+  useEffect(() => {
+    if (isIdle && !showExitIntentPopup) {
+      setShowIdlePopup(true);
+      setFlash(true);
+    }
+  }, [isIdle]);
+
+  useEffect(() => {
+    if (flash && !showIdlePopup) {
+      setFlash(false);
+    }
+  }, [showIdlePopup, flash]);
 
   const getSettings = useCallback(async () => {
     const res = await fetch('/api/settings');
@@ -121,7 +141,14 @@ const MainLayout = ({
         {metaCanonical && <link rel="canonical" href={metaCanonical} />}
       </Head>
       <ClientOnly>
-        <ExitIntentModal hide={() => setShowPopup(false)} show={showPopup} />
+        <ExitIntentModal
+          hide={() => setShowExitIntentPopup(false)}
+          show={showExitIntentPopup}
+        />
+        <IdleIntentModal
+          show={showIdlePopup}
+          hide={() => setShowIdlePopup(false)}
+        />
         <HeaderRow />
         <CustomNavbar />
         <Header hideJumbotron={hideJumbotron} />
