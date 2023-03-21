@@ -30,6 +30,9 @@ export default inngest.createFunction(
       ),
     };
 
+    if (settings.enabled !== 'true')
+      return { status: 'Abandoned carts mission not enabled' };
+
     const payments = await step.run('Get abandoned carts', () =>
       prisma.payment.findMany({
         where: {
