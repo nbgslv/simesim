@@ -1,4 +1,4 @@
-import { differenceInHours } from 'date-fns';
+import { differenceInHours, isAfter } from 'date-fns';
 import {
   PaymentStatus,
   MessageSubject,
@@ -15,6 +15,7 @@ export default inngest.createFunction(
   },
   { cron: '0 6-22/2 * * *' },
   async () => {
+    const DDATE = new Date(2023, 3, 1, 0, 0, 0, 0); // 2023-04-01 00:00:00
     try {
       const defaultSettings = {
         paymentTimeRanges: [24, 48, 72],
@@ -69,7 +70,8 @@ export default inngest.createFunction(
                 plan.payment?.createdAt ?? new Date(),
                 new Date()
               )
-            ) >= settings.paymentTimeRanges[messagesSent]
+            ) >= settings.paymentTimeRanges[messagesSent] &&
+            isAfter(plan.payment?.createdAt ?? new Date(), DDATE)
           ) {
             const messageTypePromise = async () => {
               if (settings.messagesTypes[messagesSent] === 'email') {
