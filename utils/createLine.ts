@@ -72,7 +72,7 @@ async function createLine({
     ];
     emailService.setEmailParams(
       'order@simesim.co.il',
-      'simEsim',
+      'שים eSim',
       recipients,
       'הזמנתך מאתר שים eSim',
       process.env.EMAIL_TEMPLATE_USER_NEW_LINE || '',
@@ -144,7 +144,7 @@ async function createLine({
 
     emailService.setEmailParams(
       'order@simesim.co.il',
-      'simEsim',
+      'שים eSim',
       recipients,
       'הזמנתך מאתר שים eSim',
       process.env.EMAIL_TEMPLATE_USER_PENDING_LINE || '',
@@ -238,7 +238,7 @@ async function createLine({
   ];
   emailService.setEmailParams(
     'order@simesim.co.il',
-    'simEsim',
+    'שים eSim',
     recipients,
     'הזמנתך מאתר שים eSim',
     process.env.EMAIL_TEMPLATE_USER_NEW_LINE || '',

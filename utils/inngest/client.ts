@@ -15,9 +15,15 @@ type SyncCountries = {
   data: {};
 };
 
+type SendAbandonedCart = {
+  name: 'campaign.send_abandoned_cart';
+  data: {};
+};
+
 type Events = {
   'blog.upload': UploadBlogImagesToDigitalocean;
   'countries.sync': SyncCountries;
+  'campaign.send_abandoned_cart': SendAbandonedCart;
 };
 
 const inngest = new Inngest<Events>({ name: 'simesim' });
