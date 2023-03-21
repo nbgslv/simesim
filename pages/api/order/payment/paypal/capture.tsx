@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { unstable_getServerSession } from 'next-auth';
 import paypal, { Payment, SDKError } from 'paypal-rest-sdk';
-import { PaymentStatus } from '@prisma/client';
+import { PaymentStatus, PlanStatus } from '@prisma/client';
 import { PaymentType } from '../../../../../utils/api/services/i4u/types';
 import { ApiResponse } from '../../../../../lib/types/api';
 import { authOptions } from '../../../auth/[...nextauth]';
@@ -90,6 +90,7 @@ export default async function handler(
             const updatedPlan = await prisma.plan.update({
               where: { id: orderId as string },
               data: {
+                status: PlanStatus.ACTIVE,
                 payment: {
                   update: {
                     status: PaymentStatus.PAID,
@@ -166,7 +167,7 @@ export default async function handler(
                   id: updatedPlan.id,
                 },
                 data: {
-                  status: 'PENDING',
+                  status: PlanStatus.PENDING,
                 },
               });
 

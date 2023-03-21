@@ -1,5 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { PaymentStatus, PaymentType, Plan, Prisma } from '@prisma/client';
+import {
+  PaymentStatus,
+  PaymentType,
+  Plan,
+  PlanStatus,
+  Prisma,
+} from '@prisma/client';
 import { unstable_getServerSession } from 'next-auth';
 import prisma from '../../../lib/prisma';
 import { ApiResponse } from '../../../lib/types/api';
@@ -87,6 +93,7 @@ export default async function handler(
         throw new Error('No plan found');
       }
 
+      // If no session or user is not the owner of the plan and user is not admin
       if (
         !session ||
         (plan.user.id !== session?.user.id && session?.user.role !== 'ADMIN')
@@ -299,6 +306,7 @@ export default async function handler(
                 id: plan.id,
               },
               data: {
+                status: PlanStatus.ACTIVE,
                 line: {
                   connect: {
                     id: lineDetails.id,
