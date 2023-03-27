@@ -2,12 +2,15 @@ import React, { useEffect } from 'react';
 import { Country, PlanModel, Prisma } from '@prisma/client';
 import { Col, Row } from 'react-bootstrap';
 import { isMobile } from 'react-device-detect';
+import Slider from 'react-slick';
 import BundleCard from './BundleCard';
 import styles from './Bundles.module.scss';
 // eslint-disable-next-line import/no-cycle
 import RoamingCountries from './RoamingCountries';
 import { gtagEvent } from '../../lib/gtag';
 import { fbpEvent } from '../../lib/fbpixel';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 export type BundlesList = PlanModel &
   Prisma.PlanModelGetPayload<{
@@ -195,51 +198,60 @@ const Bundles = ({
   return (
     <div>
       <Row className="d-flex justify-content-center align-items-center">
-        {volumeOptions.length
-          ? volumeOptions
-              .sort((a, b) => a.option - b.option)
-              .map((volumeOption) => (
-                <Col
-                  className="d-flex justify-content-center align-items-center mb-4"
-                  key={volumeOption.option}
-                >
-                  <BundleCard
-                    text={`${Math.floor(volumeOption.option / 1024)} ג"ב`}
-                    value={volumeOption.option.toString()}
-                    selected={
-                      volumeOption.option.toString() === selectedBundleVolume
-                    }
-                    onSelect={handleBundleVolumeSelect}
-                    disabled={volumeOption.disabled}
-                  />
-                </Col>
-              ))
-          : null}
+        <Col className="d-flex justify-content-center align-items-center mb-4">
+          <div className={styles.bundlesScroll}>
+            <div className={styles.bundlesContainer}>
+              {volumeOptions.length
+                ? volumeOptions
+                    .sort((a, b) => a.option - b.option)
+                    .map((volumeOption) => (
+                      <React.Fragment key={volumeOption.option}>
+                        <BundleCard
+                          text={`${Math.floor(volumeOption.option / 1024)} ג"ב`}
+                          value={volumeOption.option.toString()}
+                          selected={
+                            volumeOption.option.toString() ===
+                            selectedBundleVolume
+                          }
+                          onSelect={handleBundleVolumeSelect}
+                          disabled={volumeOption.disabled}
+                        />
+                      </React.Fragment>
+                    ))
+                : null}
+            </div>
+          </div>
+        </Col>
       </Row>
       <div className="mt-4 mb-4">
         <div className="text-center mb-2">לכמה זמן?</div>
         <Row className="d-flex justify-content-center align-items-center">
-          {daysOptions.length
-            ? daysOptions
-                .sort((a, b) => a.option - b.option)
-                .map((daysOption) => (
-                  <Col
-                    className="d-flex justify-content-center align-items-center"
-                    key={daysOption.option}
-                  >
-                    <BundleCard
-                      text={`${daysOption.option?.toString() || '365'} ימים`}
-                      value={daysOption.option?.toString() || '365'}
-                      selected={
-                        (daysOption.option?.toString() || '365') ===
-                        selectedBundleDays
-                      }
-                      onSelect={handleBundleDaysSelect}
-                      disabled={daysOption.disabled}
-                    />
-                  </Col>
-                ))
-            : null}
+          <Col className="d-flex justify-content-center align-items-center">
+            <div className={styles.bundlesScroll}>
+              <div className={styles.bundlesContainer}>
+                {daysOptions.length
+                  ? daysOptions
+                      .sort((a, b) => a.option - b.option)
+                      .map((daysOption) => (
+                        <React.Fragment key={daysOption.option}>
+                          <BundleCard
+                            text={`${
+                              daysOption.option?.toString() || '365'
+                            } ימים`}
+                            value={daysOption.option?.toString() || '365'}
+                            selected={
+                              (daysOption.option?.toString() || '365') ===
+                              selectedBundleDays
+                            }
+                            onSelect={handleBundleDaysSelect}
+                            disabled={daysOption.disabled}
+                          />
+                        </React.Fragment>
+                      ))
+                  : null}
+              </div>
+            </div>
+          </Col>
         </Row>
       </div>
       {selectedBundle ? (

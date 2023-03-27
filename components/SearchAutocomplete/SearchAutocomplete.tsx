@@ -207,6 +207,12 @@ const SearchAutocompleteInner = <T extends { id: string }>(
       onSelect(null);
       onCancel();
     },
+    handleSelect(item: Item<T>) {
+      setItemSelected(item);
+      setFilteredItems([]);
+      mainInputRef.current?.blur();
+      onSelect(item);
+    },
     mainInputRef,
   }));
 

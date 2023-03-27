@@ -87,6 +87,8 @@ model Plan {
   lineId      String?    @unique
   refill      Refill?    @relation(fields: [refillId], references: [id])
   refillId    String?
+  country     Country?   @relation(fields: [countryId], references: [id])
+  countryId   String?
 }
 
 enum PaymentStatus {
@@ -250,6 +252,7 @@ model Country {
   show            Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  Plan            Plan[]
 }
 
 enum DiscountType {

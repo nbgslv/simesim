@@ -16,3 +16,20 @@
   margin-bottom: 0.875rem;
   text-align: center;
 }
+
+.bundlesScroll {
+  overflow-x: scroll;
+  overflow-y: hidden;
+  white-space: nowrap;
+  width: 90vw;
+  text-align: center;
+}
+
+.bundlesScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.bundlesContainer {
+  width: 100%;
+}
+

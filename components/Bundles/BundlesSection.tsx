@@ -1,10 +1,11 @@
 import { Country, PlanModel, Prisma } from '@prisma/client';
 import React, { useEffect, useRef, useState } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, Spinner } from 'react-bootstrap';
 import Lottie from 'react-lottie';
 import { AnimatePresence, motion } from 'framer-motion';
 import { isMobile } from 'react-device-detect';
 import { useRouter } from 'next/router';
+import lookup from 'country-code-lookup';
 import SectionComponent from '../Section/Section';
 import CountrySearch, { ExtendedCountry } from '../CountrySearch/CountrySearch';
 import styles from './BundlesSection.module.scss';
@@ -20,11 +21,17 @@ type BundlesSectionProps = {
     Prisma.PlanModelGetPayload<{
       include: { refill: { include: { bundle: true } } };
     }>)[];
+  editMode?: boolean;
+  countryId?: string;
+  currentBundleId?: string;
 };
 
 const BundlesSection = ({
   countriesList,
   bundlesList,
+  editMode = false,
+  countryId,
+  currentBundleId,
 }: BundlesSectionProps) => {
   const [
     selectedCountry,
@@ -39,6 +46,7 @@ const BundlesSection = ({
   >([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(editMode);
   const countrySearchRef = useRef<any>();
   const couponDivRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -92,6 +100,34 @@ const BundlesSection = ({
     }
   };
 
+  useEffect(() => {
+    if (
+      editMode &&
+      countryId &&
+      currentBundleId &&
+      countrySearchRef.current &&
+      countrySearchRef.current.autocompleteRef.current
+    ) {
+      setLoading(true);
+      const country = countriesList.find((c) => c.id === countryId);
+      if (country) {
+        const extendedCountry = {
+          name: country.name,
+          id: country.id,
+          translation: country.translation,
+          iso2: lookup.byCountry(country.name)?.iso2,
+          displayValue: `${country.translation} (${country.name})`,
+        };
+        handleCountrySelect(extendedCountry);
+        countrySearchRef.current.autocompleteRef.current.handleSelect(
+          extendedCountry
+        );
+        handleBundleSelect(currentBundleId);
+      }
+      setLoading(false);
+    }
+  }, [editMode, countryId, currentBundleId]);
+
   const handleOrderModalClose = () => {
     setOrderModalOpen(false);
     if (!router.query.coupon) {
@@ -118,6 +154,7 @@ const BundlesSection = ({
   return (
     <AnimatePresence>
       <SectionComponent id="bundles-section" className={styles.bundlesSection}>
+        <>{loading && <Spinner animation="border" />}</>
         <Row
           className={`d-flex justify-content-between align-items-center p-3 ${styles.row}`}
         >
@@ -133,11 +170,16 @@ const BundlesSection = ({
               </div>
             )}
             {currentStep >= 0 ? (
-              <motion.div className={styles.firstStepContainer} layout>
+              <motion.div
+                className={`${styles.firstStepContainer}${
+                  loading ? ' d-none' : ''
+                }`}
+                layout
+              >
                 <div className={`${styles.infoPlate} p-1 mb-2`}>
                   <h3 id="flight-destination">1. מספרים לנו לאן אתם טסים</h3>
                 </div>
-                <div className="h-100 p-2">
+                <div className={`h-100 p-2`}>
                   <CountrySearch
                     ref={countrySearchRef}
                     ariaLabeledby="flight-destination"
@@ -150,7 +192,7 @@ const BundlesSection = ({
             {currentStep >= 1 ? (
               <div className="h-100 mt-4">
                 <div className={`${styles.infoPlate} p-1 mb-2`}>
-                  <h3>2. בוחרים חבילת דאטה</h3>
+                  <h3>בוחרים חבילת דאטה</h3>
                 </div>
                 <div className="h-100">
                   <Bundles
@@ -170,7 +212,7 @@ const BundlesSection = ({
                   onClick={() => handleOrderButtonClick()}
                   disabled={!selectedBundle}
                 >
-                  3. מזמינים
+                  מזמינים
                 </Button>
                 <Button
                   variant="secondary"
@@ -202,7 +244,7 @@ const BundlesSection = ({
               defaultCoupon={router.query.coupon as string}
             />
           </Col>
-          {!isMobile && !selectedCountry && (
+          {!isMobile && !editMode && !selectedCountry && (
             <Col role="presentation">
               <Lottie
                 ariaLabel="Traveling animation"

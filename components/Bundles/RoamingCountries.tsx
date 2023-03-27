@@ -1,15 +1,15 @@
 import React from 'react';
 import { Accordion, Col, Row } from 'react-bootstrap';
-import { Country } from '@prisma/client';
+import { Country, Prisma } from '@prisma/client';
 import styles from './RoamingCountries.module.scss';
-// eslint-disable-next-line import/no-cycle
-import { BundlesList } from './Bundles';
 
 const RoamingCountries = ({
   selectedBundle,
   countriesList,
 }: {
-  selectedBundle?: BundlesList;
+  selectedBundle?: Prisma.PlanGetPayload<{
+    include: { refill: { include: { bundle: true } } };
+  }>;
   countriesList: Country[];
 }) => {
   if (!selectedBundle) return null;
@@ -21,7 +21,7 @@ const RoamingCountries = ({
       </Accordion.Header>
       <Accordion.Body>
         <Row className={`text-center ${styles.whiteSpaceNowrap}`}>
-          {selectedBundle.refill.bundle.coverage.map((country, i) => (
+          {selectedBundle.refill?.bundle.coverage.map((country, i) => (
             <>
               <Col key={country}>
                 {
@@ -31,7 +31,8 @@ const RoamingCountries = ({
                   )?.translation
                 }
               </Col>
-              {i !== selectedBundle.refill.bundle.coverage.length - 1 && (
+              {i !==
+                (selectedBundle.refill?.bundle.coverage.length ?? 0) - 1 && (
                 <Col>{'\u2022'}</Col>
               )}
             </>
