@@ -67,7 +67,7 @@
     "sanitize-html": "^2.8.1",
     "sass": "^1.55.0",
     "styled-components": "^5.3.6",
-    "twilio": "^3.83.1",
+    "twilio": "^4.9.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
