@@ -91,7 +91,7 @@ const Footer = () => (
             <div className={`d-flex align-items-center ${styles.logo}`}>
               <FontAwesomeIcon icon={brands('whatsapp')} />
               <Nav.Link href={`https://wa.me/${text.phoneNumber}`}>
-                {text.phoneNumber}
+                {text.phoneNumberDisplay}
               </Nav.Link>
             </div>
             <div className={`d-flex justify-content-start mt-1 ${styles.logo}`}>
