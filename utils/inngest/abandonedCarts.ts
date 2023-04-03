@@ -4,10 +4,13 @@ import {
   MessageSubject,
   MessageType,
   MessageStatus,
+  PlanStatus,
 } from '@prisma/client';
 import inngest from './client';
 import prisma from '../../lib/prisma';
 import Email from '../email';
+import TwilioApi from '../api/services/twilio/twilio';
+import ShortIoApi from '../api/services/short.io/short';
 
 export default inngest.createFunction(
   {
@@ -38,12 +41,14 @@ export default inngest.createFunction(
 
       const plans = await prisma.plan.findMany({
         where: {
+          status: PlanStatus.PENDING,
           payment: {
             status: PaymentStatus.PENDING,
           },
         },
         include: {
           planModel: true,
+          country: true,
           payment: true,
           user: true,
           refill: true,
@@ -61,8 +66,6 @@ export default inngest.createFunction(
             ],
           },
         });
-        // eslint-disable-next-line no-console
-        console.log({ messagesSent });
         if (messagesSent >= 0 && messagesSent < 3) {
           if (
             Math.abs(
@@ -131,7 +134,24 @@ export default inngest.createFunction(
                 return MessageType.EMAIL;
               }
               if (settings.messagesTypes[messagesSent] === 'whatsapp') {
-                // await sendWhatsapp();
+                const twilioApi = new TwilioApi(
+                  process.env.TWILIO_ACCOUNT_SID!,
+                  process.env.TWILIO_AUTH_TOKEN!,
+                  process.env.TWILIO_VERIFY_SID!
+                );
+                const shortUrl = await ShortIoApi.shortenUrl(
+                  `${process.env.NEXT_PUBLIC_BASE_URL}/order/finish/${plan.id}`
+                );
+                await twilioApi.sendWhatsappMessage(
+                  plan.user.email,
+                  `היי ${plan.user.firstName}.
+שמנו לב שלא השלמת את הרכישה של חבילת eSim ל${plan.country?.translation}
+. יש לך שאלות או דאגות כלשהן לגבי ההזמנה? נשמח אם תוכלו לומר לנו כיצד נוכל לסייע, בכל עניין. נשמח לוודא שתקבלו את חוויית הקנייה הטובה ביותר.
+כדי להשלים את הרכישה, פשוט בקרו בלינק: ${shortUrl}
+
+בברכה,
+צוות שים eSim`
+                );
                 return MessageType.WHATSAPP;
               }
               return null;

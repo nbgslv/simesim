@@ -9,6 +9,8 @@ export default class TwilioApi {
 
   private readonly messagingServiceSid: string;
 
+  private readonly whatsappSender: string = '+972512896510';
+
   constructor(
     accountSid: string,
     authToken: string,
@@ -53,6 +55,20 @@ export default class TwilioApi {
         .verifications(validPhoneNumber)
         .update({ status: 'approved' });
       return validation.status === 'approved';
+    } catch (e: any) {
+      console.error(e);
+      throw new Error(e.message);
+    }
+  }
+
+  async sendWhatsappMessage(phoneNumber: string, message: string) {
+    try {
+      const validPhoneNumber = TwilioApi.formatPhoneNumber(phoneNumber);
+      return this.sdk.messages.create({
+        body: message,
+        from: `whatsapp:${this.whatsappSender}`,
+        to: `whatsapp:${validPhoneNumber}`,
+      });
     } catch (e: any) {
       console.error(e);
       throw new Error(e.message);
