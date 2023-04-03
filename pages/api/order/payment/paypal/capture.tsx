@@ -167,7 +167,7 @@ export default async function handler(
                   id: updatedPlan.id,
                 },
                 data: {
-                  status: PlanStatus.PENDING,
+                  status: PlanStatus.PENDING_LINE,
                 },
               });
 

@@ -66,6 +66,7 @@ enum PlanStatus {
   ACTIVE
   CANCELLED
   PENDING
+  PENDING_LINE
   EXPIRED
 }
 
