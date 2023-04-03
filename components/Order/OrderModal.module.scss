@@ -23,6 +23,10 @@
 
 .orderModalRow {
   margin-top: 1rem;
+
+  :global * {
+    color: $text-color !important;
+  }
 }
 
 .orderModalRow {

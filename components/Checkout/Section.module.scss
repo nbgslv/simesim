@@ -15,6 +15,10 @@
   }
 }
 
+.strongText {
+  vertical-align: middle;
+}
+
 .section.closed {
   padding: 0;
 }
@@ -28,4 +32,6 @@
   margin-bottom: .5rem;
   width: 100%;
   transform: none;
+  background: transparent;
+  border: none;
 }

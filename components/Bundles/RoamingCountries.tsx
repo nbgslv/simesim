@@ -7,7 +7,7 @@ const RoamingCountries = ({
   selectedBundle,
   countriesList,
 }: {
-  selectedBundle?: Prisma.PlanGetPayload<{
+  selectedBundle?: Prisma.PlanModelGetPayload<{
     include: { refill: { include: { bundle: true } } };
   }>;
   countriesList: Country[];

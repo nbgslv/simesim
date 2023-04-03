@@ -1,12 +1,23 @@
-import React, { forwardRef, useEffect, useImperativeHandle } from 'react';
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from 'react';
 import { User } from '@prisma/client';
-import { Col, Container, Row } from 'react-bootstrap';
-import Link from 'next/link';
+import { Button, Col, Container, Row, Spinner } from 'react-bootstrap';
 import { Controller, FieldErrors, FieldValues, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { AnimatePresence, motion } from 'framer-motion';
+import { toast } from 'react-toastify';
 import Input from '../Input/Input';
-import styles from '../Order/OrderModal.module.scss';
+import styles from './StepTwo.module.scss';
+import ToastContent from '../Toast/ToastContent';
+import { Context, useUserStore } from '../../lib/context/UserStore';
+import { Action } from '../../lib/reducer/userReducer';
+
+const MotionRow = motion(Row);
 
 const schema = yup.object().shape({
   firstName: yup.string().required('שדה חובה'),
@@ -21,14 +32,18 @@ const StepTwo = forwardRef(
       user,
       handleValid,
       handleErrors,
+      setUserEdit,
     }: {
       user: User | null;
       handleValid: (data: FieldValues) => Promise<void>;
-      handleErrors: (errors: FieldErrors<FieldValues>) => Promise<void>;
+      handleErrors?: (errors: FieldErrors<FieldValues>) => Promise<void>;
+      setUserEdit: (edit: boolean) => void;
     },
     ref
   ) => {
-    const { control, handleSubmit, reset, formState } = useForm({
+    const [edit, setEdit] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const { control, handleSubmit, reset } = useForm({
       mode: 'onBlur',
       reValidateMode: 'onChange',
       resolver: yupResolver(schema),
@@ -40,6 +55,7 @@ const StepTwo = forwardRef(
         terms: false,
       },
     });
+    const { state } = useUserStore() as Context<Action>;
 
     useImperativeHandle(ref, () => ({
       handleSubmit: () =>
@@ -48,9 +64,10 @@ const StepTwo = forwardRef(
             await handleValid(data);
           },
           async (errors) => {
-            await handleErrors(errors);
+            await handleErrors?.(errors);
           }
         ),
+      setStepLoading: (loadingState: boolean) => setLoading(loadingState),
     }));
 
     useEffect(() => {
@@ -65,12 +82,21 @@ const StepTwo = forwardRef(
     return (
       <Container>
         <form>
-          {user?.id && (
-            <Row className={styles.orderModalRow}>
+          {state.user.id && (
+            <Row>
               <small>
                 <strong>
                   נא לוודא שפרטיך נכונים.{' '}
-                  <Link href="/user/changeDetails">לעדכון הפרטים</Link>
+                  <Button
+                    className={styles.editButton}
+                    disabled={edit}
+                    onClick={() => {
+                      setUserEdit(true);
+                      setEdit(true);
+                    }}
+                  >
+                    לעדכון הפרטים
+                  </Button>
                 </strong>
               </small>
             </Row>
@@ -91,7 +117,7 @@ const StepTwo = forwardRef(
                     ref={field.ref}
                     value={field.value}
                     onChange={field.onChange}
-                    readonly={!!user?.id}
+                    readonly={Boolean(state.user.id) && !edit}
                     error={fieldState.error}
                   />
                 )}
@@ -113,7 +139,7 @@ const StepTwo = forwardRef(
                     focusedBorderColor="#FFC107"
                     ref={field.ref}
                     value={field.value}
-                    readonly={!!user?.id}
+                    readonly={Boolean(state.user.id) && !edit}
                     onChange={field.onChange}
                     error={fieldState.error}
                   />
@@ -136,13 +162,17 @@ const StepTwo = forwardRef(
                     focusedBorderColor="#FFC107"
                     ref={field.ref}
                     value={field.value}
-                    readonly={!!user?.id}
+                    readonly={Boolean(state.user.id) && !edit}
                     onChange={field.onChange}
                     error={fieldState.error}
                   />
                 )}
               />
-              {!user?.id && <small>מספר זה ישמש בעת התחברות לחשבונך</small>}
+              {!state.user.id && (
+                <small className={styles.note}>
+                  מספר זה ישמש בעת התחברות לחשבונך
+                </small>
+              )}
             </Col>
           </Row>
           <Row className={styles.orderModalRow}>
@@ -160,17 +190,67 @@ const StepTwo = forwardRef(
                     focusedBorderColor="#FFC107"
                     ref={field.ref}
                     value={field.value}
-                    readonly={!!user?.id}
+                    readonly={Boolean(state.user.id) && !edit}
                     onChange={field.onChange}
                     error={fieldState.error}
                   />
                 )}
               />
-              {!user?.id && (
-                <small>לכתובת דוא&quot;ל זו ישלח קוד QR להפעלת הכרטיס</small>
+              {!state.user.id && (
+                <small className={styles.note}>
+                  לכתובת דוא&quot;ל זו ישלח קוד QR להפעלת הכרטיס
+                </small>
               )}
             </Col>
           </Row>
+          <AnimatePresence initial={false}>
+            {(edit || !state.user.id) && (
+              <MotionRow
+                initial={{ height: 0 }}
+                animate={{ height: 'auto' }}
+                exit={{ height: 0 }}
+                transition={{ duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98] }}
+                className="mt-3"
+              >
+                <Col className="text-center">
+                  <Button
+                    onClick={handleSubmit(
+                      async (data) => {
+                        try {
+                          setLoading(true);
+                          await handleValid(data);
+                          setEdit(false);
+                          setUserEdit(false);
+                        } catch (error) {
+                          console.error(error);
+                          toast.error(
+                            <ToastContent
+                              content={'התקבלה שגיאה מהשרת. נסה שנית'}
+                            />
+                          );
+                        } finally {
+                          setLoading(false);
+                        }
+                      },
+                      async (errors) => {
+                        toast.error(
+                          <ToastContent content={'נראה שקיימות שגיאות בטופס'} />
+                        );
+                        await handleErrors?.(errors);
+                      }
+                    )}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <Spinner animation="border" size="sm" />
+                    ) : (
+                      'עדכון פרטים'
+                    )}
+                  </Button>
+                </Col>
+              </MotionRow>
+            )}
+          </AnimatePresence>
         </form>
       </Container>
     );

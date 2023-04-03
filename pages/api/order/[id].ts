@@ -77,7 +77,15 @@ export default async function handler(
               },
             },
             country: true,
-            planModel: true,
+            planModel: {
+              include: {
+                refill: {
+                  include: {
+                    bundle: true,
+                  },
+                },
+              },
+            },
           },
         });
 

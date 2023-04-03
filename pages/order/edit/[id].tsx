@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Country, Plan, PlanModel, Prisma } from '@prisma/client';
+import { Country, Prisma } from '@prisma/client';
 import { Spinner } from 'react-bootstrap';
 import { useRouter } from 'next/router';
 import BundlesSection from '../../../components/Bundles/BundlesSection';
@@ -12,10 +12,7 @@ const Id = () => {
     }>[]
   >([]);
   const [countriesList, setCountriesList] = React.useState<Country[]>([]);
-  const [
-    currentBundle,
-    setCurrentBundle,
-  ] = React.useState<Prisma.PlanGetPayload<{
+  const [currentPlan, setCurrentPlan] = React.useState<Prisma.PlanGetPayload<{
     include: { country: true };
   }> | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -26,7 +23,7 @@ const Id = () => {
     const fetchData = async () => {
       try {
         if (!id) return;
-        const currentBundleResponse = await fetch(
+        const currentPlanResponse = await fetch(
           `/api/order/${id}?action=finish`
         );
         const countriesListResponse = await fetch(
@@ -35,10 +32,10 @@ const Id = () => {
         const bundlesListResponse = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/planmodel`
         );
-        const currentBundleJson = await currentBundleResponse.json();
+        const currentPlanJson = await currentPlanResponse.json();
         const countriesListJson = await countriesListResponse.json();
         const bundlesListJson = await bundlesListResponse.json();
-        setCurrentBundle(currentBundleJson.data);
+        setCurrentPlan(currentPlanJson.data);
         setCountriesList(countriesListJson.data.countries);
         setBundlesList(bundlesListJson.data);
       } catch (error) {
@@ -61,8 +58,9 @@ const Id = () => {
           countriesList={countriesList}
           bundlesList={bundlesList}
           editMode
-          currentBundleId={currentBundle?.id}
-          countryId={currentBundle?.country?.id}
+          currentBundleId={currentPlan?.planModelId}
+          countryId={currentPlan?.country?.id}
+          editPlanId={currentPlan?.id}
         />
       )}
     </MainLayout>

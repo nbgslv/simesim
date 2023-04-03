@@ -27,10 +27,11 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
     try {
       if (phoneNumber.length === 10) {
         setLoading(true);
-        setCookie('phoneNumber', phoneNumber);
+        setCookie('phoneNumber', phoneNumber, { path: '/verify' });
         setCookie(
           'simesim_callbackUrl',
-          callbackUrl || process.env.NEXT_PUBLIC_BASE_URL
+          callbackUrl || process.env.NEXT_PUBLIC_BASE_URL,
+          { path: '/verify' }
         );
         if (!executeRecaptcha) {
           throw new Error('Recaptcha not loaded');
@@ -70,14 +71,21 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
       }
     } else if (router.query.phone && router.query.orderId) {
       setCallbackUrl(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/order/payment?orderId=${router.query.orderId}`
+        (router.query.callbackurl as string) ??
+          `${process.env.NEXT_PUBLIC_BASE_URL}/order/payment?orderId=${router.query.orderId}`
       );
       setPhoneNumber(router.query.phone as string);
+      setCookie('phoneNumber', router.query.phone as string, {
+        path: '/verify',
+      });
     } else if (router.query.phone && router.query.changeDetailsId) {
       setCallbackUrl(
         `${process.env.NEXT_PUBLIC_BASE_URL}/user/changeDetails?changeDetailsId=${router.query.changeDetailsId}`
       );
       setPhoneNumber(router.query.phone as string);
+      setCookie('phoneNumber', router.query.phone as string, {
+        path: '/verify',
+      });
     }
     setPageLoading(false);
   }, [router.query, executeRecaptcha]);

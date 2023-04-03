@@ -24,6 +24,7 @@ type BundlesSectionProps = {
   editMode?: boolean;
   countryId?: string;
   currentBundleId?: string;
+  editPlanId?: string;
 };
 
 const BundlesSection = ({
@@ -32,6 +33,7 @@ const BundlesSection = ({
   editMode = false,
   countryId,
   currentBundleId,
+  editPlanId,
 }: BundlesSectionProps) => {
   const [
     selectedCountry,
@@ -47,6 +49,9 @@ const BundlesSection = ({
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(editMode);
+  const [editApiRequestLoading, setEditApiRequestLoading] = useState<boolean>(
+    false
+  );
   const countrySearchRef = useRef<any>();
   const couponDivRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -135,21 +140,52 @@ const BundlesSection = ({
     }
   };
 
-  const handleOrderButtonClick = () => {
-    router.push(
-      {
-        pathname: '/',
-        query: {
-          ...router.query,
-          country: selectedCountry?.name,
-          bundle: selectedBundle,
-        },
-      },
-      undefined,
-      { shallow: true }
-    );
-    setOrderModalOpen(true);
+  const handleOrderButtonClick = async () => {
+    try {
+      if (editMode) {
+        setEditApiRequestLoading(true);
+        const updateResult = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/order/edit/${editPlanId}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              bundleId: selectedBundle,
+              countryId: selectedCountry?.id,
+            }),
+          }
+        );
+        const updateResultJson = await updateResult.json();
+        if (updateResultJson.success) {
+          router.push(`/order/finish/${editPlanId}`);
+        } else {
+          router.push(`/error?error=Order`);
+        }
+      } else {
+        router.push(
+          {
+            pathname: '/',
+            query: {
+              ...router.query,
+              country: selectedCountry?.name,
+              bundle: selectedBundle,
+            },
+          },
+          undefined,
+          { shallow: true }
+        );
+        setOrderModalOpen(true);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setEditApiRequestLoading(false);
+    }
   };
+
+  const getButtonLabel = () => (editMode ? 'שמור שינויים' : 'מזמינים');
 
   return (
     <AnimatePresence>
@@ -199,6 +235,8 @@ const BundlesSection = ({
                     countriesList={countriesList}
                     bundlesList={filteredBundles}
                     onChange={handleBundleSelect}
+                    editMode={editMode}
+                    currentPlanModelId={currentBundleId}
                   />
                 </div>
               </div>
@@ -210,14 +248,19 @@ const BundlesSection = ({
                   size="lg"
                   className={`${styles.orderButton}`}
                   onClick={() => handleOrderButtonClick()}
-                  disabled={!selectedBundle}
+                  disabled={!selectedBundle || editApiRequestLoading}
                 >
-                  מזמינים
+                  {editApiRequestLoading ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    getButtonLabel()
+                  )}
                 </Button>
                 <Button
                   variant="secondary"
                   size="lg"
                   className={`${styles.cancelButton}`}
+                  disabled={editApiRequestLoading}
                   onClick={() => {
                     countrySearchRef.current?.handleCancel();
                     countrySearchRef.current?.autocompleteRef.current?.mainInputRef.current?.scrollIntoView(

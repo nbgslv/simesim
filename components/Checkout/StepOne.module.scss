@@ -1,5 +1,14 @@
 .button {
   width: 5rem;
+  background: transparent;
+  border: none;
+  text-decoration: underline;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.strongText {
+  vertical-align: middle;
 }
 
 .data {

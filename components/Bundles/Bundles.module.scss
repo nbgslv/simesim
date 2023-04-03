@@ -22,7 +22,10 @@
   overflow-y: hidden;
   white-space: nowrap;
   width: 90vw;
+  height: 8.8rem;
   text-align: center;
+  display: flex;
+  align-items: center;
 }
 
 .bundlesScroll::-webkit-scrollbar {

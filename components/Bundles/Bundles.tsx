@@ -1,16 +1,12 @@
 import React, { useEffect } from 'react';
 import { Country, PlanModel, Prisma } from '@prisma/client';
 import { Col, Row } from 'react-bootstrap';
-import { isMobile } from 'react-device-detect';
-import Slider from 'react-slick';
 import BundleCard from './BundleCard';
 import styles from './Bundles.module.scss';
 // eslint-disable-next-line import/no-cycle
 import RoamingCountries from './RoamingCountries';
 import { gtagEvent } from '../../lib/gtag';
 import { fbpEvent } from '../../lib/fbpixel';
-import 'slick-carousel/slick/slick.css';
-import 'slick-carousel/slick/slick-theme.css';
 
 export type BundlesList = PlanModel &
   Prisma.PlanModelGetPayload<{
@@ -21,10 +17,14 @@ const Bundles = ({
   bundlesList,
   onChange,
   countriesList,
+  editMode = false,
+  currentPlanModelId,
 }: {
   bundlesList: BundlesList[];
   onChange: (bundleId: string | null) => void;
   countriesList: Country[];
+  editMode?: boolean;
+  currentPlanModelId?: string;
 }) => {
   const [selectedBundle, setSelectedBundle] = React.useState<string | null>(
     null
@@ -48,6 +48,21 @@ const Bundles = ({
   const [daysOptions, setDaysOptions] = React.useState<
     { option: number; disabled: boolean }[]
   >([]);
+
+  useEffect(() => {
+    if (currentPlanModelId && editMode) {
+      setSelectedBundle(currentPlanModelId);
+      const selectedBundleData = bundlesList.find(
+        (bundle) => bundle.id === currentPlanModelId
+      );
+      if (selectedBundleData) {
+        setSelectedBundleVolume(selectedBundleData.refill.amount_mb.toString());
+        setSelectedBundleDays(
+          selectedBundleData.refill.amount_days?.toString() || '0'
+        );
+      }
+    }
+  }, [currentPlanModelId, editMode, bundlesList]);
 
   useEffect(() => {
     if (bundlesList.length) {
@@ -261,7 +276,7 @@ const Bundles = ({
             {bundlesList.find((bundle) => bundle.id === selectedBundle)?.price}
           </div>
           {bundlesList.find((bundle) => bundle.id === selectedBundle)?.refill
-            .bundle.coverage.length && isMobile ? (
+            .bundle.coverage.length ? (
             <div className="mb-4">
               <RoamingCountries
                 countriesList={countriesList}
@@ -270,42 +285,7 @@ const Bundles = ({
                 )}
               />
             </div>
-          ) : (
-            bundlesList.find((bundle) => bundle.id === selectedBundle)?.refill
-              .bundle.coverage.length && (
-              <Row className="d-flex flex-column justify-content-center align-items-center mb-4">
-                <Col>
-                  <Row>
-                    <Col className={styles.roamingCountriesHeader}>
-                      טסים למדינות נוספות? הכרטיס יהיה תקף גם במעבר למדינות
-                      הבאות:
-                    </Col>
-                  </Row>
-                  <Row className={`text-center ${styles.whiteSpaceNowrap}`}>
-                    {bundlesList
-                      .find((bundle) => bundle.id === selectedBundle)
-                      ?.refill.bundle.coverage.map((country: string, i) => (
-                        <React.Fragment key={country}>
-                          <Col>
-                            {
-                              countriesList.find(
-                                (countryOfCountriesList) =>
-                                  countryOfCountriesList.name === country
-                              )?.translation
-                            }
-                          </Col>
-                          {i !==
-                            bundlesList.find(
-                              (bundle) => bundle.id === selectedBundle
-                            )!.refill.bundle.coverage.length -
-                              1 && <Col>{'\u2022'}</Col>}
-                        </React.Fragment>
-                      ))}
-                  </Row>
-                </Col>
-              </Row>
-            )
-          )}
+          ) : null}
         </div>
       ) : null}
     </div>
