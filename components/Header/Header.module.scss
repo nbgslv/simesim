@@ -32,6 +32,14 @@
   }
 }
 
+.container {
+  height: 83vh;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    height: auto;
+  }
+}
+
 .actionButton {
   width: 45%;
 }
@@ -66,4 +74,77 @@
     margin-bottom: 1rem;
     height: 53%;
   }
+}
+
+.videoRow {
+  background: $background-color;
+  width: 100vw;
+  max-width: 101%;
+  margin: 0;
+}
+
+.videoColumn {
+  margin-bottom: -6.1px;
+}
+
+.closeVideoButtonContainer {
+  position: absolute;
+  top: 0;
+  right: 5px;
+
+  @media (max-width: map-get($grid-breakpoints, 'md')) {
+    right: -5px;
+  }
+}
+
+.closeVideoButton {
+  background: transparent;
+  border: none;
+
+  &:hover {
+    background: transparent;
+  }
+
+  :global * {
+    color: $text-color !important;
+  }
+
+  :global svg {
+    color: $text-color !important;
+  }
+}
+
+.playVideoButton {
+  background: transparent;
+  border: none;
+
+  &:hover {
+    background: transparent;
+  }
+
+  :global * {
+    color: $text-color !important;
+  }
+
+  :global svg {
+    color: $text-color !important;
+  }
+}
+
+.videoWrap {
+  height: 61.4%;
+}
+
+.spinnerContainer {
+  width: 101%;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.emptyRow {
+  min-height: 5vh;
+  background-color: $background-color;
+  text-align: center;
 }
