@@ -287,7 +287,7 @@ const OrderModal = ({
           </Row>
           {bundle && bundle.refill.bundle.coverage.length > 0 && (
             <Row className={styles.orderModalRow}>
-              <Col>
+              <Col className={styles.roamingCountries}>
                 <RoamingCountries
                   countriesList={countriesList}
                   selectedBundle={bundle}
