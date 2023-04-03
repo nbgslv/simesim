@@ -13,7 +13,7 @@ const StepThree = ({ orderId }: { orderId?: string }) => {
     );
   return (
     <div className="d-flex flex-column align-items-center">
-      <Form.Check type="checkbox" id="terms" reverse>
+      <Form.Check className="mb-4" type="checkbox" id="terms" reverse>
         <Form.Check.Input
           type="checkbox"
           checked={agreeToTerms}

@@ -260,43 +260,45 @@ const Id = () => {
             <StepThree orderId={plan?.id} />
           </Section>
           <motion.div layout="position">
-            <Button
-              variant="primary"
-              onClick={async () => {
-                if (step === 1 && !state.user.id) {
-                  if (stepTwoRef.current) {
-                    stepTwoRef.current.setStepLoading(true);
+            {step < 2 && (
+              <Button
+                variant="primary"
+                onClick={async () => {
+                  if (step === 1 && !state.user.id) {
+                    if (stepTwoRef.current) {
+                      stepTwoRef.current.setStepLoading(true);
+                    }
+                    setLoading(true);
+                    await router.push(
+                      `${process.env.NEXT_PUBLIC_BASE_URL}/login?phone=${
+                        plan?.user.email
+                      }&orderId=${encodeURI(
+                        plan?.id ?? ''
+                      )}&callbackurl=${encodeURI(
+                        `${process.env.NEXT_PUBLIC_BASE_URL}/order/finish/${plan?.id}?step=PAYMENT`
+                      )}`
+                    );
+                  } else {
+                    stepSeen.current[step] = true;
+                    setStep(step + 1);
                   }
-                  setLoading(true);
-                  await router.push(
-                    `${process.env.NEXT_PUBLIC_BASE_URL}/login?phone=${
-                      plan?.user.email
-                    }&orderId=${encodeURI(
-                      plan?.id ?? ''
-                    )}&callbackurl=${encodeURI(
-                      `${process.env.NEXT_PUBLIC_BASE_URL}/order/finish/${plan?.id}?step=PAYMENT`
-                    )}`
-                  );
-                } else {
-                  stepSeen.current[step] = true;
-                  setStep(step + 1);
-                }
-              }}
-              className={styles.button}
-              disabled={loading || nextButtonDisabled}
-            >
-              {loading ? (
-                <div className="d-flex justify-content-center align-items-center">
-                  <Spinner
-                    animation="border"
-                    size="sm"
-                    style={{ color: '#fff' }}
-                  />
-                </div>
-              ) : (
-                'שלב הבא'
-              )}
-            </Button>
+                }}
+                className={styles.button}
+                disabled={loading || nextButtonDisabled}
+              >
+                {loading ? (
+                  <div className="d-flex justify-content-center align-items-center">
+                    <Spinner
+                      animation="border"
+                      size="sm"
+                      style={{ color: '#fff' }}
+                    />
+                  </div>
+                ) : (
+                  'שלב הבא'
+                )}
+              </Button>
+            )}
           </motion.div>
         </Container>
       </div>

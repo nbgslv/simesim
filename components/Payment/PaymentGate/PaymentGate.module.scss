@@ -1,9 +1,5 @@
 @import "styles/variables";
 
-.container {
-    height: $page-height;
-}
-
 .container.black {
     :global * {
         color: $text-color;
@@ -15,7 +11,7 @@
 }
 
 .button {
-    color: #ffffff;
+    color: #ffffff !important;
     height: 55px;
     width: 100%;
     max-width: 750px;
