@@ -3,8 +3,11 @@ import EmailProvider from 'next-auth/providers/email';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import otpGenerator from 'otp-generator';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { JWT } from 'next-auth/jwt';
 import prisma from '../../../lib/prisma';
 import TwilioApi, { Channel } from '../../../utils/api/services/twilio/twilio';
+// @ts-ignore
+import { Session } from '../../../types/next-auth';
 
 const twilioApi = new TwilioApi(
   process.env.TWILIO_ACCOUNT_SID!,
@@ -128,14 +131,20 @@ export const authOptions = (
       }
       return token;
     },
-    async session({ session, token }) {
-      if (session && session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.emailEmail = token.emailEmail as string;
-        return session;
+    async session({
+      session: userSession,
+      token,
+    }: {
+      session: Session;
+      token: JWT;
+    }) {
+      if (userSession && userSession.user) {
+        userSession.user.id = token.id as string;
+        userSession.user.role = token.role as string;
+        userSession.user.emailEmail = token.emailEmail as string;
+        return userSession;
       }
-      return session;
+      return userSession;
     },
   },
   pages: {
