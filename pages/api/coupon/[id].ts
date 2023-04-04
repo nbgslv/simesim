@@ -51,7 +51,6 @@ export default async function handler(
         },
       },
     });
-    console.log({ planModel, coupon });
     if (
       coupon &&
       coupon.validFrom < new Date() &&
