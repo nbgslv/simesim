@@ -11,7 +11,29 @@ import { deleteSchema } from '../../utils/api/validation';
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<
-    ApiResponse<PlanModel[] | Partial<PlanModel | Prisma.BatchPayload>>
+    ApiResponse<
+      | PlanModel[]
+      | Partial<PlanModel | Prisma.BatchPayload>
+      | Prisma.PlanModelGetPayload<{
+          select: {
+            id: true;
+            name: true;
+            refill: {
+              select: {
+                id: true;
+                amount_days: true;
+                amount_mb: true;
+                bundle: {
+                  select: {
+                    id: true;
+                    coverage: true;
+                  };
+                };
+              };
+            };
+          };
+        }>[]
+    >
   >
 ) {
   try {
@@ -30,7 +52,30 @@ export default async function handler(
         });
         return;
       }
-      const planModels = await prisma.planModel.findMany({});
+
+      const planModels = await prisma.planModel.findMany({
+        select: {
+          id: true,
+          name: true,
+          refill: {
+            select: {
+              id: true,
+              amount_days: true,
+              amount_mb: true,
+              bundle: {
+                select: {
+                  id: true,
+                  coverage: true,
+                },
+              },
+            },
+          },
+          description: true,
+          price: true,
+          vat: true,
+        },
+      });
+
       res.status(200).json({ success: true, data: planModels });
     } else if (method === 'POST') {
       if (!session || session.user.role !== 'ADMIN') {

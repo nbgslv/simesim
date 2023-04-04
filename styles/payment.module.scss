@@ -1,0 +1,9 @@
+@import "styles/variables";
+
+.main {
+  width: 100%;
+  height: $page-height;
+  background-color: $background-color;
+  display: flex;
+  align-items: center;
+}

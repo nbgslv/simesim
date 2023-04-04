@@ -97,7 +97,7 @@ const CountrySearch = forwardRef(
         translation: value.translation,
         displayValue: `${value.translation} (${value.name})`,
         iso2: lookup.byCountry(value.name!)?.iso2,
-        id: value.name,
+        id: value.id,
       }));
       setItems(itemsArr);
     }, [countriesList]);

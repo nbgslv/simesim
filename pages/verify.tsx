@@ -51,7 +51,7 @@ const Verify = ({ csrfToken }: { csrfToken: string }) => {
       setAlertMessage('אירעה שגיאה, נסה שנית');
       setShowOtp(false);
     }
-  }, []);
+  }, [cookies.phoneNumber, cookies.simesim_callbackUrl]);
 
   const handleVerification = async () => {
     try {

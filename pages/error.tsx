@@ -23,6 +23,9 @@ const Error = () => {
       } else if (router.query.error === 'Order') {
         setAlertVariant('danger');
         setAlertMessage('משהו השתבש עם קליטת ההזמנה. מציעים לבדוק עם התמיכה.');
+      } else if (router.query.error === 'OrderPaid_Finish') {
+        setAlertVariant('danger');
+        setAlertMessage('ההזמנה הסתיימה.');
       } else if (router.query.error === 'Payment') {
         setAlertVariant('danger');
         setAlertMessage(

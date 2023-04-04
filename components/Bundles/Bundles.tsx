@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Country, PlanModel, Prisma } from '@prisma/client';
 import { Col, Row } from 'react-bootstrap';
-import { isMobile } from 'react-device-detect';
 import BundleCard from './BundleCard';
 import styles from './Bundles.module.scss';
 // eslint-disable-next-line import/no-cycle
@@ -18,10 +17,14 @@ const Bundles = ({
   bundlesList,
   onChange,
   countriesList,
+  editMode = false,
+  currentPlanModelId,
 }: {
   bundlesList: BundlesList[];
   onChange: (bundleId: string | null) => void;
   countriesList: Country[];
+  editMode?: boolean;
+  currentPlanModelId?: string;
 }) => {
   const [selectedBundle, setSelectedBundle] = React.useState<string | null>(
     null
@@ -45,6 +48,21 @@ const Bundles = ({
   const [daysOptions, setDaysOptions] = React.useState<
     { option: number; disabled: boolean }[]
   >([]);
+
+  useEffect(() => {
+    if (currentPlanModelId && editMode) {
+      setSelectedBundle(currentPlanModelId);
+      const selectedBundleData = bundlesList.find(
+        (bundle) => bundle.id === currentPlanModelId
+      );
+      if (selectedBundleData) {
+        setSelectedBundleVolume(selectedBundleData.refill.amount_mb.toString());
+        setSelectedBundleDays(
+          selectedBundleData.refill.amount_days?.toString() || '0'
+        );
+      }
+    }
+  }, [currentPlanModelId, editMode, bundlesList]);
 
   useEffect(() => {
     if (bundlesList.length) {
@@ -195,51 +213,60 @@ const Bundles = ({
   return (
     <div>
       <Row className="d-flex justify-content-center align-items-center">
-        {volumeOptions.length
-          ? volumeOptions
-              .sort((a, b) => a.option - b.option)
-              .map((volumeOption) => (
-                <Col
-                  className="d-flex justify-content-center align-items-center mb-4"
-                  key={volumeOption.option}
-                >
-                  <BundleCard
-                    text={`${Math.floor(volumeOption.option / 1024)} ג"ב`}
-                    value={volumeOption.option.toString()}
-                    selected={
-                      volumeOption.option.toString() === selectedBundleVolume
-                    }
-                    onSelect={handleBundleVolumeSelect}
-                    disabled={volumeOption.disabled}
-                  />
-                </Col>
-              ))
-          : null}
+        <Col className="d-flex justify-content-center align-items-center mb-4">
+          <div className={styles.bundlesScroll}>
+            <div className={styles.bundlesContainer}>
+              {volumeOptions.length
+                ? volumeOptions
+                    .sort((a, b) => a.option - b.option)
+                    .map((volumeOption) => (
+                      <React.Fragment key={volumeOption.option}>
+                        <BundleCard
+                          text={`${Math.floor(volumeOption.option / 1024)} ג"ב`}
+                          value={volumeOption.option.toString()}
+                          selected={
+                            volumeOption.option.toString() ===
+                            selectedBundleVolume
+                          }
+                          onSelect={handleBundleVolumeSelect}
+                          disabled={volumeOption.disabled}
+                        />
+                      </React.Fragment>
+                    ))
+                : null}
+            </div>
+          </div>
+        </Col>
       </Row>
       <div className="mt-4 mb-4">
         <div className="text-center mb-2">לכמה זמן?</div>
         <Row className="d-flex justify-content-center align-items-center">
-          {daysOptions.length
-            ? daysOptions
-                .sort((a, b) => a.option - b.option)
-                .map((daysOption) => (
-                  <Col
-                    className="d-flex justify-content-center align-items-center"
-                    key={daysOption.option}
-                  >
-                    <BundleCard
-                      text={`${daysOption.option?.toString() || '365'} ימים`}
-                      value={daysOption.option?.toString() || '365'}
-                      selected={
-                        (daysOption.option?.toString() || '365') ===
-                        selectedBundleDays
-                      }
-                      onSelect={handleBundleDaysSelect}
-                      disabled={daysOption.disabled}
-                    />
-                  </Col>
-                ))
-            : null}
+          <Col className="d-flex justify-content-center align-items-center">
+            <div className={styles.bundlesScroll}>
+              <div className={styles.bundlesContainer}>
+                {daysOptions.length
+                  ? daysOptions
+                      .sort((a, b) => a.option - b.option)
+                      .map((daysOption) => (
+                        <React.Fragment key={daysOption.option}>
+                          <BundleCard
+                            text={`${
+                              daysOption.option?.toString() || '365'
+                            } ימים`}
+                            value={daysOption.option?.toString() || '365'}
+                            selected={
+                              (daysOption.option?.toString() || '365') ===
+                              selectedBundleDays
+                            }
+                            onSelect={handleBundleDaysSelect}
+                            disabled={daysOption.disabled}
+                          />
+                        </React.Fragment>
+                      ))
+                  : null}
+              </div>
+            </div>
+          </Col>
         </Row>
       </div>
       {selectedBundle ? (
@@ -249,7 +276,7 @@ const Bundles = ({
             {bundlesList.find((bundle) => bundle.id === selectedBundle)?.price}
           </div>
           {bundlesList.find((bundle) => bundle.id === selectedBundle)?.refill
-            .bundle.coverage.length && isMobile ? (
+            .bundle.coverage.length ? (
             <div className="mb-4">
               <RoamingCountries
                 countriesList={countriesList}
@@ -258,42 +285,7 @@ const Bundles = ({
                 )}
               />
             </div>
-          ) : (
-            bundlesList.find((bundle) => bundle.id === selectedBundle)?.refill
-              .bundle.coverage.length && (
-              <Row className="d-flex flex-column justify-content-center align-items-center mb-4">
-                <Col>
-                  <Row>
-                    <Col className={styles.roamingCountriesHeader}>
-                      טסים למדינות נוספות? הכרטיס יהיה תקף גם במעבר למדינות
-                      הבאות:
-                    </Col>
-                  </Row>
-                  <Row className={`text-center ${styles.whiteSpaceNowrap}`}>
-                    {bundlesList
-                      .find((bundle) => bundle.id === selectedBundle)
-                      ?.refill.bundle.coverage.map((country: string, i) => (
-                        <React.Fragment key={country}>
-                          <Col>
-                            {
-                              countriesList.find(
-                                (countryOfCountriesList) =>
-                                  countryOfCountriesList.name === country
-                              )?.translation
-                            }
-                          </Col>
-                          {i !==
-                            bundlesList.find(
-                              (bundle) => bundle.id === selectedBundle
-                            )!.refill.bundle.coverage.length -
-                              1 && <Col>{'\u2022'}</Col>}
-                        </React.Fragment>
-                      ))}
-                  </Row>
-                </Col>
-              </Row>
-            )
-          )}
+          ) : null}
         </div>
       ) : null}
     </div>

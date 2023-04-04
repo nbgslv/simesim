@@ -1,5 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { PaymentStatus, PaymentType, Plan, Prisma } from '@prisma/client';
+import {
+  PaymentStatus,
+  PaymentType,
+  Plan,
+  PlanStatus,
+  Prisma,
+} from '@prisma/client';
 import { unstable_getServerSession } from 'next-auth';
 import prisma from '../../../lib/prisma';
 import { ApiResponse } from '../../../lib/types/api';
@@ -56,67 +62,103 @@ export default async function handler(
     );
     const { method } = req;
     if (method === 'GET') {
-      const { id: orderId } = req.query;
+      const { id: orderId, action } = req.query;
 
-      const plan = await prisma.plan.findUnique({
-        where: {
-          id: orderId as string,
-        },
-        select: {
-          id: true,
-          price: true,
-          friendlyId: true,
-          planModel: {
-            select: {
-              id: true,
-              name: true,
-              description: true,
-              price: true,
+      if (action === 'finish') {
+        const plan = await prisma.plan.findUnique({
+          where: {
+            id: orderId as string,
+          },
+          include: {
+            user: true,
+            refill: {
+              include: {
+                bundle: true,
+              },
+            },
+            country: true,
+            planModel: {
+              include: {
+                refill: {
+                  include: {
+                    bundle: true,
+                  },
+                },
+              },
             },
           },
-          payment: {
-            select: {
-              coupon: true,
-            },
+        });
+
+        if (!plan) {
+          throw new Error('No plan found');
+        }
+
+        res.status(200).json({
+          success: true,
+          data: plan,
+        });
+      } else {
+        const plan = await prisma.plan.findUnique({
+          where: {
+            id: orderId as string,
           },
-          user: true,
-        },
-      });
-
-      if (!plan) {
-        throw new Error('No plan found');
-      }
-
-      if (
-        !session ||
-        (plan.user.id !== session?.user.id && session?.user.role !== 'ADMIN')
-      ) {
-        res.redirect(
-          302,
-          `${process.env.NEXT_PUBLIC_BASE_URL}/error?error=Order`
-        );
-      }
-
-      res.status(200).json({
-        success: true,
-        data: {
-          id: plan.id,
-          price: plan.price,
-          friendlyId: plan.friendlyId,
-          coupon: plan.payment?.coupon?.code,
-          items: [
-            {
-              id: plan.planModel.id,
-              name: plan.planModel.name,
-              description: plan.planModel.description || undefined,
-              coupon: plan.payment?.coupon?.code,
-              discount: plan.planModel.price - plan.price,
-              price: plan.planModel.price,
-              quantity: 1,
+          select: {
+            id: true,
+            price: true,
+            friendlyId: true,
+            planModel: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                price: true,
+              },
             },
-          ],
-        },
-      });
+            payment: {
+              select: {
+                coupon: true,
+              },
+            },
+            user: true,
+          },
+        });
+
+        if (!plan) {
+          throw new Error('No plan found');
+        }
+
+        // If no session or user is not the owner of the plan and user is not admin
+        if (
+          !session ||
+          (plan.user.id !== session?.user.id && session?.user.role !== 'ADMIN')
+        ) {
+          res.redirect(
+            302,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/error?error=Order`
+          );
+        }
+
+        res.status(200).json({
+          success: true,
+          data: {
+            id: plan.id,
+            price: plan.price,
+            friendlyId: plan.friendlyId,
+            coupon: plan.payment?.coupon?.code,
+            items: [
+              {
+                id: plan.planModel.id,
+                name: plan.planModel.name,
+                description: plan.planModel.description || undefined,
+                coupon: plan.payment?.coupon?.code,
+                discount: plan.planModel.price - plan.price,
+                price: plan.planModel.price,
+                quantity: 1,
+              },
+            ],
+          },
+        });
+      }
     } else if (method === 'PUT') {
       const { id } = req.query;
       const {
@@ -299,6 +341,7 @@ export default async function handler(
                 id: plan.id,
               },
               data: {
+                status: PlanStatus.ACTIVE,
                 line: {
                   connect: {
                     id: lineDetails.id,
