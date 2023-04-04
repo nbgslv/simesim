@@ -138,7 +138,7 @@ const Contact = () => {
                   </Col>
                   <Col>
                     <Nav.Link href={`https://wa.me/${text.phoneNumber}`}>
-                      {text.phoneNumber}
+                      {text.phoneNumberDisplay}
                     </Nav.Link>
                   </Col>
                 </Row>
