@@ -226,18 +226,20 @@ const BundlesSection = ({
               </motion.div>
             ) : null}
             {currentStep >= 1 ? (
-              <div className="h-100 mt-4">
+              <div className="h-100 mt-md-4">
                 <div className={`${styles.infoPlate} p-1 mb-2`}>
                   <h3>בוחרים חבילת דאטה</h3>
                 </div>
                 <div className="h-100">
-                  <Bundles
-                    countriesList={countriesList}
-                    bundlesList={filteredBundles}
-                    onChange={handleBundleSelect}
-                    editMode={editMode}
-                    currentPlanModelId={currentBundleId}
-                  />
+                  <div>
+                    <Bundles
+                      countriesList={countriesList}
+                      bundlesList={filteredBundles}
+                      onChange={handleBundleSelect}
+                      editMode={editMode}
+                      currentPlanModelId={currentBundleId}
+                    />
+                  </div>
                 </div>
               </div>
             ) : null}

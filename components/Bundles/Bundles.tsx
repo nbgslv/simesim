@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 import { Country, PlanModel, Prisma } from '@prisma/client';
-import { Col, Row } from 'react-bootstrap';
-import BundleCard from './BundleCard';
 import styles from './Bundles.module.scss';
-// eslint-disable-next-line import/no-cycle
 import RoamingCountries from './RoamingCountries';
 import { gtagEvent } from '../../lib/gtag';
 import { fbpEvent } from '../../lib/fbpixel';
+import BundlesScroll from './BundlesScroll';
 
 export type BundlesList = PlanModel &
   Prisma.PlanModelGetPayload<{
@@ -43,10 +41,10 @@ const Bundles = ({
     }[]
   >([]);
   const [volumeOptions, setVolumeOptions] = React.useState<
-    { option: number; disabled: boolean }[]
+    { value: string; disabled: boolean; displayValue: string }[]
   >([]);
   const [daysOptions, setDaysOptions] = React.useState<
-    { option: number; disabled: boolean }[]
+    { value: string; disabled: boolean; displayValue: string }[]
   >([]);
 
   useEffect(() => {
@@ -112,14 +110,16 @@ const Bundles = ({
       });
       setVolumeOptions(
         Array.from(volumeOptionsSet).map((option) => ({
-          option,
+          value: option.toString(),
           disabled: false,
+          displayValue: `${Math.floor(option / 1024)} ג"ב`,
         }))
       );
       setDaysOptions(
         Array.from(daysOptionsSet).map((option) => ({
-          option,
+          value: option.toString(),
           disabled: false,
+          displayValue: `${option?.toString() || '365'} ימים`,
         }))
       );
     }
@@ -152,11 +152,11 @@ const Bundles = ({
       );
       if (availableDays.length) {
         const optionalDays = daysOptions.map((option) => ({
-          option: option.option,
+          ...option,
           disabled:
-            option.option === 365
+            option.value === '365'
               ? !availableDays.includes(null)
-              : !availableDays.includes(option.option),
+              : !availableDays.includes(Number(option.value)),
         }));
         setDaysOptions(optionalDays);
         if (
@@ -171,9 +171,7 @@ const Bundles = ({
           optionalDays.filter((option) => !option.disabled).length === 1
         ) {
           setSelectedBundleDays(
-            optionalDays
-              .filter((option) => !option.disabled)[0]
-              .option.toString()
+            optionalDays.filter((option) => !option.disabled)[0].value
           );
         }
       }
@@ -212,62 +210,18 @@ const Bundles = ({
 
   return (
     <div>
-      <Row className="d-flex justify-content-center align-items-center">
-        <Col className="d-flex justify-content-center align-items-center mb-4">
-          <div className={styles.bundlesScroll}>
-            <div className={styles.bundlesContainer}>
-              {volumeOptions.length
-                ? volumeOptions
-                    .sort((a, b) => a.option - b.option)
-                    .map((volumeOption) => (
-                      <React.Fragment key={volumeOption.option}>
-                        <BundleCard
-                          text={`${Math.floor(volumeOption.option / 1024)} ג"ב`}
-                          value={volumeOption.option.toString()}
-                          selected={
-                            volumeOption.option.toString() ===
-                            selectedBundleVolume
-                          }
-                          onSelect={handleBundleVolumeSelect}
-                          disabled={volumeOption.disabled}
-                        />
-                      </React.Fragment>
-                    ))
-                : null}
-            </div>
-          </div>
-        </Col>
-      </Row>
-      <div className="mt-4 mb-4">
+      <BundlesScroll
+        cards={volumeOptions}
+        selected={selectedBundleVolume}
+        onSelect={handleBundleVolumeSelect}
+      />
+      <div className="mt-4 mb-md-4">
         <div className="text-center mb-2">לכמה זמן?</div>
-        <Row className="d-flex justify-content-center align-items-center">
-          <Col className="d-flex justify-content-center align-items-center">
-            <div className={styles.bundlesScroll}>
-              <div className={styles.bundlesContainer}>
-                {daysOptions.length
-                  ? daysOptions
-                      .sort((a, b) => a.option - b.option)
-                      .map((daysOption) => (
-                        <React.Fragment key={daysOption.option}>
-                          <BundleCard
-                            text={`${
-                              daysOption.option?.toString() || '365'
-                            } ימים`}
-                            value={daysOption.option?.toString() || '365'}
-                            selected={
-                              (daysOption.option?.toString() || '365') ===
-                              selectedBundleDays
-                            }
-                            onSelect={handleBundleDaysSelect}
-                            disabled={daysOption.disabled}
-                          />
-                        </React.Fragment>
-                      ))
-                  : null}
-              </div>
-            </div>
-          </Col>
-        </Row>
+        <BundlesScroll
+          cards={daysOptions}
+          selected={selectedBundleDays}
+          onSelect={handleBundleDaysSelect}
+        />
       </div>
       {selectedBundle ? (
         <div>
