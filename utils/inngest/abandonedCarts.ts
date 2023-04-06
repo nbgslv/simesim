@@ -6,6 +6,7 @@ import {
   MessageStatus,
   PlanStatus,
 } from '@prisma/client';
+import cuid from 'cuid';
 import inngest from './client';
 import prisma from '../../lib/prisma';
 import Email from '../email';
@@ -85,6 +86,7 @@ export default inngest.createFunction(
                     `${plan.user.firstName} ${plan.user.lastName}`
                   ),
                 ];
+                const unsubscribeId = cuid();
                 const emailVariables = [
                   {
                     email: plan.user.emailEmail,
@@ -117,6 +119,10 @@ export default inngest.createFunction(
                         var: 'planDescription',
                         value: plan.planModel.description ?? '',
                       },
+                      {
+                        var: 'userId',
+                        value: plan.userId,
+                      },
                     ],
                   },
                 ];
@@ -131,7 +137,10 @@ export default inngest.createFunction(
                   emailVariables
                 );
                 await emailService.send();
-                return MessageType.EMAIL;
+                return {
+                  messageType: MessageType.EMAIL,
+                  unsubscribeId,
+                };
               }
               if (settings.messagesTypes[messagesSent] === 'whatsapp') {
                 const twilioApi = new TwilioApi(
@@ -152,20 +161,24 @@ export default inngest.createFunction(
 בברכה,
 צוות שים eSim`
                 );
-                return MessageType.WHATSAPP;
+                return {
+                  messageType: MessageType.WHATSAPP,
+                  unsubscribeId: cuid(),
+                };
               }
               return null;
             };
 
-            const messageType = await messageTypePromise();
-            if (!messageType)
+            const messageTypeData = await messageTypePromise();
+            if (!messageTypeData)
               return {
                 status: 'No message sent',
               };
             await prisma.messages.create({
               data: {
+                id: messageTypeData.unsubscribeId,
                 subject: MessageSubject.ABANDONED_CART,
-                type: messageType,
+                type: messageTypeData.messageType,
                 status: MessageStatus.SENT,
                 paymentId: plan.paymentId,
                 user: {

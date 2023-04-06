@@ -31,6 +31,11 @@ const Error = () => {
         setAlertMessage(
           'משהו קרה לשירות התשלומים שלנו. מציעים לבדוק שוב בעוד זמן קצר.'
         );
+      } else if (router.query.error === 'Unsubscribe') {
+        setAlertVariant('danger');
+        setAlertMessage(
+          'התרחשה שגיאה בעת ניסיון ההסרה מרשימת התפוצה. אנו מתנצלים, אנא נסו שוב מאוחר יותר.'
+        );
       } else {
         setAlertVariant('danger');
         setAlertMessage('אירעה שגיאה, נסה שנית');
