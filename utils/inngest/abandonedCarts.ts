@@ -153,8 +153,7 @@ export default inngest.createFunction(
                 );
                 await twilioApi.sendWhatsappMessage(
                   plan.user.email,
-                  `
-היי ${plan.user.firstName}.
+                  `היי ${plan.user.firstName}.
 שמנו לב שלא השלמת את הרכישה של חבילת eSim ל${plan.country?.translation}. יש לך שאלות או דאגות כלשהן לגבי ההזמנה? נשמח אם תוכלו לומר לנו כיצד נוכל לסייע, בכל עניין. נשמח לוודא שתקבלו את חוויית הקנייה הטובה ביותר.
 כדי להשלים את הרכישה, פשוט בקרו בלינק: ${shortUrl}
 
