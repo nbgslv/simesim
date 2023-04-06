@@ -35,6 +35,7 @@ model User {
   coupons        CouponUser[]
   ChangeDetails  ChangeDetails[]
   messages       Messages[]
+  Unsubscribe    Unsubscribe?
 
   @@map(name: "users")
 }
@@ -386,4 +387,25 @@ model Messages {
   status     MessageStatus
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
+}
+
+enum UnsubscribeType {
+  EMAIL
+  SMS
+  WHATSAPP
+}
+
+enum MessagesType {
+  COMMERCIAL
+  NOTIFICATION
+}
+
+model Unsubscribe {
+  id          String            @id @default(cuid())
+  user        User              @relation(fields: [userId], references: [id])
+  userId      String            @unique
+  type        UnsubscribeType[]
+  messageType MessagesType[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }

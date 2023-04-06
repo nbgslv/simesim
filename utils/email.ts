@@ -1,5 +1,5 @@
 // @ts-ignore
-import MailerSend from 'mailersend';
+import MailerSend, { BlockListType } from 'mailersend';
 
 type Attachment = {
   content: string;
@@ -81,5 +81,15 @@ export default class Email {
         console.log({ emailJson });
       }
     }
+  }
+
+  async unsubscribe(email: string) {
+    await this.mailerSend.email.recipient.blockRecepients(
+      {
+        domain_id: process.env.MAILER_SEND_DOMAIN_ID || '',
+        recipients: [email],
+      },
+      BlockListType.UNSUBSCRIBE
+    );
   }
 }
