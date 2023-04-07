@@ -42,7 +42,7 @@ export default class Email {
     this.nodemailer = nodemailer.createTransport({
       host: process.env.SMTP_HOST!,
       port: Number(process.env.SMTP_PORT) || 587,
-      secure: true,
+      secure: false,
       auth: {
         user: process.env.SMTP_EMAIL_USER_NAME!,
         pass: process.env.SMTP_EMAIL_PASSWORD!,
