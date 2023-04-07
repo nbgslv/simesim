@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { unstable_getServerSession } from 'next-auth';
 import prisma from '../../../../lib/prisma';
 import { ApiResponse } from '../../../../lib/types/api';
-import { authOptions } from '../../auth/[...nextauth]';
 import { toFixedNumber } from '../../../../utils/math';
 
 export type Item = {
@@ -29,11 +27,6 @@ export default async function handler(
   res: NextApiResponse<ApiResponse<string>>
 ) {
   try {
-    const session = await unstable_getServerSession(
-      req,
-      res,
-      authOptions(req, res)
-    );
     const { method } = req;
     if (method === 'PUT') {
       const { id } = req.query;
@@ -54,18 +47,6 @@ export default async function handler(
 
       if (!plan) {
         throw new Error('Plan not found');
-      }
-
-      if (
-        !session ||
-        (plan?.userId !== session?.user.id && session?.user.role !== 'ADMIN')
-      ) {
-        res.status(401).json({
-          success: false,
-          message: 'Unauthorized',
-          name: 'UNAUTHORIZED',
-        });
-        return;
       }
 
       const newPlanModel = await prisma.planModel.findUnique({

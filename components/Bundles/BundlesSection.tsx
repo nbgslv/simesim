@@ -48,7 +48,6 @@ const BundlesSection = ({
   >([]);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [orderModalOpen, setOrderModalOpen] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(editMode);
   const [editApiRequestLoading, setEditApiRequestLoading] = useState<boolean>(
     false
   );
@@ -113,7 +112,6 @@ const BundlesSection = ({
       countrySearchRef.current &&
       countrySearchRef.current.autocompleteRef.current
     ) {
-      setLoading(true);
       const country = countriesList.find((c) => c.id === countryId);
       if (country) {
         const extendedCountry = {
@@ -129,7 +127,6 @@ const BundlesSection = ({
         );
         handleBundleSelect(currentBundleId);
       }
-      setLoading(false);
     }
   }, [editMode, countryId, currentBundleId]);
 
@@ -190,7 +187,6 @@ const BundlesSection = ({
   return (
     <AnimatePresence>
       <SectionComponent id="bundles-section" className={styles.bundlesSection}>
-        <>{loading && <Spinner animation="border" />}</>
         <Row
           className={`d-flex justify-content-between align-items-center p-3 ${styles.row}`}
         >
@@ -206,14 +202,9 @@ const BundlesSection = ({
               </div>
             )}
             {currentStep >= 0 ? (
-              <motion.div
-                className={`${styles.firstStepContainer}${
-                  loading ? ' d-none' : ''
-                }`}
-                layout
-              >
+              <motion.div className={styles.firstStepContainer} layout>
                 <div className={`${styles.infoPlate} p-1 mb-2`}>
-                  <h3 id="flight-destination">1. מספרים לנו לאן אתם טסים</h3>
+                  <h3 id="flight-destination">מספרים לנו לאן אתם טסים</h3>
                 </div>
                 <div className={`h-100 p-2`}>
                   <CountrySearch
@@ -282,7 +273,7 @@ const BundlesSection = ({
               show={orderModalOpen}
               onHide={handleOrderModalClose}
               country={selectedCountry?.displayValue}
-              bundle={bundlesList.find(
+              bundle={bundlesList?.find(
                 (bundle) => bundle.id === selectedBundle
               )}
               countriesList={countriesList}

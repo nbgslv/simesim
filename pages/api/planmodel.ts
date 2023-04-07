@@ -44,15 +44,6 @@ export default async function handler(
     );
     const { method } = req;
     if (method === 'GET') {
-      if (!session || session.user.role !== 'ADMIN') {
-        res.status(401).json({
-          name: 'UNAUTHORIZED',
-          success: false,
-          message: 'Unauthorized',
-        });
-        return;
-      }
-
       const planModels = await prisma.planModel.findMany({
         select: {
           id: true,

@@ -20,7 +20,7 @@ const Id = () => {
   const { id } = router.query;
 
   useEffect(() => {
-    const fetchData = async () => {
+    (async () => {
       try {
         if (!id) return;
         const currentPlanResponse = await fetch(
@@ -43,14 +43,13 @@ const Id = () => {
       } finally {
         setLoading(false);
       }
-    };
-    fetchData();
+    })();
   }, [id]);
 
   return (
     <MainLayout title="ערוך חבילה" hideJumbotron>
       {loading ? (
-        <div className="w-100">
+        <div className="w-100 d-flex align-items-center justify-content-center">
           <Spinner animation="border" role="status" />
         </div>
       ) : (
