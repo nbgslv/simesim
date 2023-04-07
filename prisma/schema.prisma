@@ -366,6 +366,7 @@ enum MessageType {
 
 enum MessageSubject {
   ABANDONED_CART
+  INCOMING
 }
 
 enum MessageStatus {
@@ -376,18 +377,26 @@ enum MessageStatus {
   FAILED
 }
 
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
 model Messages {
-  id         String         @id @default(cuid())
-  token      String         @unique
-  user       User           @relation(fields: [userId], references: [id])
-  userId     String
+  id         String            @id @default(cuid())
+  token      String            @unique
+  user       User?             @relation(fields: [userId], references: [id])
+  userId     String?
   paymentId  String?
   type       MessageType
   subject    MessageSubject
+  body       String?
+  from       String?
   externalId String?
   status     MessageStatus
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  direction  MessageDirection? @default(INBOUND)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
 }
 
 enum UnsubscribeType {

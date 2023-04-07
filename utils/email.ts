@@ -1,5 +1,7 @@
 // @ts-ignore
 import MailerSend, { BlockListType } from 'mailersend';
+import nodemailer from 'nodemailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 type Attachment = {
   content: string;
@@ -21,6 +23,12 @@ type Variable = {
 export default class Email {
   private mailerSend;
 
+  private nodemailer;
+
+  private notificationsSubscribers = ['nbgslv@gmail.com'];
+
+  private notificationsSender = '"Notifications" inbound@simesim.co.il';
+
   private Recipient = MailerSend.Recipient;
 
   private EmailParams = MailerSend.EmailParams;
@@ -30,6 +38,24 @@ export default class Email {
   constructor() {
     this.mailerSend = new MailerSend({
       api_key: process.env.MAILER_SNED_API_KEY || '',
+    });
+    this.nodemailer = nodemailer.createTransport({
+      host: process.env.SMTP_HOST!,
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: true,
+      auth: {
+        user: process.env.SMTP_EMAIL_USER_NAME!,
+        pass: process.env.SMTP_EMAIL_PASSWORD!,
+      },
+      logging: true,
+    } as SMTPTransport.Options);
+    this.nodemailer.verify((error) => {
+      if (error) {
+        console.error(error);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log('Server is ready to take our messages');
+      }
     });
   }
 
@@ -91,5 +117,18 @@ export default class Email {
       },
       BlockListType.UNSUBSCRIBE
     );
+  }
+
+  async sendNotificationEmail(body: string, subject: string) {
+    const mailOptions = {
+      from: this.notificationsSender,
+      to: this.notificationsSubscribers,
+      subject,
+      html: body,
+    };
+
+    const emailSent = await this.nodemailer.sendMail(mailOptions);
+    // eslint-disable-next-line no-console
+    console.log({ emailSent });
   }
 }
