@@ -8,7 +8,7 @@ export default async function handler(
     const { method } = req;
     if (method === 'POST') {
       // eslint-disable-next-line no-console
-      console.error({ req });
+      console.error({ req, body: req.body });
       res
         .setHeader('Content-Type', 'text/xml')
         .status(200)
