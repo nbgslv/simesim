@@ -9,7 +9,8 @@ export default async function handler(
     const { method } = req;
     if (method === 'POST') {
       // eslint-disable-next-line no-console
-      console.error({ query: req.query, body: req.body });
+      console.error({ req });
+      res.status(200);
     } else {
       res.status(405).json({
         name: 'METHOD_NOT_ALLOWED',
