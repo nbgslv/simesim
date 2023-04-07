@@ -40,7 +40,7 @@ export default async function handler(
 
       const messageData = await prisma.messages.findUnique({
         where: {
-          id: unsubscribe_id as string,
+          token: unsubscribe_id as string,
         },
         include: {
           user: true,
@@ -99,7 +99,7 @@ export default async function handler(
 
       const messageData = await prisma.messages.findUnique({
         where: {
-          id: unsubscribe_id as string,
+          token: unsubscribe_id as string,
         },
         include: {
           user: true,
@@ -175,7 +175,7 @@ export default async function handler(
 
       const messageData = await prisma.messages.findUnique({
         where: {
-          id: unsubscribe_id as string,
+          token: unsubscribe_id as string,
         },
         include: {
           user: true,

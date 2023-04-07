@@ -107,7 +107,7 @@ const UserId = () => {
       } catch (err) {
         console.error(err);
       } finally {
-        setPageLoading(false);
+        if (unsubscribe_id) setPageLoading(false);
       }
     })();
   }, [unsubscribe_id]);
