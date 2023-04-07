@@ -121,7 +121,7 @@ export default inngest.createFunction(
                       },
                       {
                         var: 'userId',
-                        value: plan.userId,
+                        value: unsubscribeId,
                       },
                     ],
                   },
@@ -143,26 +143,34 @@ export default inngest.createFunction(
                 };
               }
               if (settings.messagesTypes[messagesSent] === 'whatsapp') {
+                const unsubscribeId = cuid();
                 const twilioApi = new TwilioApi(
                   process.env.TWILIO_ACCOUNT_SID!,
                   process.env.TWILIO_AUTH_TOKEN!,
                   process.env.TWILIO_VERIFY_SID!
                 );
-                const shortUrl = await ShortIoApi.shortenUrl(
+                const finishOrderUrl = await ShortIoApi.shortenUrl(
                   `${process.env.NEXT_PUBLIC_BASE_URL}/order/finish/${plan.id}`
+                );
+                const unsubscribeUrl = await ShortIoApi.shortenUrl(
+                  `${process.env.NEXT_PUBLIC_BASE_URL}/unsubscribe/${unsubscribeId}`
                 );
                 await twilioApi.sendWhatsappMessage(
                   plan.user.email,
                   `היי ${plan.user.firstName}.
-שמנו לב שלא השלמת את הרכישה של חבילת eSim ל${plan.country?.translation}. יש לך שאלות או דאגות כלשהן לגבי ההזמנה? נשמח אם תוכלו לומר לנו כיצד נוכל לסייע, בכל עניין. נשמח לוודא שתקבלו את חוויית הקנייה הטובה ביותר.
-כדי להשלים את הרכישה, פשוט בקרו בלינק: ${shortUrl}
+שמנו לב שלא השלמת את הרכישה של חבילת eSim ל${
+                    plan.country?.translation ?? plan.planModel.name
+                  }. יש לך שאלות או דאגות כלשהן לגבי ההזמנה? נשמח אם תוכלו לומר לנו כיצד נוכל לסייע, בכל עניין. נשמח לוודא שתקבלו את חוויית הקנייה הטובה ביותר.
+כדי להשלים את הרכישה, פשוט בקרו בלינק: ${finishOrderUrl}
 
 בברכה,
-צוות שים eSim`
+צוות שים eSim
+
+להסרה, לחצו כאן: ${unsubscribeUrl}`
                 );
                 return {
                   messageType: MessageType.WHATSAPP,
-                  unsubscribeId: cuid(),
+                  unsubscribeId,
                 };
               }
               return null;
@@ -175,7 +183,7 @@ export default inngest.createFunction(
               };
             await prisma.messages.create({
               data: {
-                id: messageTypeData.unsubscribeId,
+                token: messageTypeData.unsubscribeId,
                 subject: MessageSubject.ABANDONED_CART,
                 type: messageTypeData.messageType,
                 status: MessageStatus.SENT,
