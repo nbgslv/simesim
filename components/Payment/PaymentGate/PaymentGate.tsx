@@ -91,7 +91,7 @@ const PaymentGate = ({
 
   const handlePaymentSelect = async (paymentMethod: PaymentType) => {
     try {
-      if (router.query.orderId) {
+      if (orderIdToUse) {
         setLoading(true);
         const res = await fetch(
           `/api/order/payment?paymentType=${paymentMethod}&orderId=${encodeURI(
