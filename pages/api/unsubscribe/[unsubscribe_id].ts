@@ -41,6 +41,9 @@ export default async function handler(
       const messageData = await prisma.messages.findUnique({
         where: {
           token: unsubscribe_id as string,
+          paymentId: {
+            not: null,
+          },
         },
         include: {
           user: true,
@@ -53,7 +56,7 @@ export default async function handler(
 
       const data = await prisma.unsubscribe.findUnique({
         where: {
-          userId: messageData.user.id,
+          userId: messageData.user!.id,
         },
       });
 
@@ -133,7 +136,7 @@ export default async function handler(
 
       const data = await prisma.unsubscribe.upsert({
         where: {
-          userId: messageData.user.id,
+          userId: messageData.user!.id,
         },
         update: {
           type: unsubscribeType,
@@ -142,7 +145,7 @@ export default async function handler(
         create: {
           user: {
             connect: {
-              id: messageData.user.id,
+              id: messageData.user!.id,
             },
           },
           type: unsubscribeType,
@@ -186,7 +189,7 @@ export default async function handler(
         throw new Error("Original message wasn't found");
       }
 
-      if (messageData.user.emailEmail !== email) {
+      if (messageData.user!.emailEmail !== email) {
         res.status(404).json({
           name: 'USER_NOT_FOUND',
           message: 'User not found',
@@ -207,7 +210,7 @@ export default async function handler(
 
       const data = await prisma.unsubscribe.upsert({
         where: {
-          userId: messageData.user.id,
+          userId: messageData.user!.id,
         },
         update: {
           type: unsubscribeType,
@@ -216,7 +219,7 @@ export default async function handler(
         create: {
           user: {
             connect: {
-              id: messageData.user.id,
+              id: messageData.user!.id,
             },
           },
           type: unsubscribeType,
