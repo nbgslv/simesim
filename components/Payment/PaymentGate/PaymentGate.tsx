@@ -15,17 +15,34 @@ enum PaymentType {
   BIT = 'BIT',
 }
 
-const PaymentGate = () => {
+const PaymentGate = ({
+  orderId,
+  disable = false,
+  black = true,
+}: {
+  orderId?: string;
+  disable?: boolean;
+  black?: boolean;
+}) => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [orderData, setOrderData] = React.useState<OrderData | null>(null);
+  const [orderIdToUse, setOrderIdToUse] = React.useState<string | null>(null);
   const [{ isPending }] = usePayPalScriptReducer();
   const router = useRouter();
 
   useEffect(() => {
+    if (orderId) {
+      setOrderIdToUse(orderId);
+    } else if (router.query.orderId) {
+      setOrderIdToUse(router.query.orderId as string);
+    }
+  }, [orderId, router.query.orderId]);
+
+  useEffect(() => {
     (async () => {
       try {
-        if (router.query.orderId) {
-          const order = await fetch(`/api/order/${router.query.orderId}`);
+        if (orderIdToUse) {
+          const order = await fetch(`/api/order/${orderIdToUse}`);
           const orderJson = await order.json();
           setOrderData(orderJson.data);
         }
@@ -34,10 +51,10 @@ const PaymentGate = () => {
         await router.push('/error?error=Order');
       }
     })();
-  }, [router.query.orderId]);
+  }, [orderIdToUse]);
 
   useEffect(() => {
-    if (router.query.orderId && !isPending && orderData) {
+    if (orderIdToUse && !isPending && orderData) {
       fbpEvent('InitiateCheckout', {
         content_category: 'product',
         content_ids: orderData.items.map((item) => item.id),
@@ -70,15 +87,15 @@ const PaymentGate = () => {
       });
       setLoading(false);
     }
-  }, [router.query.orderId, isPending, orderData]);
+  }, [orderIdToUse, isPending, orderData]);
 
   const handlePaymentSelect = async (paymentMethod: PaymentType) => {
     try {
-      if (router.query.orderId) {
+      if (orderIdToUse) {
         setLoading(true);
         const res = await fetch(
           `/api/order/payment?paymentType=${paymentMethod}&orderId=${encodeURI(
-            router.query.orderId as string
+            orderIdToUse as string
           )}`
         );
         if (res.redirected) {
@@ -95,9 +112,11 @@ const PaymentGate = () => {
 
   return (
     <Container
-      className={`text-center d-flex flex-column justify-content-center ${styles.container}`}
+      className={`text-center d-flex flex-column justify-content-center ${
+        styles.container
+      }${black ? ` ${styles.black}` : ''}`}
     >
-      <h1 className="mb-5">3. בוחרים איך לשלם</h1>
+      <h1 className="mb-5">בוחרים איך לשלם</h1>
       {loading ? (
         <Spinner className="ms-auto me-auto" animation={'border'} />
       ) : (
@@ -107,7 +126,7 @@ const PaymentGate = () => {
               <Col>
                 <Button
                   onClick={() => handlePaymentSelect(PaymentType.BIT)}
-                  disabled={loading}
+                  disabled={loading || disable}
                   className={styles.button}
                 >
                   Bit{' '}
@@ -125,7 +144,7 @@ const PaymentGate = () => {
             <Col>
               <Button
                 onClick={() => handlePaymentSelect(PaymentType.CREDIT_CARD)}
-                disabled={loading}
+                disabled={loading || disable}
                 className={styles.button}
               >
                 כרטיס אשראי
@@ -140,7 +159,7 @@ const PaymentGate = () => {
           <Row>
             <Col>
               <PayPalButtons
-                disabled={loading}
+                disabled={loading || disable}
                 createOrder={async () => {
                   const order = await fetch(
                     `/api/order/payment/paypal/create`,
@@ -150,7 +169,7 @@ const PaymentGate = () => {
                         'Content-Type': 'application/json',
                       },
                       body: JSON.stringify({
-                        orderId: router.query.orderId,
+                        orderId: orderIdToUse,
                       }),
                     }
                   );
@@ -164,7 +183,7 @@ const PaymentGate = () => {
                       'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                      orderId: router.query.orderId,
+                      orderId: orderIdToUse,
                       payerId: data.payerID,
                       paymentId: data.paymentID,
                     }),

@@ -1,0 +1,36 @@
+@import "styles/variables";
+
+.orderModalRow {
+  margin-top: 1rem;
+
+  :global * {
+    color: $text-color !important;
+  }
+}
+
+.editButton {
+  background: transparent;
+  border: none;
+  text-decoration: underline;
+  font-size: 0.875rem;
+  margin: 0;
+
+  &:disabled {
+    background: transparent;
+  }
+}
+
+.note {
+  color: #ffffff !important;
+}
+
+.verifyContainer {
+  :global form {
+    border-radius: .375rem;
+  }
+}
+
+.verifyAlert {
+  text-align: center;
+  color: $text-color !important;
+}

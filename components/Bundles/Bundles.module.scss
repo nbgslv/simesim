@@ -16,3 +16,46 @@
   margin-bottom: 0.875rem;
   text-align: center;
 }
+
+.bundlesScroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  width: 90vw;
+  height: 8.8rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+
+  @media (max-width: map-get($grid-breakpoints, "md")) {
+    height: 6.8rem;
+  }
+}
+
+.bundlesScroll::-webkit-scrollbar {
+  background-color: map-get($theme-colors, "secondary");
+  height: 0.2rem;
+  border-radius: 5px;
+}
+
+.bundlesScroll::-webkit-scrollbar-thumb {
+  background-color: map-get($theme-colors, "orange");
+  border-radius: 5px;
+}
+
+.bundlesContainer {
+  width: 100%;
+}
+
+.arrowButton {
+  background: transparent;
+  border: none;
+
+  &:hover {
+    background: none;
+  }
+
+  :global svg {
+    fill: #ffffff;
+  }
+}

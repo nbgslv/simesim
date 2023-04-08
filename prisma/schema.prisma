@@ -34,6 +34,8 @@ model User {
   role           UserRoles       @default(USER)
   coupons        CouponUser[]
   ChangeDetails  ChangeDetails[]
+  messages       Messages[]
+  Unsubscribe    Unsubscribe?
 
   @@map(name: "users")
 }
@@ -65,6 +67,7 @@ enum PlanStatus {
   ACTIVE
   CANCELLED
   PENDING
+  PENDING_LINE
   EXPIRED
 }
 
@@ -86,6 +89,8 @@ model Plan {
   lineId      String?    @unique
   refill      Refill?    @relation(fields: [refillId], references: [id])
   refillId    String?
+  country     Country?   @relation(fields: [countryId], references: [id])
+  countryId   String?
 }
 
 enum PaymentStatus {
@@ -249,6 +254,7 @@ model Country {
   show            Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  Plan            Plan[]
 }
 
 enum DiscountType {
@@ -345,9 +351,71 @@ model SupportedPhones {
 }
 
 model Settings {
-    id              String   @id @default(cuid())
-    name            String   @unique
-    value           String
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum MessageType {
+  EMAIL
+  SMS
+  WHATSAPP
+}
+
+enum MessageSubject {
+  ABANDONED_CART
+  INCOMING
+}
+
+enum MessageStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+model Messages {
+  id         String            @id @default(cuid())
+  token      String            @unique
+  user       User?             @relation(fields: [userId], references: [id])
+  userId     String?
+  paymentId  String?
+  type       MessageType
+  subject    MessageSubject
+  body       String?
+  from       String?
+  externalId String?
+  status     MessageStatus
+  direction  MessageDirection? @default(INBOUND)
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+}
+
+enum UnsubscribeType {
+  EMAIL
+  SMS
+  WHATSAPP
+}
+
+enum MessagesType {
+  COMMERCIAL
+  NOTIFICATION
+}
+
+model Unsubscribe {
+  id          String            @id @default(cuid())
+  user        User              @relation(fields: [userId], references: [id])
+  userId      String            @unique
+  type        UnsubscribeType[]
+  messageType MessagesType[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }

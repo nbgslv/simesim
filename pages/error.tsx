@@ -23,10 +23,18 @@ const Error = () => {
       } else if (router.query.error === 'Order') {
         setAlertVariant('danger');
         setAlertMessage('משהו השתבש עם קליטת ההזמנה. מציעים לבדוק עם התמיכה.');
+      } else if (router.query.error === 'OrderPaid_Finish') {
+        setAlertVariant('danger');
+        setAlertMessage('ההזמנה הסתיימה.');
       } else if (router.query.error === 'Payment') {
         setAlertVariant('danger');
         setAlertMessage(
           'משהו קרה לשירות התשלומים שלנו. מציעים לבדוק שוב בעוד זמן קצר.'
+        );
+      } else if (router.query.error === 'Unsubscribe') {
+        setAlertVariant('danger');
+        setAlertMessage(
+          'התרחשה שגיאה בעת ניסיון ההסרה מרשימת התפוצה. אנו מתנצלים, אנא נסו שוב מאוחר יותר.'
         );
       } else {
         setAlertVariant('danger');

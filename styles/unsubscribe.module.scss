@@ -1,0 +1,46 @@
+@import "styles/variables";
+
+.main {
+  min-height: $page-height;
+  height: 100%;
+  background-color: $background-color;
+  padding: 2rem;
+
+  :global * {
+    color: $text-color;
+  }
+}
+
+.textContent {
+  margin-top: 2rem;
+  text-align: right;
+}
+
+.formContainer {
+  margin-top: 2rem;
+}
+
+.buttonContainer {
+  margin-top: 1.5rem;
+
+  :global button {
+    color: #ffffff;
+  }
+}
+
+.unsubscribeForm {
+  margin-top: 2rem;
+}
+
+.divider {
+  margin: 1.5rem 0 !important;
+  border-color: rgba(0, 0, 0, 0.22) !important;
+}
+
+.emailLabel {
+  text-align: right;
+}
+
+.formTitle {
+  margin-bottom: 1rem;
+}

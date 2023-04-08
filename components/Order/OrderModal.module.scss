@@ -23,6 +23,10 @@
 
 .orderModalRow {
   margin-top: 1rem;
+
+  :global * {
+    color: $text-color !important;
+  }
 }
 
 .orderModalRow {
@@ -157,5 +161,18 @@
 .agreementCheckbox {
   @media (max-width: map-get($grid-breakpoints, 'md')) {
     margin-bottom: 1rem;
+  }
+}
+
+.roamingCountries {
+  :global .accordion {
+    border: 1px solid #000000;
+  }
+
+  :global .accordion-button::after {
+    background-color: #000000;
+    -webkit-mask-image: url('/plus.svg');
+    mask-image: url('/plus.svg');
+    background-image: none;
   }
 }

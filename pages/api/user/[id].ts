@@ -57,45 +57,82 @@ export default async function handler(
       });
       res.status(200).json({ success: true, data: { id: changeDetails.id } });
     } else if (method === 'PUT') {
-      const { id } = req.query;
-      const postSchema = yup.object({
-        id: yup.string().required(),
-      });
-      await postSchema.validate({
-        id,
-      });
-      const updateDetails = await prisma.changeDetails.findUnique({
-        where: {
-          id: id as string,
-        },
-      });
-      if (!updateDetails) {
-        res.status(404).json({
-          name: 'NOT_FOUND',
-          success: false,
-          message: 'Not found',
+      const { id, action } = req.query;
+
+      if (action && action === 'finish') {
+        const { firstName, lastName, email, phoneNumber } = req.body;
+        const putSchema = yup.object().shape({
+          firstName: yup.string().required(),
+          lastName: yup.string().required(),
+          email: yup.string().email().required(),
+          phoneNumber: yup.string().length(10).required(),
         });
-        return;
-      }
-      const [updatedUser] = await prisma.$transaction([
-        prisma.user.update({
+        await putSchema.validate({
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+        });
+        const updatedUser = await prisma.user.update({
           where: {
-            id: updateDetails.userId,
+            id: id as string,
           },
           data: {
-            firstName: updateDetails.firstName,
-            lastName: updateDetails.lastName,
-            email: updateDetails.email as string,
-            emailEmail: updateDetails.emailEmail as string,
+            firstName,
+            lastName,
+            email: phoneNumber,
+            emailEmail: email,
           },
-        }),
-        prisma.changeDetails.delete({
+          select: {
+            id: true,
+          },
+        });
+
+        if (!updatedUser) {
+          throw new Error('User not found');
+        }
+
+        res.status(200).json({ success: true, data: updatedUser });
+      } else {
+        const postSchema = yup.object({
+          id: yup.string().required(),
+        });
+        await postSchema.validate({
+          id,
+        });
+        const updateDetails = await prisma.changeDetails.findUnique({
           where: {
-            id: updateDetails.id as string,
+            id: id as string,
           },
-        }),
-      ]);
-      res.status(200).json({ success: true, data: updatedUser });
+        });
+        if (!updateDetails) {
+          res.status(404).json({
+            name: 'NOT_FOUND',
+            success: false,
+            message: 'Not found',
+          });
+          return;
+        }
+        const [updatedUser] = await prisma.$transaction([
+          prisma.user.update({
+            where: {
+              id: updateDetails.userId,
+            },
+            data: {
+              firstName: updateDetails.firstName,
+              lastName: updateDetails.lastName,
+              email: updateDetails.email as string,
+              emailEmail: updateDetails.emailEmail as string,
+            },
+          }),
+          prisma.changeDetails.delete({
+            where: {
+              id: updateDetails.id as string,
+            },
+          }),
+        ]);
+        res.status(200).json({ success: true, data: updatedUser });
+      }
     } else {
       res.status(405).json({
         name: 'METHOD_NOT_ALLOWED',
