@@ -28,7 +28,7 @@ export default async function handler(
           },
         });
         const userConnect = user?.id ? { connect: { id: user.id } } : undefined;
-        const newMessageRecord = await prisma.messages.create({
+        await prisma.messages.create({
           data: {
             from: formattedLocalNumber,
             token: cuid(),
@@ -45,10 +45,13 @@ export default async function handler(
         await notificationEmailService.sendNotificationEmail(
           `<b>התקבלה הודעת Whatsapp חדשה מ-${formattedLocalNumber} ${
             user?.firstName || ''
-          } ${
-            user?.lastName || ''
-          }</b><br /><br /><b>ההודעה:</b><br />${Body}<br /><br /><b>נקלטה בצורה הבאה:</b><br />${newMessageRecord.toString()}`,
-          `התקבלה הודעת Whatsapp חדשה מ-${formattedLocalNumber}`
+          } ${user?.lastName || ''}</b>(${
+            user?.id || ''
+          }<br /><br /><b>ההודעה:</b><br />${Body}<br /><br /><b>התקבלה בצורה הבאה:</b><br />${JSON.stringify(
+            req.body
+          )}`,
+          `
+          }התקבלה הודעת Whatsapp חדשה מ-${formattedLocalNumber}`
         );
       }
       res
