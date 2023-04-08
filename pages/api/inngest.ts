@@ -8,5 +8,6 @@ export default serve(
   [blogUpload, countriesSync, abandonedCarts], // A list of functions to expose.  This can be empty to start.
   {
     signingKey: process.env.INNGEST_SIGNING_KEY,
+    landingPage: process.env.NODE_ENV !== 'production',
   }
 );
