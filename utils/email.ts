@@ -47,6 +47,9 @@ export default class Email {
         user: process.env.SMTP_EMAIL_USER_NAME!,
         pass: process.env.SMTP_EMAIL_PASSWORD!,
       },
+      tls: {
+        rejectUnauthorized: false,
+      },
       logging: true,
     } as SMTPTransport.Options);
     this.nodemailer.verify((error) => {
