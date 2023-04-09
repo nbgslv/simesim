@@ -366,6 +366,7 @@ enum MessageType {
 
 enum MessageSubject {
   ABANDONED_CART
+  FEEDBACK
   INCOMING
 }
 
