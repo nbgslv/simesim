@@ -38,6 +38,7 @@ import RefillsAdminModal from '../../components/Refills/RefillsAdminModal';
 import prisma from '../../lib/prisma';
 import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
 import { verifyAdmin } from '../../utils/auth';
+import AdminCopy from '../../components/AdminCopy/AdminCopy';
 
 type PlanData = Plan &
   Prisma.PlanGetPayload<{
@@ -193,6 +194,10 @@ const Plans = ({
     {
       field: 'id',
       headerName: 'ID',
+      renderCell: (params: GridCellParams) => (
+        <AdminCopy>{params.value}</AdminCopy>
+      ),
+      width: 250,
     },
     {
       field: 'friendlyId',
@@ -352,10 +357,12 @@ const Plans = ({
     {
       field: 'createdAt',
       headerName: 'Created At',
+      width: 200,
     },
     {
       field: 'updatedAt',
       headerName: 'Updated At',
+      width: 200,
     },
   ];
 
@@ -680,6 +687,9 @@ export async function getServerSideProps(context: NextPageContext) {
     },
     line: {
       ...plan.line,
+      expiredAt: plan.line?.expiredAt
+        ? format(plan.line.expiredAt, 'dd/MM/yy kk:mm')
+        : null,
       createdAt: format(plan.line?.createdAt || new Date(), 'dd/MM/yy kk:mm'),
       updatedAt: format(plan.line?.updatedAt || new Date(), 'dd/MM/yy kk:mm'),
     },

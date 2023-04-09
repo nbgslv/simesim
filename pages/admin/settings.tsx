@@ -4,6 +4,8 @@ import { Settings } from '@prisma/client';
 import { format } from 'date-fns';
 import { NextPageContext } from 'next';
 import React, { useState } from 'react';
+// @ts-ignore
+import prettyJson from 'json-pretty-html';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import FormModal from '../../components/AdminTable/FormModal';
 import AdminLayout from '../../components/Layouts/AdminLayout';
@@ -11,6 +13,9 @@ import prisma from '../../lib/prisma';
 import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
 import { verifyAdmin } from '../../utils/auth';
 import SettingsForm from '../../components/Settings/SettingsForm';
+import AdminCopy from '../../components/AdminCopy/AdminCopy';
+import styles from '../../styles/settings.module.scss';
+import AdminExpandableCell from '../../components/AdminExpandableCell/AdminExpandableCell';
 
 type SettingsAsAdminTableData = (GridValidRowModel & Settings)[];
 
@@ -48,24 +53,42 @@ const SettingsPage = ({ settings }: SettingsProps) => {
     {
       field: 'id',
       headerName: 'ID',
+      width: 250,
     },
     {
       field: 'name',
       headerName: 'Name',
+      width: 200,
+      renderCell: (params) => <AdminCopy>{params.value}</AdminCopy>,
       editable: true,
     },
     {
       field: 'value',
       headerName: 'Value',
+      renderCell: (params) => (
+        <AdminExpandableCell
+          value={
+            <div
+              dangerouslySetInnerHTML={{
+                __html: prettyJson(JSON.parse(params.value)),
+              }}
+            />
+          }
+          shortValue={params.value}
+        />
+      ),
+      width: 500,
       editable: true,
     },
     {
       field: 'createdAt',
       headerName: 'Created At',
+      width: 150,
     },
     {
       field: 'updatedAt',
       headerName: 'Updated At',
+      width: 150,
     },
   ];
 
@@ -131,6 +154,7 @@ const SettingsPage = ({ settings }: SettingsProps) => {
         deleteRows={handleDeleteRows}
         processRowUpdate={handleRowUpdate}
         deleteRow={handleDeleteRow}
+        className={styles.main}
       />
       <FormModal
         id="add-settings"

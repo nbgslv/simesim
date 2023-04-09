@@ -3,12 +3,14 @@ import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { Country } from '@prisma/client';
 import {
+  GridCellParams,
   GridColumns,
   GridRowId,
   GridSelectionModel,
   GridValidRowModel,
 } from '@mui/x-data-grid';
 import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
+import { Tooltip } from '@mui/material';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
@@ -17,6 +19,7 @@ import { verifyAdmin } from '../../utils/auth';
 import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
 import CountriesForm from '../../components/Countries/CountriesForm';
 import FormModal from '../../components/AdminTable/FormModal';
+import styles from '../../styles/bundles.module.scss';
 
 type CountriesAsAdminTableData = (GridValidRowModel & Country)[];
 
@@ -90,11 +93,21 @@ const Countries = ({ countries }: { countries: CountriesAsAdminTableData }) => {
     {
       field: 'name',
       headerName: 'Country',
+      renderCell: (params: GridCellParams) => (
+        <Tooltip title={params.value}>
+          <span className={styles.tooltip}>{params.value}</span>
+        </Tooltip>
+      ),
       width: 200,
     },
     {
       field: 'translation',
       headerName: 'Translation',
+      renderCell: (params: GridCellParams) => (
+        <Tooltip title={params.value}>
+          <span className={styles.tooltip}>{params.value}</span>
+        </Tooltip>
+      ),
       editable: true,
       width: 200,
     },

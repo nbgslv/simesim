@@ -14,6 +14,7 @@ import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
 import { verifyAdmin } from '../../utils/auth';
 import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
+import AdminCopy from '../../components/AdminCopy/AdminCopy';
 
 type ApiAsAdminTableData = (GridValidRowModel & ApiKey)[];
 
@@ -26,11 +27,18 @@ const ApiKeys = ({ apiKeys }: { apiKeys: ApiAsAdminTableData }) => {
     {
       field: 'id',
       headerName: 'ID',
-      width: 200,
+      renderCell: (params) => <AdminCopy>{params.value}</AdminCopy>,
+      width: 250,
     },
     {
       field: 'key',
       headerName: 'Key',
+      renderCell: (params) =>
+        params.value === '********' ? (
+          <span>{params.value}</span>
+        ) : (
+          <AdminCopy>{params.value}</AdminCopy>
+        ),
       width: 500,
     },
     {

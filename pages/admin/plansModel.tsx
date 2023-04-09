@@ -26,6 +26,7 @@ import PlansModelForm from '../../components/PlansModel/PlansModelForm';
 import styles from '../../styles/bundles.module.scss';
 import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
 import { verifyAdmin } from '../../utils/auth';
+import AdminCopy from '../../components/AdminCopy/AdminCopy';
 
 type PlanModelData = PlanModel &
   Prisma.PlanModelGetPayload<{
@@ -105,7 +106,10 @@ const PlansModel = ({
     {
       field: 'id',
       headerName: 'ID',
-      width: 220,
+      renderCell: (params: GridCellParams) => (
+        <AdminCopy>{params.value}</AdminCopy>
+      ),
+      width: 250,
     },
     {
       field: 'bundle',
@@ -172,6 +176,11 @@ const PlansModel = ({
     {
       field: 'name',
       headerName: 'Name',
+      renderCell: (params: GridCellParams) => (
+        <Tooltip title={params.value}>
+          <span className={styles.tooltip}>{params.value}</span>
+        </Tooltip>
+      ),
       width: 200,
       editable: true,
     },

@@ -1,4 +1,3 @@
-import { Tooltip } from '@mui/material';
 import { GridCellParams, GridRowId } from '@mui/x-data-grid';
 import { NextPageContext } from 'next';
 import React from 'react';
@@ -11,7 +10,7 @@ import AdminTable from '../../components/AdminTable/AdminTable';
 import RefillsAdminModal from '../../components/Refills/RefillsAdminModal';
 import prisma from '../../lib/prisma';
 import { verifyAdmin } from '../../utils/auth';
-import styles from '../../styles/bundles.module.scss';
+import AdminExpandableCell from '../../components/AdminExpandableCell/AdminExpandableCell';
 
 type BundleData = Bundle &
   Prisma.BundleGetPayload<{ select: { refills: true } }>;
@@ -62,16 +61,17 @@ const Bundles = ({ bundlesList }: { bundlesList: BundleAsAdminTableData }) => {
       headerName: 'Description',
       width: 200,
       renderCell: (params: GridCellParams) => (
-        <Tooltip title={params.value}>
-          <span className={styles.tooltip}>{params.value}</span>
-        </Tooltip>
+        <AdminExpandableCell value={params.value} length={10} />
       ),
     },
     {
       field: 'coverage',
       headerName: 'Coverage',
       renderCell: (params: GridCellParams) => (
-        <Button onClick={() => handleShowCountries(params.id)}>
+        <Button
+          style={{ fontSize: '14px' }}
+          onClick={() => handleShowCountries(params.id)}
+        >
           Show Countries
         </Button>
       ),
