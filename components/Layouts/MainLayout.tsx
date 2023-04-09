@@ -58,7 +58,10 @@ const MainLayout = ({
   const router = useRouter();
 
   const handleScroll = useCallback(() => {
-    if (window.scrollY > 1200) {
+    if (
+      (!isMobile && window.scrollY > 1400) ||
+      (isMobile && window.scrollY > 1510)
+    ) {
       setShowOrderButton(true);
     } else {
       setShowOrderButton(false);
