@@ -1,0 +1,12 @@
+.tooltip {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis !important;
+  direction: ltr;
+  text-align: left;
+
+  :global * {
+    direction: ltr;
+    text-align: left;
+  }
+}

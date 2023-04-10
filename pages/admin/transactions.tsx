@@ -10,10 +10,13 @@ import {
 } from '@mui/x-data-grid';
 import { format, parseISO } from 'date-fns';
 import { Button } from 'react-bootstrap';
+import { Tooltip } from '@mui/material';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
 import { verifyAdmin } from '../../utils/auth';
+import AdminCopy from '../../components/AdminCopy/AdminCopy';
+import styles from '../../styles/bundles.module.scss';
 
 type TransactionAsAdminTableData = (GridValidRowModel & Transaction)[];
 
@@ -30,10 +33,15 @@ const Transactions = ({ transactions }: LinesProps) => {
     {
       field: 'id',
       headerName: 'ID',
+      renderCell: (params: GridCellParams) => (
+        <AdminCopy>{params.value}</AdminCopy>
+      ),
+      width: 250,
     },
     {
       field: 'createdAtExternal',
       headerName: 'Created At',
+      width: 150,
     },
     {
       field: 'status',
@@ -58,10 +66,23 @@ const Transactions = ({ transactions }: LinesProps) => {
     {
       field: 'reason',
       headerName: 'Reason',
+      renderCell: (params: GridCellParams) => (
+        <Tooltip title={params.value}>
+          <span className={styles.tooltip}>{params.value}</span>
+        </Tooltip>
+      ),
     },
     {
       field: 'transactionId',
       headerName: 'Transaction ID',
+      renderCell: (params: GridCellParams) => (
+        <Tooltip title={params.value}>
+          <AdminCopy>
+            <span className={styles.tooltip}>{params.value}</span>
+          </AdminCopy>
+        </Tooltip>
+      ),
+      width: 250,
     },
     {
       field: 'invoiceHash',

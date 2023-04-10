@@ -70,14 +70,27 @@ const Blog = ({ posts }: BlogProps) => {
     {
       field: 'id',
       headerName: 'ID',
+      width: 250,
     },
     {
       field: 'title',
       headerName: 'Title',
+      renderCell: (params: GridCellParams) => (
+        <Tooltip title={params.value}>
+          <span className={styles.tooltip}>{params.value}</span>
+        </Tooltip>
+      ),
+      width: 200,
     },
     {
       field: 'slug',
       headerName: 'Slug',
+      renderCell: (params: GridCellParams) => (
+        <Tooltip title={params.value}>
+          <span className={styles.tooltip}>{params.value}</span>
+        </Tooltip>
+      ),
+      width: 200,
     },
     {
       field: 'description',
@@ -87,6 +100,7 @@ const Blog = ({ posts }: BlogProps) => {
           <span className={styles.tooltip}>{params.value}</span>
         </Tooltip>
       ),
+      width: 250,
     },
     {
       field: 'content',
@@ -129,10 +143,12 @@ const Blog = ({ posts }: BlogProps) => {
     {
       field: 'createdAt',
       headerName: 'Created At',
+      width: 150,
     },
     {
       field: 'updatedAt',
       headerName: 'Updated At',
+      width: 150,
     },
   ];
 

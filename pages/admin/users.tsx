@@ -14,6 +14,7 @@ import { verifyAdmin } from '../../utils/auth';
 import FormModal from '../../components/AdminTable/FormModal';
 import UsersForm from '../../components/Users/UsersForm';
 import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
+import AdminCopy from '../../components/AdminCopy/AdminCopy';
 
 type UserData = User &
   Prisma.UserGetPayload<{
@@ -43,17 +44,22 @@ const Users = ({ users }: UsersProps) => {
     {
       field: 'id',
       headerName: 'ID',
+      renderCell: (params) => <AdminCopy>{params.value}</AdminCopy>,
       width: 250,
     },
     {
       field: 'email',
       headerName: 'Phone',
+      align: 'right',
+      renderCell: (params) => <AdminCopy>{params.value}</AdminCopy>,
       editable: true,
+      width: 120,
     },
     {
       field: 'emailEmail',
       headerName: 'Email',
-      width: 200,
+      renderCell: (params) => <AdminCopy>{params.value}</AdminCopy>,
+      width: 250,
       editable: true,
     },
     {

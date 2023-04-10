@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { PhoneBrand, SupportedPhones } from '@prisma/client';
 import {
+  GridCellParams,
   GridColumns,
   GridRowId,
   GridSelectionModel,
@@ -12,6 +13,7 @@ import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { Tooltip } from '@mui/material';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
@@ -22,6 +24,7 @@ import FormModal from '../../components/AdminTable/FormModal';
 import SupportedPhonesForm from '../../components/SupportedPhones/SupportedPhonesForm';
 import AdminSelect from '../../components/AdminSelect/AdminSelect';
 import PhoneBrandAdminModal from '../../components/PhoneBrand/PhoneBrandAdminModal';
+import styles from '../../styles/bundles.module.scss';
 
 type SupportedPhonesAsAdminTableData = (GridValidRowModel & SupportedPhones)[];
 
@@ -52,12 +55,22 @@ const Countries = ({
     {
       field: 'phoneModel',
       headerName: 'Model',
+      renderCell: (params: GridCellParams) => (
+        <Tooltip title={params.value}>
+          <span className={styles.tooltip}>{params.value}</span>
+        </Tooltip>
+      ),
       editable: true,
       width: 250,
     },
     {
       field: 'brand',
       headerName: 'Brand Name',
+      renderCell: (params: GridCellParams) => (
+        <Tooltip title={params.value.name}>
+          <span className={styles.tooltip}>{params.value.name}</span>
+        </Tooltip>
+      ),
       valueFormatter: ({ value }) => value.name,
       width: 150,
     },

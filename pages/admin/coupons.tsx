@@ -2,7 +2,12 @@ import { NextPageContext } from 'next';
 import React, { useEffect, useState } from 'react';
 import { format, parse, parseISO } from 'date-fns';
 import { Coupon, PlanModel, Prisma } from '@prisma/client';
-import { GridColumns, GridRowId, GridValidRowModel } from '@mui/x-data-grid';
+import {
+  GridCellParams,
+  GridColumns,
+  GridRowId,
+  GridValidRowModel,
+} from '@mui/x-data-grid';
 import NiceModal, { bootstrapDialog, useModal } from '@ebay/nice-modal-react';
 import { Button } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
@@ -18,6 +23,7 @@ import AdminOffcanvas from '../../components/Offcanvas/AdminOffcanvas';
 import PlanModelData from '../../components/Offcanvas/PlanModelData/PlanModelData';
 import AdminSelect from '../../components/AdminSelect/AdminSelect';
 import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
+import AdminCopy from '../../components/AdminCopy/AdminCopy';
 
 type CouponData = Coupon &
   Prisma.CouponGetPayload<{
@@ -80,11 +86,18 @@ const Coupons = ({
     {
       field: 'id',
       headerName: 'ID',
+      renderCell: (params: GridCellParams) => (
+        <AdminCopy>{params.value}</AdminCopy>
+      ),
       width: 250,
     },
     {
       field: 'code',
       headerName: 'Code',
+      renderCell: (params: GridCellParams) => (
+        <AdminCopy>{params.value}</AdminCopy>
+      ),
+      width: 150,
       editable: true,
     },
     {
