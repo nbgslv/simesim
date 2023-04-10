@@ -134,4 +134,26 @@ export default class Email {
     // eslint-disable-next-line no-console
     console.log({ emailSent });
   }
+
+  async sendSmtpEmail(
+    body: string,
+    subject: string,
+    to: string,
+    variables: Record<any, any>
+  ) {
+    const mailBodyWithVariables = Object.keys(variables).reduce(
+      (acc, key) => acc.replace(`{{${key}}}`, variables[key]),
+      body
+    );
+    const mailOptions = {
+      from: this.notificationsSender,
+      to,
+      subject,
+      html: mailBodyWithVariables,
+    };
+
+    const emailSent = await this.nodemailer.sendMail(mailOptions);
+    // eslint-disable-next-line no-console
+    console.log({ emailSent });
+  }
 }
