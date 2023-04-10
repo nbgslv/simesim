@@ -43,6 +43,7 @@ type AdminTableProps<T extends GridValidRowModel> = {
   >;
   deleteRows?: (ids: GridRowId[]) => Promise<void>;
   deleteRow?: (id: GridRowId) => Promise<void>;
+  className?: string;
 };
 
 function useApiRef({ columns }: { columns: any }) {
@@ -79,6 +80,7 @@ const AdminTable = <T extends GridValidRowModel>({
   addRow,
   deleteRows,
   deleteRow,
+  className,
 }: AdminTableProps<T>) => {
   const [dataRows, setDataRows] = React.useState<GridRowModel<T>[]>(data);
   const [
@@ -164,10 +166,12 @@ const AdminTable = <T extends GridValidRowModel>({
     ) ?? oldRow;
 
   return (
-    <div className={styles.main}>
+    <div className={`${styles.main}${className ? `${className}` : ''}`}>
       {title && <h2>{title}</h2>}
       <div className={styles.table} dir="ltr">
         <DataGrid
+          autoHeight
+          getRowHeight={() => 'auto'}
           pageSize={limit}
           pagination
           columns={rowActions.length ? columnsWithActions : columnsWithApi}

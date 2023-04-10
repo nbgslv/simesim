@@ -22,6 +22,9 @@ import RefillsAdminModal from '../../components/Refills/RefillsAdminModal';
 import prisma from '../../lib/prisma';
 import { verifyAdmin } from '../../utils/auth';
 import AdminApi from '../../utils/api/services/adminApi';
+import AdminCopy from '../../components/AdminCopy/AdminCopy';
+import AdminExpandableCell from '../../components/AdminExpandableCell/AdminExpandableCell';
+import styles from '../../styles/lines.module.scss';
 
 type LineData = Line & Prisma.LineGetPayload<{ select: { plan: true } }>;
 
@@ -45,10 +48,18 @@ const Lines = ({ lines }: LinesProps) => {
     {
       field: 'id',
       headerName: 'ID',
+      renderCell: (params: GridCellParams) => (
+        <AdminCopy>{params.value}</AdminCopy>
+      ),
+      width: 250,
     },
     {
-      field: 'externalId',
-      headerName: 'External ID',
+      field: 'iccid',
+      headerName: 'ICCID',
+      renderCell: (params: GridCellParams) => (
+        <AdminCopy>{params.value}</AdminCopy>
+      ),
+      width: 220,
     },
     {
       field: 'plan',
@@ -58,14 +69,6 @@ const Lines = ({ lines }: LinesProps) => {
           <FontAwesomeIcon icon={solid('up-right-from-square')} />
         </Button>
       ),
-    },
-    {
-      field: 'iccid',
-      headerName: 'ICCID',
-    },
-    {
-      field: 'productId',
-      headerName: 'Product ID',
     },
     {
       field: 'allowedUsageKb',
@@ -104,6 +107,11 @@ const Lines = ({ lines }: LinesProps) => {
     {
       field: 'notes',
       headerName: 'Notes',
+      renderCell: (params: GridCellParams) => (
+        <AdminExpandableCell value={params.value} />
+      ),
+      width: 200,
+      cellClassName: styles.notesCell,
     },
     {
       field: 'autoRefillTurnedOn',
@@ -112,10 +120,12 @@ const Lines = ({ lines }: LinesProps) => {
     {
       field: 'createdAt',
       headerName: 'Created At',
+      width: 150,
     },
     {
       field: 'updatedAt',
       headerName: 'Updated At',
+      width: 150,
     },
   ];
 
@@ -201,17 +211,17 @@ export async function getServerSideProps(context: NextPageContext) {
           payment: true,
           planModel: {
             include: {
-              refill: {
-                include: {
-                  bundle: {
-                    include: {
-                      refills: true,
-                    },
-                  },
-                },
-              },
               plans: true,
               coupons: true,
+            },
+          },
+          refill: {
+            include: {
+              bundle: {
+                include: {
+                  refills: true,
+                },
+              },
             },
           },
         },
@@ -224,6 +234,29 @@ export async function getServerSideProps(context: NextPageContext) {
     plan: line.plan
       ? {
           ...line.plan,
+          refill: line.plan.refill
+            ? {
+                ...line.plan.refill,
+                bundle: {
+                  ...line.plan.refill.bundle,
+                  refills: line.plan.refill.bundle.refills.map((refill) => ({
+                    ...refill,
+                    createdAt: format(refill.createdAt, 'dd/MM/yy kk:mm'),
+                    updatedAt: format(refill.updatedAt, 'dd/MM/yy kk:mm'),
+                  })),
+                  createdAt: format(
+                    line.plan.refill.bundle.createdAt,
+                    'dd/MM/yy kk:mm'
+                  ),
+                  updatedAt: format(
+                    line.plan.refill.bundle.updatedAt,
+                    'dd/MM/yy kk:mm'
+                  ),
+                },
+                createdAt: format(line.plan.createdAt, 'dd/MM/yy kk:mm'),
+                updatedAt: format(line.plan.updatedAt, 'dd/MM/yy kk:mm'),
+              }
+            : null,
           user: {
             ...line.plan.user,
             lastLogin: line.plan.user.lastLogin
@@ -253,35 +286,6 @@ export async function getServerSideProps(context: NextPageContext) {
             : null,
           planModel: {
             ...line.plan.planModel,
-            bundle: {
-              ...line.plan.planModel.refill.bundle,
-              refills: line.plan.planModel.refill.bundle.refills.map(
-                (refill) => ({
-                  ...refill,
-                  createdAt: format(refill.createdAt, 'dd/MM/yy kk:mm'),
-                  updatedAt: format(refill.updatedAt, 'dd/MM/yy kk:mm'),
-                })
-              ),
-              createdAt: format(
-                line.plan.planModel.refill.bundle.createdAt,
-                'dd/MM/yy kk:mm'
-              ),
-              updatedAt: format(
-                line.plan.planModel.refill.bundle.updatedAt,
-                'dd/MM/yy kk:mm'
-              ),
-            },
-            refill: {
-              ...line.plan.planModel.refill,
-              createdAt: format(
-                line.plan.planModel.refill.createdAt,
-                'dd/MM/yy kk:mm'
-              ),
-              updatedAt: format(
-                line.plan.planModel.refill.updatedAt,
-                'dd/MM/yy kk:mm'
-              ),
-            },
             plans: line.plan.planModel.plans.map((plan) => ({
               ...plan,
               createdAt: format(plan.createdAt, 'dd/MM/yy kk:mm'),
@@ -303,6 +307,7 @@ export async function getServerSideProps(context: NextPageContext) {
             : null,
         }
       : null,
+    expiredAt: line.expiredAt ? format(line.expiredAt, 'dd/MM/yy kk:mm') : null,
     createdAt: format(line.createdAt, 'dd/MM/yy kk:mm'),
     updatedAt: format(line.updatedAt, 'dd/MM/yy kk:mm'),
   }));

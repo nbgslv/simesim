@@ -2,12 +2,19 @@ import { NextPageContext } from 'next';
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { Inquiry } from '@prisma/client';
-import { GridColumns, GridRowId, GridValidRowModel } from '@mui/x-data-grid';
+import {
+  GridCellParams,
+  GridColumns,
+  GridRowId,
+  GridValidRowModel,
+} from '@mui/x-data-grid';
 import AdminLayout from '../../components/Layouts/AdminLayout';
 import AdminTable from '../../components/AdminTable/AdminTable';
 import prisma from '../../lib/prisma';
 import { verifyAdmin } from '../../utils/auth';
 import AdminApi, { AdminApiAction } from '../../utils/api/services/adminApi';
+import AdminCopy from '../../components/AdminCopy/AdminCopy';
+import AdminExpandableCell from '../../components/AdminExpandableCell/AdminExpandableCell';
 
 type InquiriesAsAdminTableData = (GridValidRowModel & Inquiry)[];
 
@@ -31,17 +38,21 @@ const Inquiries = ({ inquiries }: { inquiries: InquiriesAsAdminTableData }) => {
     {
       field: 'email',
       headerName: 'Email',
-      width: 200,
+      renderCell: (params: GridCellParams) => (
+        <AdminCopy>{params.value}</AdminCopy>
+      ),
+      width: 250,
     },
     {
       field: 'message',
       headerName: 'Message',
-      width: 200,
+      renderCell: (params) => <AdminExpandableCell value={params.value} />,
+      width: 250,
     },
     {
       field: 'createdAt',
       headerName: 'Received At',
-      width: 200,
+      width: 150,
     },
   ];
 
