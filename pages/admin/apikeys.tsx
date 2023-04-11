@@ -27,7 +27,7 @@ const ApiKeys = ({ apiKeys }: { apiKeys: ApiAsAdminTableData }) => {
     {
       field: 'id',
       headerName: 'ID',
-      renderCell: (params) => <AdminCopy>{params.value}</AdminCopy>,
+      renderCell: (params) => <AdminCopy value={params.value} />,
       width: 250,
     },
     {
@@ -37,7 +37,7 @@ const ApiKeys = ({ apiKeys }: { apiKeys: ApiAsAdminTableData }) => {
         params.value === '********' ? (
           <span>{params.value}</span>
         ) : (
-          <AdminCopy>{params.value}</AdminCopy>
+          <AdminCopy value={params.value} />
         ),
       width: 500,
     },

@@ -87,7 +87,7 @@ const Coupons = ({
       field: 'id',
       headerName: 'ID',
       renderCell: (params: GridCellParams) => (
-        <AdminCopy>{params.value}</AdminCopy>
+        <AdminCopy value={params.value} />
       ),
       width: 250,
     },
@@ -95,7 +95,7 @@ const Coupons = ({
       field: 'code',
       headerName: 'Code',
       renderCell: (params: GridCellParams) => (
-        <AdminCopy>{params.value}</AdminCopy>
+        <AdminCopy value={params.value} />
       ),
       width: 150,
       editable: true,

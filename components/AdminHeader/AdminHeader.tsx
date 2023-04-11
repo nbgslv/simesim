@@ -3,6 +3,7 @@ import { Nav, Navbar } from 'react-bootstrap';
 import * as Sentry from '@sentry/nextjs';
 import Image from 'next/legacy/image';
 import { signOut } from 'next-auth/react';
+import Link from 'next/link';
 import styles from './AdminHeader.module.scss';
 
 const AdminHeader = () => (
@@ -10,51 +11,48 @@ const AdminHeader = () => (
     <Navbar.Toggle aria-controls="basic-navbar-nav" />
     <Navbar.Collapse id="basic-navbar-nav">
       <Nav>
-        <Nav.Link eventKey="/admin/main" href="/admin/main">
-          ראשי
-        </Nav.Link>
-        <Nav.Link eventKey="/admin/plans" href="/admin/plans">
-          תכניות
-        </Nav.Link>
-        <Nav.Link eventKey="/admin/lines" href="/admin/lines">
-          קווים
-        </Nav.Link>
-        <Nav.Link eventKey="/admin/bundles" href="/admin/bundles">
-          חבילות
-        </Nav.Link>
-        <Nav.Link eventKey="/admin/plansModel" href="/admin/plansModel">
-          מודלים
-        </Nav.Link>
-        <Nav.Link eventKey="/admin/countries" href="/admin/countries">
-          מדינות
-        </Nav.Link>
-        <Nav.Link eventKey="/admin/coupons" href="/admin/coupons">
-          קופונים
-        </Nav.Link>
-        <Nav.Link eventKey="/admin/users" href="/admin/transactions">
-          תנועות
-        </Nav.Link>
-        <Nav.Link eventKey="/admin/users" href="/admin/users">
-          משתמשים
-        </Nav.Link>
-        <Nav.Link
-          eventKey="/admin/supportedphones"
-          href="/admin/supportedphones"
-        >
-          טלפונים נתמכים
-        </Nav.Link>
-        <Nav.Link eventKey="/admin/blog" href="/admin/blog">
-          בלוג
-        </Nav.Link>
-        <Nav.Link eventKey="/admin/inquiries" href="/admin/inquiries">
-          פניות
-        </Nav.Link>
-        <Nav.Link eventKey="/admin/apikeys" href="/admin/apikeys">
-          API
-        </Nav.Link>
-        <Nav.Link eventKey="/settings" href="/admin/settings">
-          הגדרות
-        </Nav.Link>
+        <Link href="/admin/main" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/main">ראשי</Nav.Link>
+        </Link>
+        <Link href="/admin/plans" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/plans">תכניות</Nav.Link>
+        </Link>
+        <Link href="/admin/lines" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/lines">קווים</Nav.Link>
+        </Link>
+        <Link href="/admin/bundles" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/bundles">חבילות</Nav.Link>
+        </Link>
+        <Link href="/admin/plansModel" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/plansModel">מודלים</Nav.Link>
+        </Link>
+        <Link href="/admin/countries" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/countries">מדינות</Nav.Link>
+        </Link>
+        <Link href="/admin/coupons" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/coupons">קופונים</Nav.Link>
+        </Link>
+        <Link href="/admin/transactions" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/transactions">תנועות</Nav.Link>
+        </Link>
+        <Link href="/admin/users" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/users">משתמשים</Nav.Link>
+        </Link>
+        <Link href="/admin/supportedphones" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/supportedphones">טלפונים נתמכים</Nav.Link>
+        </Link>
+        <Link href="/admin/blog" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/blog">בלוג</Nav.Link>
+        </Link>
+        <Link href="/admin/inquiries" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/inquiries">פניות</Nav.Link>
+        </Link>
+        <Link href="/admin/apikeys" passHref legacyBehavior>
+          <Nav.Link eventKey="/admin/apikeys">API</Nav.Link>
+        </Link>
+        <Link href="/admin/settings" passHref legacyBehavior>
+          <Nav.Link eventKey="/settings">הגדרות</Nav.Link>
+        </Link>
       </Nav>
       <Nav className="me-auto">
         <Nav.Link
@@ -65,7 +63,9 @@ const AdminHeader = () => (
         >
           התנתק
         </Nav.Link>
-        <Nav.Link href="/">חזרה לאתר</Nav.Link>
+        <Link href="/" passHref legacyBehavior>
+          <Nav.Link>חזרה לאתר</Nav.Link>
+        </Link>
       </Nav>
     </Navbar.Collapse>
     <Navbar.Brand>

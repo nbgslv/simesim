@@ -39,7 +39,7 @@ const Inquiries = ({ inquiries }: { inquiries: InquiriesAsAdminTableData }) => {
       field: 'email',
       headerName: 'Email',
       renderCell: (params: GridCellParams) => (
-        <AdminCopy>{params.value}</AdminCopy>
+        <AdminCopy value={params.value} />
       ),
       width: 250,
     },

@@ -44,6 +44,7 @@ type AdminTableProps<T extends GridValidRowModel> = {
   deleteRows?: (ids: GridRowId[]) => Promise<void>;
   deleteRow?: (id: GridRowId) => Promise<void>;
   className?: string;
+  disableVirtualization?: boolean;
 };
 
 function useApiRef({ columns }: { columns: any }) {
@@ -75,12 +76,13 @@ const AdminTable = <T extends GridValidRowModel>({
   columns,
   multiActions = ['delete', 'add'],
   rowActions = ['delete', 'edit'],
-  limit = 20,
+  limit = 15,
   editMode = 'cell',
   addRow,
   deleteRows,
   deleteRow,
   className,
+  disableVirtualization = false,
 }: AdminTableProps<T>) => {
   const [dataRows, setDataRows] = React.useState<GridRowModel<T>[]>(data);
   const [
@@ -170,6 +172,7 @@ const AdminTable = <T extends GridValidRowModel>({
       {title && <h2>{title}</h2>}
       <div className={styles.table} dir="ltr">
         <DataGrid
+          disableVirtualization={disableVirtualization}
           autoHeight
           getRowHeight={() => 'auto'}
           pageSize={limit}

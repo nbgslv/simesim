@@ -28,10 +28,12 @@ const AdminExpandableCell = ({
 
   return (
     <div>
-      {expanded
-        ? typedValue
-        : shortValue?.substring?.(0, length) ??
-          (typedValue as string).substring(0, length)}
+      <span>
+        {expanded
+          ? typedValue
+          : shortValue?.substring?.(0, length) ??
+            (typedValue as string).substring(0, length)}
+      </span>
       &nbsp;
       {(shortValue ?? (typedValue as string)).length > length && (
         <Button

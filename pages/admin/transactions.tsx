@@ -34,7 +34,7 @@ const Transactions = ({ transactions }: LinesProps) => {
       field: 'id',
       headerName: 'ID',
       renderCell: (params: GridCellParams) => (
-        <AdminCopy>{params.value}</AdminCopy>
+        <AdminCopy value={params.value} />
       ),
       width: 250,
     },
@@ -77,9 +77,9 @@ const Transactions = ({ transactions }: LinesProps) => {
       headerName: 'Transaction ID',
       renderCell: (params: GridCellParams) => (
         <Tooltip title={params.value}>
-          <AdminCopy>
-            <span className={styles.tooltip}>{params.value}</span>
-          </AdminCopy>
+          <span className={styles.tooltip}>
+            <AdminCopy value={params.value} />
+          </span>
         </Tooltip>
       ),
       width: 250,

@@ -59,7 +59,7 @@ const SettingsPage = ({ settings }: SettingsProps) => {
       field: 'name',
       headerName: 'Name',
       width: 200,
-      renderCell: (params) => <AdminCopy>{params.value}</AdminCopy>,
+      renderCell: (params) => <AdminCopy value={params.value} />,
       editable: true,
     },
     {

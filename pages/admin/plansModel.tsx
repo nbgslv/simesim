@@ -107,7 +107,7 @@ const PlansModel = ({
       field: 'id',
       headerName: 'ID',
       renderCell: (params: GridCellParams) => (
-        <AdminCopy>{params.value}</AdminCopy>
+        <AdminCopy value={params.value} />
       ),
       width: 250,
     },
