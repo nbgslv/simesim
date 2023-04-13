@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`useAddActions renders correctly 1`] = `
+{
+  "current": {
+    "columns": [
+      {
+        "field": "id",
+        "headerName": "ID",
+        "width": 100,
+      },
+      {
+        "field": "name",
+        "headerName": "Name",
+        "width": 200,
+      },
+      {
+        "field": "actions",
+        "getActions": [Function],
+        "headerName": "Actions",
+        "type": "actions",
+      },
+    ],
+  },
+}
+`;

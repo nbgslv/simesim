@@ -8,6 +8,17 @@ describe('AdminExpandableCell', () => {
   const shortValue = 'Lorem ipsum dolor';
   const length = 20;
 
+  it('matches snapshot', () => {
+    const { container } = render(
+      <AdminExpandableCell
+        value={value}
+        shortValue={shortValue}
+        length={length}
+      />
+    );
+    expect(container).toMatchSnapshot();
+  });
+
   it('renders the short value by default', () => {
     render(
       <AdminExpandableCell

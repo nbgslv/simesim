@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AdminTable matches snapshot 1`] = `
+<div>
+  <div
+    class="main"
+  >
+    <div
+      class="table"
+      dir="ltr"
+    >
+      <table>
+        <thead>
+          <tr>
+            <th />
+            <th>
+              ID
+            </th>
+            <th>
+              Name
+            </th>
+            <th>
+              Age
+            </th>
+            <th />
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <input
+                type="checkbox"
+              />
+            </td>
+            <td>
+              1
+            </td>
+            <td>
+              John Smith
+            </td>
+            <td>
+              35
+            </td>
+            <td />
+          </tr>
+          <tr>
+            <td>
+              <input
+                type="checkbox"
+              />
+            </td>
+            <td>
+              2
+            </td>
+            <td>
+              Jane Doe
+            </td>
+            <td>
+              25
+            </td>
+            <td />
+          </tr>
+          <tr>
+            <td>
+              <input
+                type="checkbox"
+              />
+            </td>
+            <td>
+              3
+            </td>
+            <td>
+              Bob Johnson
+            </td>
+            <td>
+              45
+            </td>
+            <td />
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+`;

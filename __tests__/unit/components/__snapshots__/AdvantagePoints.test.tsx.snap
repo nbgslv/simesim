@@ -1,0 +1,74 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AdvantagePoints matches snapshot 1`] = `
+<div>
+  <div
+    class="main container"
+  >
+    <div
+      class="mb-2 row"
+      layout="position"
+    >
+      <div
+        class="column col"
+        data-testid="first-column"
+      >
+        <div
+          class="icon"
+        />
+        <div
+          class="title"
+        >
+          החזר כספי מובטח
+        </div>
+      </div>
+      <div
+        class="column col"
+        data-testid="second-column"
+      >
+        <div
+          class="icon"
+        />
+        <div
+          class="title"
+        >
+          אבטחת המידע שלכם
+        </div>
+      </div>
+      <div
+        class="column col"
+        data-testid="third-column"
+      >
+        <div
+          class="icon"
+        />
+        <div
+          class="title"
+        >
+          מגוון חבילות חו"ל רחב
+        </div>
+      </div>
+      <div
+        class="column col"
+        data-testid="fourth-column"
+      >
+        <div
+          class="icon"
+        />
+        <div
+          class="title"
+        >
+          שירות ותמיכה מסביב לשעון
+        </div>
+      </div>
+    </div>
+    <div
+      class="empty row"
+    >
+      <div
+        class="col"
+      />
+    </div>
+  </div>
+</div>
+`;

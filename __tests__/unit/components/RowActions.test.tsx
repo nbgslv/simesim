@@ -20,6 +20,22 @@ describe('RowActions', () => {
     rowModesModel[row.id] = { mode: 'view' };
   });
 
+  it('matches snapshot', () => {
+    const { container } = render(
+      // @ts-ignore
+      <RowActions
+        rowModesModel={rowModesModel}
+        row={row}
+        rowsActions={rowsActions}
+        setRowModesModel={setRowModesModel}
+        setRows={setRows}
+        rows={rows}
+        onDelete={onDelete}
+      />
+    );
+    expect(container).toMatchSnapshot();
+  });
+
   it('renders the edit and delete actions', () => {
     render(
       // @ts-ignore

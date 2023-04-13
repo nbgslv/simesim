@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AdminExpandableCell matches snapshot 1`] = `
+<div>
+  <div>
+    <span>
+      Lorem ipsum dolor
+    </span>
+     
+  </div>
+</div>
+`;

@@ -58,6 +58,18 @@ describe('AdminTable', () => {
     { id: 3, name: 'Bob Johnson', age: 45 },
   ];
 
+  it('matches snapshot', () => {
+    const { container } = render(
+      <AdminTable
+        disableVirtualization
+        rowActions={[]}
+        data={rows}
+        columns={columns}
+      />
+    );
+    expect(container).toMatchSnapshot();
+  });
+
   it('renders basic table without errors', () => {
     render(
       <AdminTable

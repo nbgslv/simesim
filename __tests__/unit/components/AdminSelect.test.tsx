@@ -5,6 +5,8 @@ import AdminSelect, {
   AdminSelectOption,
 } from '../../../components/AdminSelect/AdminSelect';
 
+const onSelect = jest.fn();
+
 const options: AdminSelectOption[] = [
   { label: 'Option 1', value: '1' },
   { label: 'Option 2', value: '2' },
@@ -12,8 +14,18 @@ const options: AdminSelectOption[] = [
 ];
 
 describe('AdminSelect', () => {
+  it('matches snapshot', () => {
+    const { container } = render(
+      <AdminSelect
+        ariaLabel="test-label"
+        options={options}
+        onSelect={onSelect}
+      />
+    );
+    expect(container).toMatchSnapshot();
+  });
+
   it('renders select options', () => {
-    const onSelect = jest.fn();
     const { getByRole, getByText } = render(
       <AdminSelect
         ariaLabel="test-label"
@@ -30,7 +42,6 @@ describe('AdminSelect', () => {
   });
 
   it('calls onSelect when an option is selected', () => {
-    const onSelect = jest.fn();
     const { getByText, getByRole } = render(
       <AdminSelect
         ariaLabel="test-label"
@@ -50,7 +61,6 @@ describe('AdminSelect', () => {
     const defaultValue: AdminSelectOption[] = [
       { label: 'Option 1', value: '1' },
     ];
-    const onSelect = jest.fn();
     const { getByText } = render(
       <AdminSelect
         ariaLabel="test-label"
@@ -63,7 +73,6 @@ describe('AdminSelect', () => {
   });
 
   it('allows to search for a value', () => {
-    const onSelect = jest.fn();
     const { getByRole, getAllByText } = render(
       <AdminSelect
         ariaLabel="test-label"
@@ -81,7 +90,6 @@ describe('AdminSelect', () => {
   });
 
   it('allows to select multiple values', () => {
-    const onSelect = jest.fn();
     const { getByRole, getAllByText, getByText, getAllByLabelText } = render(
       <AdminSelect
         ariaLabel="test-label"
@@ -114,7 +122,6 @@ describe('AdminSelect', () => {
   });
 
   it('shows default value for single select', () => {
-    const onSelect = jest.fn();
     const { getAllByText, getByText } = render(
       <AdminSelect
         ariaLabel="test-label"
@@ -132,7 +139,6 @@ describe('AdminSelect', () => {
   });
 
   it('shows default value for multi select', () => {
-    const onSelect = jest.fn();
     const { getByText } = render(
       <form role="form">
         <AdminSelect

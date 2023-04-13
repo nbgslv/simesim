@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ShareButton renders correctly 1`] = `
+<div>
+  <div
+    aria-label="Share this blog"
+    class="dropdown dropdown"
+  >
+    <button
+      aria-expanded="false"
+      class="dropdown-toggle btn btn-primary"
+      id="dropdown-basic"
+      type="button"
+    />
+  </div>
+</div>
+`;

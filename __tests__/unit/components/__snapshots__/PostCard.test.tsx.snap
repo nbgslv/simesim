@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PostCard component matches snapshot 1`] = `
+<div>
+  <a
+    class="cardLink"
+    data-testid="/blog/test-post"
+    href="/blog/test-post"
+  >
+    <div
+      style="transform: none;"
+    >
+      <div
+        class="main card"
+      >
+        <img
+          alt="Test Post"
+          class="card-img-top coverImage"
+          src="undefined/https://picsum.photos/500/200"
+        />
+        <div
+          class="card-body"
+        >
+          <div
+            class="title card-title h5"
+          >
+            Test Post
+          </div>
+          <p
+            class="description card-text"
+          >
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            ...
+          </p>
+        </div>
+      </div>
+    </div>
+  </a>
+</div>
+`;

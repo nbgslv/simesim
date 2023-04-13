@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EditToolbar matches snapshot 1`] = `
+<div>
+  <div
+    class="position-relative"
+    dir="rtl"
+  >
+    <div>
+      <button
+        class="button btn btn-primary"
+        type="button"
+      >
+        חדש
+      </button>
+      <button
+        class="button btn btn-primary"
+        disabled=""
+        type="button"
+      >
+        מחק
+      </button>
+    </div>
+  </div>
+</div>
+`;

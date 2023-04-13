@@ -33,6 +33,7 @@ const AdvantagePoints = () => {
     <Container className={styles.main}>
       <Row layout="position" className="mb-2">
         <Col
+          data-testid="first-column"
           onMouseEnter={() =>
             setMessage('רכשתם חבילה והטלפון לא תומך? קבלו החזר כספי בלי שאלות')
           }
@@ -45,6 +46,7 @@ const AdvantagePoints = () => {
           <div className={styles.title}>החזר כספי מובטח</div>
         </Col>
         <Col
+          data-testid="second-column"
           onMouseEnter={() =>
             setMessage(
               'כל הפרטים באתר מוצפנים ומועברים בצורה מאובטחת בטכנולוגיית SSL. כל עסקאות האשראי מאובטחות בתקן PCI המתקדם'
@@ -59,6 +61,7 @@ const AdvantagePoints = () => {
           <div className={styles.title}>אבטחת המידע שלכם</div>
         </Col>
         <Col
+          data-testid="third-column"
           onMouseEnter={() =>
             setMessage(
               'מגוון חבילות חו"ל רחב במחירים הנמוכים ביותר; יותר מ-100 מדינות נתמכות; מעבר בין מדינות בלי להחליף eSim!'
@@ -73,6 +76,7 @@ const AdvantagePoints = () => {
           <div className={styles.title}>מגוון חבילות חו&quot;ל רחב</div>
         </Col>
         <Col
+          data-testid="fourth-column"
           onMouseEnter={() =>
             setMessage("גישה לחבילות ותמיכה בוואצאפ, בצ'אט ובטלפון מסביב לשעון")
           }

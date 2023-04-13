@@ -18,6 +18,11 @@ describe('ConfirmationModal', () => {
     jest.clearAllMocks();
   });
 
+  it('matches snapshot', () => {
+    const { container } = render(<ConfirmationModal {...props} />);
+    expect(container).toMatchSnapshot();
+  });
+
   it('should render the modal with the correct title and body', () => {
     const { getByText } = render(<ConfirmationModal {...props} />);
 

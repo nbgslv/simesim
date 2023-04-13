@@ -22,6 +22,21 @@ describe('useAddActions', () => {
     setRows.mockClear();
   });
 
+  it('renders correctly', () => {
+    const { result } = renderHook(() =>
+      useAddActions({
+        columns,
+        rowsActions,
+        rowModesModel: rowModesModel as GridRowModesModel,
+        setRowModesModel,
+        setRows,
+        rows,
+        onDelete,
+      })
+    );
+    expect(result).toMatchSnapshot();
+  });
+
   it('should add an actions column to the columns array', () => {
     const { result } = renderHook(() =>
       useAddActions({

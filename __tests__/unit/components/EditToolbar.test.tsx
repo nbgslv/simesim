@@ -1,5 +1,6 @@
 import { render, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
+import { library } from '@fortawesome/fontawesome-svg-core';
 import EditToolbar from '../../../components/AdminTable/EditToolbar';
 
 jest.mock('@mui/x-data-grid', () => ({
@@ -7,6 +8,8 @@ jest.mock('@mui/x-data-grid', () => ({
     <div>{children}</div>
   ),
 }));
+
+library.add({ icon: [0, 0, [], '', ''], prefix: 'fas', iconName: 'plus' });
 
 describe('EditToolbar', () => {
   const props = {
@@ -18,6 +21,11 @@ describe('EditToolbar', () => {
     deleteRows: jest.fn(),
     loading: false,
   };
+
+  it('matches snapshot', () => {
+    const { container } = render(<EditToolbar {...props} />);
+    expect(container).toMatchSnapshot();
+  });
 
   it('should render correctly', () => {
     const { getByText } = render(<EditToolbar {...props} />);

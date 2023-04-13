@@ -10,6 +10,11 @@ Object.assign(navigator, {
 });
 
 describe('AdminCopy', () => {
+  it('matches snapshot', () => {
+    const { container } = render(<AdminCopy value="Text to copy" />);
+    expect(container).toMatchSnapshot();
+  });
+
   it('renders the copy button', () => {
     render(<AdminCopy value="Text to copy" />);
     expect(screen.getByRole('button')).toBeInTheDocument();

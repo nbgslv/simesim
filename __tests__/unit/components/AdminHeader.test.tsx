@@ -18,13 +18,18 @@ describe('AdminHeader', () => {
     Router.events.off('routeChangeStart', spies.routerChangeStart);
   });
 
-  test('renders the header with all navigation links', () => {
+  it('matches snapshot', () => {
+    const { container } = render(<AdminHeader />);
+    expect(container).toMatchSnapshot();
+  });
+
+  it('renders the header with all navigation links', () => {
     render(<AdminHeader />);
 
     expect(screen.getAllByRole('link')).toHaveLength(15);
   });
 
-  test('clicking the sign out link calls Sentry.setUser and signOut', () => {
+  it('clicking the sign out link calls Sentry.setUser and signOut', () => {
     const setUserMock = jest.spyOn(Sentry, 'setUser');
 
     render(<AdminHeader />);

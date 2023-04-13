@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AdminCopy matches snapshot 1`] = `
+<div>
+  <div
+    class="main"
+  >
+    <button
+      class="copyButton btn btn-primary"
+      type="button"
+    >
+      <span
+        class="me-1"
+      >
+        Text to copy
+      </span>
+    </button>
+  </div>
+</div>
+`;
