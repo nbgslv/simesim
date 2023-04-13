@@ -5,35 +5,6 @@ import { Router } from 'next/router';
 import React from 'react';
 import AdminHeader from '../../../components/AdminHeader/AdminHeader';
 
-jest.mock('@sentry/nextjs');
-jest.mock('next/link', () => ({ children }: { children: React.ReactNode }) =>
-  React.cloneElement(children as React.ReactElement, { href: '/' } as any)
-);
-jest.mock('next-auth/react', () => {
-  const originalModule = jest.requireActual('next-auth/react');
-  const mockSession = {
-    expires: new Date(Date.now() + 2 * 86400).toISOString(),
-    user: {
-      email: '0512345678',
-      emailEmail: 'test@test.com',
-      id: 'clcclcclcclcclcclc1234',
-      image: null,
-      name: 'foo bar',
-      role: 'ADMIN',
-    },
-  };
-  return {
-    __esModule: true,
-    ...originalModule,
-    useSession: jest.fn(
-      () => ({ data: mockSession, status: 'authenticated' }) // return type is [] in v3 but changed to {} in v4
-    ),
-    signOut: jest.fn(() =>
-      Promise.resolve({ url: process.env.NEXTAUTH_URL as string })
-    ),
-  };
-});
-
 describe('AdminHeader', () => {
   const spies: any = {};
 

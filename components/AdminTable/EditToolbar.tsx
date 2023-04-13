@@ -71,7 +71,7 @@ const EditToolbar = ({
     <div dir="rtl" className="position-relative">
       {loading && (
         <div className={styles.spinner}>
-          <Spinner animation={'border'} />
+          <Spinner animation={'border'} data-testid="spinner" />
         </div>
       )}
       <GridToolbarContainer>

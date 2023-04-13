@@ -28,6 +28,7 @@ const ConfirmationModal = ({
 }: ConfirmationModalProps) => (
   <Modal
     id={id}
+    data-testid={id}
     show={show}
     onHide={cancelAction}
     className={styles.main}

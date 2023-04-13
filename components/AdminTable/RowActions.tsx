@@ -81,25 +81,9 @@ const RowActions = <T extends GridValidRowModel>({
     }
   };
 
-  if (inEditMode) {
-    return [
-      <GridActionsCellItem
-        key={0}
-        label={'שמור'}
-        icon={<FontAwesomeIcon icon={solid('floppy-disk')} />}
-        onClick={handleSaveClick((id as unknown) as GridRowParams)}
-      />,
-      <GridActionsCellItem
-        key={1}
-        label={'בטל'}
-        icon={<FontAwesomeIcon icon={solid('xmark')} />}
-        onClick={handleCancelClick((id as unknown) as GridRowParams)}
-      />,
-    ];
-  }
-
   const saveCell = (
     <GridActionsCellItem
+      key="save"
       label={'שמור'}
       icon={<FontAwesomeIcon icon={solid('floppy-disk')} />}
       onClick={handleSaveClick((id as unknown) as GridRowParams)}
@@ -108,6 +92,7 @@ const RowActions = <T extends GridValidRowModel>({
 
   const cancelCell = (
     <GridActionsCellItem
+      key="cancel"
       label={'בטל'}
       icon={<FontAwesomeIcon icon={solid('xmark')} />}
       onClick={handleCancelClick((id as unknown) as GridRowParams)}
@@ -116,6 +101,7 @@ const RowActions = <T extends GridValidRowModel>({
 
   const editCell = (
     <GridActionsCellItem
+      key="edit"
       label={'ערוך'}
       icon={<FontAwesomeIcon icon={solid('pen')} />}
       onClick={handleEditClick(id)}
@@ -124,6 +110,7 @@ const RowActions = <T extends GridValidRowModel>({
 
   const deleteCell = (
     <GridActionsCellItem
+      key="delete"
       label={'מחק'}
       icon={<FontAwesomeIcon icon={solid('trash')} />}
       onClick={handleDeleteClick(id)}

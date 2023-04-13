@@ -1,11 +1,47 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridColumns, GridRowModel } from '@mui/x-data-grid';
 import AdminTable from '../../../components/AdminTable/AdminTable';
+
+const handleRowsSelection = jest.fn((ids) => ids);
 
 jest.mock('@mui/x-data-grid/DataGrid', () => ({
   ...jest.requireActual('@mui/x-data-grid/DataGrid'),
-  DataGrid: jest.fn(() => <div data-test-id="data-grid" />),
+  DataGrid: jest.fn(
+    ({
+      rows,
+      columns,
+    }: {
+      rows: GridRowModel[];
+      columns: GridColumns<any>;
+    }) => (
+      <table>
+        <thead>
+          <tr>
+            <th />
+            {columns.map((column) => (
+              <th key={column.field}>{column.headerName}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.id}>
+              <td>
+                <input
+                  type="checkbox"
+                  onClick={() => jest.fn(() => handleRowsSelection([row.id]))}
+                />
+              </td>
+              {columns.map((column) => (
+                <td key={column.field}>{row[column.field]}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )
+  ),
 }));
 
 const mockedDataGrid = jest.mocked(DataGrid);
@@ -23,7 +59,14 @@ describe('AdminTable', () => {
   ];
 
   it('renders basic table without errors', () => {
-    render(<AdminTable data={rows} columns={columns} disableVirtualization />);
+    render(
+      <AdminTable
+        disableVirtualization
+        rowActions={[]}
+        data={rows}
+        columns={columns}
+      />
+    );
   });
 
   it('displays table rows and columns', () => {
@@ -36,45 +79,16 @@ describe('AdminTable', () => {
       {}
     );
   });
-  //
-  // it('invokes handleRowsSelection when a row is selected', () => {
-  //   const { getAllByRole } = render(
-  //     <AdminTable
-  //       data={rows}
-  //       columns={columns}
-  //       handleRowsSelection={handleRowsSelection}
-  //     />
-  //   );
-  //   const row = getAllByRole('row')[1];
-  //   fireEvent.click(row);
-  //   expect(handleRowsSelection).toHaveBeenCalledWith([2]);
-  // });
-  //
-  // it('invokes addRow when the add action is clicked', async () => {
-  //   const { getByRole } = render(
-  //     <AdminTable
-  //       data={rows}
-  //       columns={columns}
-  //       addRow={addRow}
-  //       multiActions={multiActions}
-  //     />
-  //   );
-  //   const addButton = getByRole('button', { name: /add/i });
-  //   fireEvent.click(addButton);
-  //   await waitFor(() => expect(addRow).toHaveBeenCalled());
-  // });
-  //
-  // it('invokes deleteRows when the delete action is clicked', async () => {
-  //   const { getByRole } = render(
-  //     <AdminTable
-  //       data={rows}
-  //       columns={columns}
-  //       deleteRows={deleteRows}
-  //       multiActions={multiActions}
-  //     />
-  //   );
-  //   const deleteButton = getByRole('button', { name: /delete/i });
-  //   fireEvent.click(deleteButton);
-  //   await waitFor(() => expect(deleteRows).toHaveBeenCalled());
-  // });
+
+  it('should display title', () => {
+    const { getByText } = render(
+      <AdminTable
+        disableVirtualization
+        title="Test Title"
+        data={rows}
+        columns={columns}
+      />
+    );
+    expect(getByText('Test Title')).toBeInTheDocument();
+  });
 });
